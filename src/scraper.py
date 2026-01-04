@@ -56,17 +56,30 @@ class PremierLeagueScraper:
             # Parse HTML
             soup = BeautifulSoup(response.content, 'html.parser')
 
-            # Find the league table - FBRef uses specific table IDs
-            # The main table is usually 'results{YEAR}{SEASON_ID}_overall'
-            # We'll look for tables with squad statistics
-            table = soup.find('table', {'id': lambda x: x and 'stats_squads_standard' in x})
+            # Find the league standings table with xG data
+            # Look for table with ID containing 'results' and 'overall'
+            table = soup.find('table', {'id': lambda x: x and 'results' in str(x) and 'overall' in str(x)})
 
             if not table:
-                # Try alternative table ID
-                table = soup.find('table', {'class': 'stats_table'})
+                # Fallback: try to find by caption
+                for potential_table in soup.find_all('table'):
+                    caption = potential_table.find('caption')
+                    if caption and 'Premier League Table' in caption.get_text():
+                        table = potential_table
+                        break
 
             if not table:
                 raise ValueError("Could not find league table on page")
+
+            # First, get column headers to find correct indices
+            headers = []
+            header_row = table.find('thead').find_all('tr')[-1]  # Get last header row
+            for th in header_row.find_all(['th', 'td']):
+                # Get data-stat attribute or text
+                col_name = th.get('data-stat', th.get_text(strip=True))
+                headers.append(col_name)
+
+            logger.info(f"Found {len(headers)} columns in table")
 
             # Extract table data
             teams_data = []
@@ -79,20 +92,31 @@ class PremierLeagueScraper:
 
                 cells = row.find_all(['th', 'td'])
 
-                # Extract data from cells
+                # Skip if not enough cells
+                if len(cells) < 10:
+                    continue
+
+                # Extract data from cells using data-stat attributes
                 try:
-                    team_name = cells[0].get_text(strip=True)
-                    matches_played = int(cells[2].get_text(strip=True))
+                    row_data = {}
+                    for i, cell in enumerate(cells):
+                        stat_name = cell.get('data-stat')
+                        value = cell.get_text(strip=True)
+                        if stat_name:
+                            row_data[stat_name] = value
 
-                    # Find goals and xG columns - positions may vary
-                    # Typical structure: Squad, MP, W, D, L, GF, GA, GD, Pts, xG, xGA
-                    goals_for = int(cells[6].get_text(strip=True))
-                    goals_against = int(cells[7].get_text(strip=True))
-                    points = int(cells[9].get_text(strip=True))
+                    # Extract required fields
+                    # Team name has data-stat='team', fallback to cells[1] if needed
+                    team_name = row_data.get('team', '')
+                    if not team_name or team_name.isdigit():
+                        team_name = cells[1].get_text(strip=True) if len(cells) > 1 else 'Unknown'
 
-                    # xG columns are typically later in the table
-                    xg_for = float(cells[10].get_text(strip=True))
-                    xg_against = float(cells[11].get_text(strip=True))
+                    matches_played = int(row_data.get('games', '0'))
+                    goals_for = int(row_data.get('goals_for', '0'))
+                    goals_against = int(row_data.get('goals_against', '0'))
+                    points = int(row_data.get('points', '0'))
+                    xg_for = float(row_data.get('xg_for', '0'))
+                    xg_against = float(row_data.get('xg_against', '0'))
 
                     teams_data.append({
                         'Team': team_name,
@@ -106,7 +130,7 @@ class PremierLeagueScraper:
 
                     logger.info(f"Extracted data for {team_name}")
 
-                except (IndexError, ValueError) as e:
+                except (IndexError, ValueError, KeyError) as e:
                     logger.warning(f"Could not extract data from row: {e}")
                     continue
 
