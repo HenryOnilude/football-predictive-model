@@ -84,59 +84,121 @@ export default async function HomePage() {
   const highRiskCount = data.teams.filter(t => t.Risk_Score >= 70).length;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
       {/* Header */}
-      <div className="mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-2">
-          Performance Analysis Dashboard
-        </h2>
-        <p className="text-gray-600">
-          Identifying performance regression risk based on Expected Goals (xG) data
-        </p>
-        <p className="text-sm text-gray-500 mt-1">
-          Last updated: {new Date(data.lastUpdated).toLocaleString()}
-        </p>
+      <div className="mb-12">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-4xl font-semibold text-slate-900 mb-3 tracking-tight">
+              Performance Analysis
+            </h2>
+            <p className="text-slate-600 text-lg">
+              Identifying regression risk using Expected Goals (xG) data
+            </p>
+          </div>
+          <div className="hidden md:block">
+            <div className="text-right">
+              <p className="text-xs text-slate-400 uppercase tracking-wide mb-1">Last Updated</p>
+              <p className="text-sm font-medium text-slate-600">
+                {new Date(data.lastUpdated).toLocaleDateString('en-GB', {
+                  day: 'numeric',
+                  month: 'short',
+                  year: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+              </p>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
-        <div className="bg-white rounded-lg shadow p-6">
-          <div className="text-sm font-medium text-gray-500 mb-1">Total Teams</div>
-          <div className="text-3xl font-bold text-gray-900">{data.teams.length}</div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
+        <div className="card p-6 hover:border-slate-300 transition-colors">
+          <div className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">Total Teams</div>
+          <div className="text-4xl font-semibold text-slate-900">{data.teams.length}</div>
         </div>
-        <div className="bg-red-50 rounded-lg shadow p-6 border border-red-200">
-          <div className="text-sm font-medium text-red-600 mb-1">High Risk</div>
-          <div className="text-3xl font-bold text-red-700">{highRiskCount}</div>
-          <div className="text-xs text-red-600 mt-1">Risk Score ≥ 70</div>
+        <div className="card p-6 bg-gradient-to-br from-red-50 to-red-100/50 border-red-200 hover:border-red-300 transition-colors">
+          <div className="text-xs font-semibold text-red-600 uppercase tracking-wide mb-2">High Risk</div>
+          <div className="text-4xl font-semibold text-red-700">{highRiskCount}</div>
+          <div className="text-xs text-red-600/80 mt-2">Risk Score ≥ 70</div>
         </div>
-        <div className="bg-orange-50 rounded-lg shadow p-6 border border-orange-200">
-          <div className="text-sm font-medium text-orange-600 mb-1">Overperforming</div>
-          <div className="text-3xl font-bold text-orange-700">{overperformingCount}</div>
-          <div className="text-xs text-orange-600 mt-1">Variance &gt; +3</div>
+        <div className="card p-6 bg-gradient-to-br from-orange-50 to-orange-100/50 border-orange-200 hover:border-orange-300 transition-colors">
+          <div className="text-xs font-semibold text-orange-600 uppercase tracking-wide mb-2">Overperforming</div>
+          <div className="text-4xl font-semibold text-orange-700">{overperformingCount}</div>
+          <div className="text-xs text-orange-600/80 mt-2">Variance &gt; +3</div>
         </div>
-        <div className="bg-blue-50 rounded-lg shadow p-6 border border-blue-200">
-          <div className="text-sm font-medium text-blue-600 mb-1">Underperforming</div>
-          <div className="text-3xl font-bold text-blue-700">{underperformingCount}</div>
-          <div className="text-xs text-blue-600 mt-1">Variance &lt; -3</div>
+        <div className="card p-6 bg-gradient-to-br from-blue-50 to-blue-100/50 border-blue-200 hover:border-blue-300 transition-colors">
+          <div className="text-xs font-semibold text-blue-600 uppercase tracking-wide mb-2">Underperforming</div>
+          <div className="text-4xl font-semibold text-blue-700">{underperformingCount}</div>
+          <div className="text-xs text-blue-600/80 mt-2">Variance &lt; -3</div>
+        </div>
+      </div>
+
+      {/* Understanding the Analysis */}
+      <div className="card bg-gradient-to-br from-slate-50 to-slate-100/30 p-8 mb-6 border-slate-200">
+        <h3 className="text-xl font-semibold text-slate-900 mb-4 tracking-tight">📊 Understanding the Analysis</h3>
+        <div className="space-y-3 text-sm text-slate-700">
+          <p>
+            <strong className="text-slate-900">What is "Overperforming"?</strong> Getting more points than your chance quality (xG) suggests.
+            A team in 12th with 26 points might be overperforming if their xG says they should have 20 points - they're getting results that flatter their actual performance.
+          </p>
+          <p>
+            <strong className="text-slate-900">Why it matters:</strong> Overperformance is usually unsustainable luck (finishing, goalkeeping).
+            When it normalizes, results will drop. Underperformers often improve naturally without changes.
+          </p>
         </div>
       </div>
 
       {/* Key Insights */}
-      <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-lg p-6 mb-8">
-        <h3 className="text-lg font-bold text-gray-900 mb-3">Key Insights</h3>
-        <div className="space-y-2 text-sm text-gray-700">
-          <p>
-            📊 <strong>{highRiskCount} teams</strong> are at high risk of performance regression (Risk Score ≥ 70)
-          </p>
-          <p>
-            ⚠️ Teams overperforming their xG by <strong>+3 points or more</strong> should be monitored closely for regression to mean
-          </p>
-          <p>
-            💡 Underperforming teams may see natural improvement without major changes
-          </p>
-          <p>
-            💰 <strong>Potential ROI:</strong> £40-60M by avoiding reactive decisions based on short-term variance
-          </p>
+      <div className="card bg-gradient-to-br from-indigo-50/50 to-blue-50/30 p-8 mb-10 border-indigo-200/60">
+        <h3 className="text-xl font-semibold text-slate-900 mb-5 tracking-tight">Key Insights</h3>
+        <div className="grid md:grid-cols-2 gap-4">
+          <div className="flex gap-3">
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center">
+              <span className="text-red-600 font-semibold text-lg">!</span>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-slate-900 mb-1">High Risk Teams</p>
+              <p className="text-sm text-slate-600">
+                <strong className="text-slate-900">{highRiskCount} teams</strong> getting results that flatter their performance
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-orange-100 flex items-center justify-center">
+              <span className="text-orange-600 font-semibold text-lg">↑</span>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-slate-900 mb-1">Overperformance Warning</p>
+              <p className="text-sm text-slate-600">
+                <strong className="text-slate-900">+3 variance</strong> = unsustainable finishing/goalkeeping luck
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
+              <span className="text-blue-600 font-semibold text-lg">↓</span>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-slate-900 mb-1">Unlucky Teams</p>
+              <p className="text-sm text-slate-600">
+                Creating quality chances but not getting the points they deserve
+              </p>
+            </div>
+          </div>
+          <div className="flex gap-3">
+            <div className="flex-shrink-0 w-10 h-10 rounded-lg bg-green-100 flex items-center justify-center">
+              <span className="text-green-600 font-semibold text-lg">£</span>
+            </div>
+            <div>
+              <p className="text-sm font-medium text-slate-900 mb-1">Potential ROI</p>
+              <p className="text-sm text-slate-600">
+                <strong className="text-slate-900">£40-60M</strong> saved by avoiding panic decisions
+              </p>
+            </div>
+          </div>
         </div>
       </div>
 

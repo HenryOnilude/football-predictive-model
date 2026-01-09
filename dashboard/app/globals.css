@@ -1,3 +1,79 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+/* Modern minimalist color scheme */
+:root {
+  --background: 250 250 250;
+  --foreground: 15 23 42;
+}
+
+/* Clean typography */
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'cv11', 'ss01';
+}
+
+body {
+  color: rgb(30 41 59);
+  background-color: rgb(250 250 250);
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  letter-spacing: -0.011em;
+}
+
+/* Improved heading hierarchy */
+h1 {
+  font-size: 1.875rem;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.021em;
+}
+
+h3 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.014em;
+}
+
+/* Modern card style with subtle shadow */
+.card {
+  background-color: white;
+  border-radius: 0.75rem;
+  border: 1px solid rgba(226, 232, 240, 0.6);
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  transition: box-shadow 200ms;
+}
+
+.card:hover {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+
+/* Stat card with better visual hierarchy */
+.stat-card {
+  padding: 1.5rem;
+}
+
+/* Clean table styles */
+.table-minimal {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table-minimal th {
+  text-align: left;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: rgb(71 85 105);
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgb(226 232 240);
+}
+
+.table-minimal td {
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid rgb(241 245 249);
+}

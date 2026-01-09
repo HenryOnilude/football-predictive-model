@@ -23,11 +23,12 @@ venv/
 env/
 ENV/
 
-# Data files
-data/*.csv
+# Data files - CSV files are committed for dashboard and automation
 !data/.gitkeep
 
-# Output files
+# Output files - Generated artifacts
+data/*.png
+reports/*.pdf
 output/charts/*.png
 output/charts/*.jpg
 output/reports/*.pdf
