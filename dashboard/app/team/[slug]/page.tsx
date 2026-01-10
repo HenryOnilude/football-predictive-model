@@ -124,7 +124,7 @@ export default async function TeamPage({ params }: { params: Promise<{ slug: str
               </div>
             </div>
             <div className="flex-1">
-              <h3 className="text-base font-semibold text-red-900 mb-2">⚠️ High Regression Risk - Results Flattering Performance</h3>
+              <h3 className="text-base font-semibold text-red-900 mb-2">High Regression Risk - Results Flattering Performance</h3>
               <p className="text-sm text-red-700 leading-relaxed mb-3">
                 <strong>Warning:</strong> This team is getting better results than their underlying performance suggests they should.
                 They have <strong>{team.Actual_Points}</strong> points but based on chances created/allowed (xG),
@@ -145,11 +145,13 @@ export default async function TeamPage({ params }: { params: Promise<{ slug: str
           <div className="flex gap-4">
             <div className="flex-shrink-0">
               <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                <span className="text-blue-600 font-semibold text-lg">↑</span>
+                <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                </svg>
               </div>
             </div>
             <div className="flex-1">
-              <h3 className="text-base font-semibold text-blue-900 mb-2">📈 Improvement Potential - Unlucky But Creating Quality</h3>
+              <h3 className="text-base font-semibold text-blue-900 mb-2">Improvement Potential - Unlucky But Creating Quality</h3>
               <p className="text-sm text-blue-700 leading-relaxed mb-3">
                 <strong>Good news:</strong> This team is getting worse results than their performance deserves.
                 They have <strong>{team.Actual_Points}</strong> points but based on chances created/allowed (xG),
@@ -192,7 +194,7 @@ export default async function TeamPage({ params }: { params: Promise<{ slug: str
 
       {/* What This Means in Plain English */}
       <div className="card bg-linear-to-br from-indigo-50/30 to-blue-50/20 p-8 mt-10 border-indigo-200/40">
-        <h3 className="text-xl font-semibold text-slate-900 mb-4 tracking-tight">📋 What This Means in Plain English</h3>
+        <h3 className="text-xl font-semibold text-slate-900 mb-4 tracking-tight">What This Means in Plain English</h3>
         <div className="prose prose-sm max-w-none text-slate-700 space-y-3">
           <p>
             <strong className="text-slate-900">{team.Team}</strong> has earned <strong>{team.Actual_Points} points</strong> from {team.Matches} matches
@@ -263,7 +265,9 @@ export default async function TeamPage({ params }: { params: Promise<{ slug: str
           {team.Variance < -3 && (
             <div className="flex gap-3 p-4 rounded-lg bg-blue-50 border border-blue-200">
               <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-200 flex items-center justify-center">
-                <span className="text-blue-700 text-xs font-bold">↑</span>
+                <svg className="w-3 h-3 text-blue-700" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                </svg>
               </div>
               <p className="text-sm text-blue-900">
                 <strong className="font-semibold">Underperforming:</strong> Expected to improve naturally. Review finishing efficiency.
