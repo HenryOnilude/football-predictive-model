@@ -18,8 +18,10 @@ export default function RootLayout({
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
               <div className="flex items-center gap-3">
-                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-indigo-500 to-indigo-600 flex items-center justify-center">
-                  <span className="text-white text-lg">⚽</span>
+                <div className="w-8 h-8 rounded-lg bg-linear-to-br from-indigo-500 to-indigo-600 flex items-center justify-center">
+                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <circle cx="10" cy="10" r="8" />
+                  </svg>
                 </div>
                 <div>
                   <h1 className="text-lg font-semibold text-slate-900 tracking-tight">
@@ -38,13 +40,25 @@ export default function RootLayout({
         <main className="min-h-screen">{children}</main>
         <footer className="bg-white border-t border-slate-200/60 mt-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <div className="text-center space-y-2">
-              <p className="text-sm text-slate-500">
-                Data sourced from FBRef.com
+            <div className="text-center space-y-3">
+              <div className="flex items-center justify-center gap-2 text-sm text-slate-600">
+                <span className="px-3 py-1 rounded-full bg-slate-100 text-xs font-medium">
+                  2025-2026 Season
+                </span>
+                <span>•</span>
+                <span>Data from FBRef.com (Opta Sports)</span>
+              </div>
+              <p className="text-xs text-slate-500">
+                Statistical analysis using Expected Goals (xG) and Poisson distribution modeling
               </p>
               <p className="text-xs text-slate-400">
-                Analysis powered by Poisson distribution • Auto-updated daily
+                Auto-updated daily via GitHub Actions • Identifies regression risk to prevent 40-60M in reactive decisions
               </p>
+              <div className="pt-3 border-t border-slate-100 mt-4">
+                <p className="text-xs text-slate-400">
+                  <strong>Tip:</strong> Scroll to "Understanding the Analysis" section on the homepage for detailed metric explanations
+                </p>
+              </div>
             </div>
           </div>
         </footer>

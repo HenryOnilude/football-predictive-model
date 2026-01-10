@@ -118,37 +118,66 @@ export default function TeamChart({ team }: TeamChartProps) {
 
       {/* Statistical Metrics */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
-        <div className="card p-6 bg-gradient-to-br from-purple-50 to-purple-100/50 border-purple-200">
+        <div className="card p-6 bg-linear-to-br from-purple-50 to-purple-100/50 border-purple-200">
           <div className="text-xs font-medium text-purple-600 uppercase tracking-wide mb-2">Regression Probability</div>
-          <div className="text-3xl font-semibold text-purple-900 mt-1">
+          <div className="text-3xl font-semibold text-purple-900 mt-1 mb-3">
             {(team.Regression_Probability * 100).toFixed(1)}%
           </div>
+          <p className="text-xs text-purple-700">
+            Likelihood that performance will revert to expected levels. Higher = more likely to regress (for overperformers) or improve (for underperformers).
+          </p>
         </div>
-        <div className="card p-6 bg-gradient-to-br from-indigo-50 to-indigo-100/50 border-indigo-200">
+        <div className="card p-6 bg-linear-to-br from-indigo-50 to-indigo-100/50 border-indigo-200">
           <div className="text-xs font-medium text-indigo-600 uppercase tracking-wide mb-2">Z-Score</div>
-          <div className="text-3xl font-semibold text-indigo-900 mt-1">
+          <div className="text-3xl font-semibold text-indigo-900 mt-1 mb-3">
             {team.Z_Score.toFixed(2)}
           </div>
+          <p className="text-xs text-indigo-700">
+            How unusual this variance is compared to all teams. Above +2 or below -2 indicates extreme performance deviation from the mean.
+          </p>
         </div>
-        <div className="card p-6 bg-gradient-to-br from-cyan-50 to-cyan-100/50 border-cyan-200">
+        <div className="card p-6 bg-linear-to-br from-cyan-50 to-cyan-100/50 border-cyan-200">
           <div className="text-xs font-medium text-cyan-600 uppercase tracking-wide mb-2">P-Value</div>
-          <div className="flex items-baseline gap-2">
+          <div className="flex items-baseline gap-2 mb-3">
             <div className="text-3xl font-semibold text-cyan-900">
               {team.P_Value.toFixed(3)}
             </div>
             {team.Significant && <span className="text-lg text-red-600 font-bold">*</span>}
           </div>
+          <p className="text-xs text-cyan-700">
+            Probability this variance is due to random chance. Below 0.05 (*) means statistically significant - not just luck.
+          </p>
+        </div>
+      </div>
+
+      {/* Statistical Explanation */}
+      <div className="card bg-linear-to-br from-slate-50 to-slate-100/30 p-6 border-slate-200">
+        <h4 className="text-sm font-semibold text-slate-900 mb-3">Understanding These Statistics</h4>
+        <div className="grid md:grid-cols-3 gap-4 text-xs text-slate-700">
+          <div>
+            <p className="font-medium text-slate-900 mb-1">Regression Probability</p>
+            <p>High % (70%+) = very likely to change. Low % (20%-) = performance is sustainable. This tells you if the current form will last.</p>
+          </div>
+          <div>
+            <p className="font-medium text-slate-900 mb-1">Z-Score</p>
+            <p>Measures extremeness. +2.0 = top 2.5% (extremely lucky). -2.0 = bottom 2.5% (extremely unlucky). Between -1 and +1 = normal.</p>
+          </div>
+          <div>
+            <p className="font-medium text-slate-900 mb-1">P-Value</p>
+            <p>Below 0.05 marked with * = less than 5% chance this is random. Above 0.05 = could just be normal variance, not a real pattern.</p>
+          </div>
         </div>
       </div>
 
       {team.Significant && (
-        <div className="card bg-gradient-to-br from-yellow-50 to-yellow-100/50 border-yellow-200 p-6">
+        <div className="card bg-linear-to-br from-yellow-50 to-yellow-100/50 border-yellow-200 p-6">
           <div className="flex gap-3">
             <div className="flex-shrink-0 w-6 h-6 rounded-full bg-yellow-200 flex items-center justify-center">
               <span className="text-yellow-700 text-xs font-bold">*</span>
             </div>
             <p className="text-sm text-yellow-900">
-              <strong className="font-semibold">Statistically Significant:</strong> This variance is unlikely to be due to chance (p &lt; 0.05). The performance difference between actual and expected is meaningful.
+              <strong className="font-semibold">Statistically Significant (*):</strong> This variance is NOT due to random chance (p-value &lt; 0.05).
+              The {Math.abs(team.Variance).toFixed(1)} point gap between actual and expected performance is a real, measurable pattern that will likely correct itself.
             </p>
           </div>
         </div>

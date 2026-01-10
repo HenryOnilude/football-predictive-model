@@ -116,7 +116,7 @@ export default async function TeamPage({ params }: { params: Promise<{ slug: str
 
       {/* Performance Status Alert */}
       {team.Performance_Status === 'Overperforming' && team.Risk_Score >= 70 && (
-        <div className="card bg-gradient-to-br from-red-50 to-red-100/50 border-red-200 p-6 mb-10">
+        <div className="card bg-linear-to-br from-red-50 to-red-100/50 border-red-200 p-6 mb-10">
           <div className="flex gap-4">
             <div className="flex-shrink-0">
               <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center">
@@ -141,7 +141,7 @@ export default async function TeamPage({ params }: { params: Promise<{ slug: str
       )}
 
       {team.Performance_Status === 'Underperforming' && (
-        <div className="card bg-gradient-to-br from-blue-50 to-blue-100/50 border-blue-200 p-6 mb-10">
+        <div className="card bg-linear-to-br from-blue-50 to-blue-100/50 border-blue-200 p-6 mb-10">
           <div className="flex gap-4">
             <div className="flex-shrink-0">
               <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
@@ -189,6 +189,52 @@ export default async function TeamPage({ params }: { params: Promise<{ slug: str
 
       {/* Charts */}
       <TeamChart team={team} />
+
+      {/* What This Means in Plain English */}
+      <div className="card bg-linear-to-br from-indigo-50/30 to-blue-50/20 p-8 mt-10 border-indigo-200/40">
+        <h3 className="text-xl font-semibold text-slate-900 mb-4 tracking-tight">📋 What This Means in Plain English</h3>
+        <div className="prose prose-sm max-w-none text-slate-700 space-y-3">
+          <p>
+            <strong className="text-slate-900">{team.Team}</strong> has earned <strong>{team.Actual_Points} points</strong> from {team.Matches} matches
+            (position #{team.Position_Actual}).
+          </p>
+          <p>
+            However, based on the quality of chances they've created ({team.xG_For.toFixed(1)} xG) and conceded ({team.xG_Against.toFixed(1)} xGA),
+            statistical models predict they should have closer to <strong>{team.xPTS.toFixed(1)} points</strong> (position #{team.Position_Expected}).
+          </p>
+          <p className={team.Variance > 3 ? 'text-red-800' : team.Variance < -3 ? 'text-blue-800' : 'text-slate-700'}>
+            {team.Variance > 3 ? (
+              <>
+                This means they're getting <strong>{team.Variance.toFixed(1)} more points than their performance suggests</strong> -
+                likely due to exceptional finishing (converting low-quality chances) or outstanding goalkeeping (saving shots that typically go in).
+                This level of luck is <strong>difficult to sustain</strong>. Expect results to worsen as finishing/goalkeeping normalizes.
+              </>
+            ) : team.Variance < -3 ? (
+              <>
+                This means they're getting <strong>{Math.abs(team.Variance).toFixed(1)} fewer points than their performance suggests</strong> -
+                likely due to poor finishing (missing good chances) or unlucky goalkeeping (conceding from weak shots).
+                The good news: This is usually <strong>temporary bad luck</strong>. Expect natural improvement as finishing/goalkeeping normalizes,
+                without needing major tactical changes or expensive signings.
+              </>
+            ) : (
+              <>
+                This means their results closely match their underlying performance quality. They're getting roughly the points their
+                chance creation and defense deserves. This is <strong>sustainable</strong> - no major regression or improvement expected based on luck alone.
+              </>
+            )}
+          </p>
+          <p>
+            <strong className="text-slate-900">Bottom line:</strong>
+            {team.Variance > 3 ? (
+              <> Don't be fooled by current position. Performance quality suggests a drop is coming. Avoid panic buys - the issue isn't lack of talent, it's unsustainable luck running out.</>
+            ) : team.Variance < -3 ? (
+              <> Don't panic about current position. Performance quality suggests improvement is coming naturally. Avoid hasty managerial changes - the issue is bad luck, not tactics.</>
+            ) : (
+              <> Current position accurately reflects performance quality. Any improvement will require genuine tactical or squad upgrades, not just waiting for luck to change.</>
+            )}
+          </p>
+        </div>
+      </div>
 
       {/* Recommendations */}
       <div className="card p-8 mt-10">

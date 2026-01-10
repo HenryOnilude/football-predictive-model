@@ -8,25 +8,25 @@ interface RiskBadgeProps {
 export default function RiskBadge({ riskCategory, riskScore }: RiskBadgeProps) {
   const styles = {
     Critical: {
-      bg: 'bg-gradient-to-br from-red-50 to-red-100',
+      bg: 'bg-linear-to-br from-red-50 to-red-100',
       text: 'text-red-700',
       border: 'border-red-200',
       dot: 'bg-red-500'
     },
     High: {
-      bg: 'bg-gradient-to-br from-orange-50 to-orange-100',
+      bg: 'bg-linear-to-br from-orange-50 to-orange-100',
       text: 'text-orange-700',
       border: 'border-orange-200',
       dot: 'bg-orange-500'
     },
     Moderate: {
-      bg: 'bg-gradient-to-br from-yellow-50 to-yellow-100',
+      bg: 'bg-linear-to-br from-yellow-50 to-yellow-100',
       text: 'text-yellow-700',
       border: 'border-yellow-200',
       dot: 'bg-yellow-500'
     },
     Low: {
-      bg: 'bg-gradient-to-br from-green-50 to-green-100',
+      bg: 'bg-linear-to-br from-green-50 to-green-100',
       text: 'text-green-700',
       border: 'border-green-200',
       dot: 'bg-green-500'
