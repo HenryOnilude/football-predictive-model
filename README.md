@@ -6,6 +6,8 @@ A data-driven system for identifying Premier League teams at risk of performance
 
 This project helps football clubs avoid costly reactive decisions (estimated £40-60M savings) by identifying teams whose current performance significantly deviates from underlying metrics. Uses real Premier League data with **automated daily updates**.
 
+<img width="1270" height="835" alt="Screenshot 2026-01-12 at 16 07 26" src="https://github.com/user-attachments/assets/34541596-8a69-4d7e-98dd-90e39301f45a" />
+
 ### Key Features
 
 - **Real-time Data**: Automatically scrapes latest Premier League stats from FBRef.com daily
