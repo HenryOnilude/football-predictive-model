@@ -6,7 +6,6 @@ A data-driven system for identifying Premier League teams at risk of performance
 
 This project helps football clubs avoid costly reactive decisions (estimated £40-60M savings) by identifying teams whose current performance significantly deviates from underlying metrics. Uses real Premier League data with **automated daily updates**.
 
-<img width="1270" height="835" alt="Screenshot 2026-01-12 at 16 07 26" src="https://github.com/user-attachments/assets/34541596-8a69-4d7e-98dd-90e39301f45a" />
 
 ### Key Features
 
@@ -15,6 +14,24 @@ This project helps football clubs avoid costly reactive decisions (estimated £4
 - **Risk Scoring**: 0-100 scale identifying critical regression risk (90+), high (70-89), moderate (40-69), and low (0-39)
 - **Interactive Dashboard**: Next.js web app with sortable tables, team detail pages, and data visualizations
 - **Automated Reports**: PDF reports with charts analyzing performance variance
+
+### Dashboard Preview
+<img width="1270" height="835" alt="Screenshot 2026-01-12 at 16 07 26" src="https://github.com/user-attachments/assets/34541596-8a69-4d7e-98dd-90e39301f45a" />
+Figure 1: Performance Analysis Summary. A high-level overview of the 2025-2026 Season, identifying critical regression outliers and league-wide trends.
+
+### Key Insights & Analytics Table
+
+<img width="1261" height="850" alt="Screenshot 2026-01-12 at 17 22 20" src="https://github.com/user-attachments/assets/fead6ab5-9d6e-4ff7-8926-7769a2e08d82" />
+Figure 2: Real-time Risk Table. Shows exactly which teams are over-performing. Aston Villa is the biggest outlier, with results far better than their underlying play.
+
+### User Guide & Legend
+
+<img width="1404" height="860" alt="Screenshot 2026-01-13 at 00 30 23" src="https://github.com/user-attachments/assets/7a95fe83-15fe-4cc9-ac79-f39fa3fede63" />
+Figure 3: Results Legend. A clear breakdown of the color-coded risk levels and score ranges so you know exactly how each team is performing.
+
+### Advanced Statistical Deep-Dive
+<img width="1147" height="637" alt="Screenshot 2026-01-13 at 00 38 48" src="https://github.com/user-attachments/assets/9951626c-222a-4982-9f26-e9d070c54953" />
+Figure 4: Advanced Statistical Deep-Dive as it shows a detail view showing the Poisson-derived probability and statistical significance of performance deviations.
 
 ## How It Works
 
