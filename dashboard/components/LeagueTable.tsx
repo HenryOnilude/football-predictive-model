@@ -56,11 +56,11 @@ export default function LeagueTable({ teams }: LeagueTableProps) {
   const SortButton = ({ field, children }: { field: SortField; children: React.ReactNode }) => (
     <button
       onClick={() => handleSort(field)}
-      className="flex items-center gap-1.5 hover:text-indigo-600 transition-colors group"
+      className="flex items-center gap-1.5 hover:text-emerald-400 transition-colors group"
     >
       {children}
       {sortField === field && (
-        <span className="text-indigo-600">
+        <span className="text-emerald-400">
           {sortDirection === 'asc' ? (
             <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
@@ -87,14 +87,14 @@ export default function LeagueTable({ teams }: LeagueTableProps) {
       {/* Filter section */}
       <div className="flex items-center justify-between card p-5">
         <div className="flex items-center gap-4">
-          <label htmlFor="filter" className="text-sm font-medium text-slate-700">
+          <label htmlFor="filter" className="text-sm font-medium text-slate-400">
             View:
           </label>
           <select
             id="filter"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
-            className="px-4 py-2 bg-white border border-slate-300 rounded-lg text-sm font-medium text-slate-700 focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all"
+            className="px-4 py-2 bg-slate-800 border border-slate-600 rounded-lg text-sm font-medium text-slate-200 focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all"
           >
             <option value="all">All Teams ({teams.length})</option>
             <option value="high-risk">High Risk</option>
@@ -102,7 +102,7 @@ export default function LeagueTable({ teams }: LeagueTableProps) {
             <option value="underperforming">Underperforming (Var &lt; -3)</option>
           </select>
         </div>
-        <span className="text-sm text-slate-500">
+        <span className="text-sm text-slate-400">
           {filteredTeams.length} team{filteredTeams.length !== 1 ? 's' : ''}
         </span>
       </div>
@@ -112,29 +112,29 @@ export default function LeagueTable({ teams }: LeagueTableProps) {
         <div className="overflow-x-auto">
           <table className="min-w-full">
             <thead>
-              <tr className="border-b border-slate-200 bg-slate-50/50">
-                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
+              <tr className="border-b border-slate-700 bg-slate-800/50">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">
                   <SortButton field="Position_Actual">Pos</SortButton>
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">
                   <SortButton field="Team">Team</SortButton>
                 </th>
-                <th className="px-6 py-4 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                <th className="px-6 py-4 text-center text-xs font-semibold text-slate-400 uppercase tracking-wider">
                   <SortButton field="Matches">MP</SortButton>
                 </th>
-                <th className="px-6 py-4 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                <th className="px-6 py-4 text-center text-xs font-semibold text-slate-400 uppercase tracking-wider">
                   <SortButton field="Actual_Points">Pts</SortButton>
                 </th>
-                <th className="px-6 py-4 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                <th className="px-6 py-4 text-center text-xs font-semibold text-slate-400 uppercase tracking-wider">
                   <SortButton field="xPTS">xPTS</SortButton>
                 </th>
-                <th className="px-6 py-4 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                <th className="px-6 py-4 text-center text-xs font-semibold text-slate-400 uppercase tracking-wider">
                   <SortButton field="Variance">Var</SortButton>
                 </th>
-                <th className="px-6 py-4 text-center text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                <th className="px-6 py-4 text-center text-xs font-semibold text-slate-400 uppercase tracking-wider">
                   <SortButton field="Risk_Score">Risk</SortButton>
                 </th>
-                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">
                   Status
                 </th>
               </tr>
@@ -143,43 +143,43 @@ export default function LeagueTable({ teams }: LeagueTableProps) {
               {filteredTeams.map((team) => (
                 <tr
                   key={team.Team}
-                  className="border-b border-slate-100 hover:bg-slate-50/50 transition-colors group"
+                  className="border-b border-slate-800 hover:bg-slate-800/50 transition-colors group"
                 >
                   <td className="px-6 py-5 whitespace-nowrap">
-                    <div className="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center group-hover:bg-slate-200 transition-colors">
-                      <span className="text-sm font-semibold text-slate-700">{team.Position_Actual}</span>
+                    <div className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center group-hover:bg-slate-700 transition-colors">
+                      <span className="text-sm font-semibold text-slate-200">{team.Position_Actual}</span>
                     </div>
                   </td>
                   <td className="px-6 py-5 whitespace-nowrap">
                     <Link
                       href={`/team/${team.Team.toLowerCase().replace(/\s+/g, '-')}`}
-                      className="text-sm font-semibold text-slate-900 hover:text-indigo-600 transition-colors"
+                      className="text-sm font-semibold text-white hover:text-emerald-400 transition-colors"
                     >
                       {team.Team}
                     </Link>
                   </td>
-                  <td className="px-6 py-5 whitespace-nowrap text-sm text-slate-600 text-center font-medium">
+                  <td className="px-6 py-5 whitespace-nowrap text-sm text-slate-300 text-center font-medium">
                     {team.Matches}
                   </td>
                   <td className="px-6 py-5 whitespace-nowrap text-center">
-                    <span className="text-sm font-semibold text-slate-900">
+                    <span className="text-sm font-semibold text-white">
                       {team.Actual_Points}
                     </span>
                   </td>
-                  <td className="px-6 py-5 whitespace-nowrap text-sm text-slate-600 text-center font-medium">
+                  <td className="px-6 py-5 whitespace-nowrap text-sm text-slate-300 text-center font-medium">
                     {team.xPTS.toFixed(1)}
                   </td>
                   <td className="px-6 py-5 whitespace-nowrap text-center">
                     <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold ${
-                      team.Variance > 3 ? 'bg-red-100 text-red-700' :
-                      team.Variance < -3 ? 'bg-blue-100 text-blue-700' :
-                      'bg-slate-100 text-slate-700'
+                      team.Variance > 3 ? 'bg-rose-500/20 text-rose-400' :
+                      team.Variance < -3 ? 'bg-emerald-500/20 text-emerald-400' :
+                      'bg-slate-700 text-slate-300'
                     }`}>
                       {team.Variance > 0 ? '+' : ''}{team.Variance.toFixed(1)}
                     </span>
                   </td>
                   <td className="px-6 py-5 whitespace-nowrap text-center">
-                    <span className="text-sm font-bold text-slate-900">
+                    <span className="text-sm font-bold text-white">
                       {team.Risk_Score}
                     </span>
                   </td>
@@ -194,56 +194,56 @@ export default function LeagueTable({ teams }: LeagueTableProps) {
       </div>
 
       {/* Legend */}
-      <div className="card p-6 bg-slate-50/50">
-        <h4 className="text-sm font-semibold text-slate-900 mb-4 tracking-tight">Legend</h4>
+      <div className="card p-6 bg-slate-800/50">
+        <h4 className="text-sm font-semibold text-white mb-4 tracking-tight">Legend</h4>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
           <div>
             <span className="text-slate-500">MP</span>
-            <p className="text-slate-700 font-medium">Matches Played</p>
+            <p className="text-slate-300 font-medium">Matches Played</p>
           </div>
           <div>
             <span className="text-slate-500">Pts</span>
-            <p className="text-slate-700 font-medium">Actual Points</p>
+            <p className="text-slate-300 font-medium">Actual Points</p>
           </div>
           <div>
             <span className="text-slate-500">xPTS</span>
-            <p className="text-slate-700 font-medium">Expected Points</p>
+            <p className="text-slate-300 font-medium">Expected Points</p>
             <p className="text-xs text-slate-500 mt-1">Based on chance quality</p>
           </div>
           <div>
             <span className="text-slate-500">Var</span>
-            <p className="text-slate-700 font-medium">Variance</p>
+            <p className="text-slate-300 font-medium">Variance</p>
             <p className="text-xs text-slate-500 mt-1">Pts - xPTS difference</p>
           </div>
         </div>
-        <div className="mt-4 pt-4 border-t border-slate-200 space-y-3">
+        <div className="mt-4 pt-4 border-t border-slate-700 space-y-3">
           <div>
-            <p className="text-xs font-semibold text-slate-700 mb-2">Risk Categories:</p>
+            <p className="text-xs font-semibold text-slate-300 mb-2">Risk Categories:</p>
             <div className="flex flex-wrap gap-3 text-xs">
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-red-500"></div>
-                <span className="text-slate-600">Critical (90-100)</span>
+                <span className="text-slate-400">Critical (90-100)</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-orange-500"></div>
-                <span className="text-slate-600">High (70-89)</span>
+                <span className="text-slate-400">High (70-89)</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-yellow-500"></div>
-                <span className="text-slate-600">Moderate (40-69)</span>
+                <span className="text-slate-400">Moderate (40-69)</span>
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-green-500"></div>
-                <span className="text-slate-600">Low (0-39)</span>
+                <span className="text-slate-400">Low (0-39)</span>
               </div>
             </div>
           </div>
           <div>
-            <p className="text-xs font-semibold text-slate-700 mb-2">Variance Interpretation:</p>
-            <div className="text-xs text-slate-600 space-y-1">
-              <p><span className="inline-block w-12 text-red-600 font-semibold">+3 or more:</span> Overperforming (results better than performance) - regression risk</p>
-              <p><span className="inline-block w-12 text-blue-600 font-semibold">-3 or less:</span> Underperforming (unlucky) - natural improvement likely</p>
-              <p><span className="inline-block w-12 text-slate-600 font-semibold">-2 to +2:</span> Performing as expected - results match underlying metrics</p>
+            <p className="text-xs font-semibold text-slate-300 mb-2">Variance Interpretation:</p>
+            <div className="text-xs text-slate-400 space-y-1">
+              <p><span className="inline-block w-12 text-rose-400 font-semibold">+3 or more:</span> Overperforming (results better than performance) - regression risk</p>
+              <p><span className="inline-block w-12 text-emerald-400 font-semibold">-3 or less:</span> Underperforming (unlucky) - natural improvement likely</p>
+              <p><span className="inline-block w-12 text-slate-400 font-semibold">-2 to +2:</span> Performing as expected - results match underlying metrics</p>
             </div>
           </div>
         </div>

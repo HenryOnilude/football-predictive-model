@@ -1,0 +1,262 @@
+'use client';
+
+import { useState } from 'react';
+import { X } from 'lucide-react';
+import {
+  TeamAnalysis,
+  ConversionStatus,
+  getConversionBadgeConfig,
+  getFundamentalScoreColor,
+} from '@/lib/TeamAnalysis';
+
+interface TeamAnalysisTableProps {
+  analyses: TeamAnalysis[];
+}
+
+interface InsightModalProps {
+  analysis: TeamAnalysis;
+  onClose: () => void;
+}
+
+function InsightModal({ analysis, onClose }: InsightModalProps) {
+  const badgeConfig = getConversionBadgeConfig(analysis.conversionStatus);
+  const scoreColor = getFundamentalScoreColor(analysis.fundamentalScore);
+  
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      {/* Backdrop */}
+      <div 
+        className="absolute inset-0 bg-slate-950/80 backdrop-blur-sm"
+        onClick={onClose}
+      />
+      
+      {/* Modal */}
+      <div className="relative w-full max-w-lg bg-slate-900 border border-slate-800 rounded-xl shadow-2xl overflow-hidden">
+        {/* Header */}
+        <div className="flex items-center justify-between px-6 py-4 border-b border-slate-800">
+          <div>
+            <h3 className="text-lg font-semibold text-white">{analysis.teamName}</h3>
+            <p className="text-xs text-slate-500 mt-0.5">Performance Analysis</p>
+          </div>
+          <button
+            onClick={onClose}
+            className="p-2 rounded-lg hover:bg-slate-800 transition-colors"
+          >
+            <X className="w-5 h-5 text-slate-400" />
+          </button>
+        </div>
+        
+        {/* Metrics Grid */}
+        <div className="grid grid-cols-2 gap-4 px-6 py-4 border-b border-slate-800">
+          <div>
+            <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">System Health</p>
+            <div className="flex items-center gap-2">
+              <span className="text-2xl font-bold font-mono text-white">
+                {analysis.fundamentalScore}
+              </span>
+              <span className="text-sm text-slate-500">/100</span>
+            </div>
+            <div className="mt-2 h-2 bg-slate-800 rounded-full overflow-hidden">
+              <div
+                className={`h-full ${scoreColor} transition-all duration-500`}
+                style={{ width: `${analysis.fundamentalScore}%` }}
+              />
+            </div>
+          </div>
+          
+          <div>
+            <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">Conversion Status</p>
+            <div className={`inline-flex px-3 py-1.5 rounded-md ${badgeConfig.bgColor}`}>
+              <span className={`text-sm font-mono font-semibold ${badgeConfig.textColor}`}>
+                {badgeConfig.label}
+              </span>
+            </div>
+            <p className="text-xs text-slate-500 mt-2">
+              Delta: <span className="font-mono">{analysis.conversionDelta > 0 ? '+' : ''}{analysis.conversionDelta}</span>
+            </p>
+          </div>
+        </div>
+        
+        {/* Additional Metrics */}
+        <div className="grid grid-cols-2 gap-4 px-6 py-4 border-b border-slate-800 bg-slate-900/50">
+          <div>
+            <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">Net xG</p>
+            <span className={`text-lg font-bold font-mono ${analysis.netXG >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+              {analysis.netXG > 0 ? '+' : ''}{analysis.netXG}
+            </span>
+          </div>
+          <div>
+            <p className="text-xs text-slate-500 uppercase tracking-wide mb-1">Risk Level</p>
+            <span className={`text-lg font-semibold ${
+              analysis.riskLevel === 'HIGH' ? 'text-rose-400' :
+              analysis.riskLevel === 'LOW' ? 'text-emerald-400' :
+              'text-amber-400'
+            }`}>
+              {analysis.riskLevel}
+            </span>
+          </div>
+        </div>
+        
+        {/* Analyst Note */}
+        <div className="px-6 py-5">
+          <p className="text-xs text-slate-500 uppercase tracking-wide mb-2">Analyst Note</p>
+          <p className="text-sm text-slate-300 leading-relaxed">
+            {analysis.diagnosis.split('**').map((part, i) => 
+              i % 2 === 1 ? (
+                <strong key={i} className="text-white font-semibold">{part}</strong>
+              ) : (
+                <span key={i}>{part}</span>
+              )
+            )}
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SystemHealthBar({ score }: { score: number }) {
+  const barColor = getFundamentalScoreColor(score);
+  
+  return (
+    <div className="flex items-center gap-3 w-full max-w-[200px]">
+      <div className="flex-1 h-2 bg-slate-200 dark:bg-slate-800 rounded-full overflow-hidden">
+        <div
+          className={`h-full ${barColor} transition-all duration-500`}
+          style={{ width: `${score}%` }}
+        />
+      </div>
+      <span className="text-xs font-mono text-slate-400 w-8 text-right">
+        {score}
+      </span>
+    </div>
+  );
+}
+
+function ConversionBadge({ status }: { status: ConversionStatus }) {
+  const config = getConversionBadgeConfig(status);
+  
+  return (
+    <div className={`inline-flex px-2.5 py-1 rounded-full ${config.bgColor}`}>
+      <span className={`text-xs font-mono font-semibold tracking-wide ${config.textColor}`}>
+        {config.label}
+      </span>
+    </div>
+  );
+}
+
+export default function TeamAnalysisTable({ analyses }: TeamAnalysisTableProps) {
+  const [selectedTeam, setSelectedTeam] = useState<TeamAnalysis | null>(null);
+
+  return (
+    <>
+      <div className="w-full overflow-hidden rounded-xl border border-slate-800 bg-slate-900">
+        {/* Table Header */}
+        <div className="grid grid-cols-3 gap-4 px-6 py-4 bg-slate-800/50 border-b border-slate-800">
+          <div className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
+            Team
+          </div>
+          <div className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
+            System Health
+          </div>
+          <div className="text-xs font-semibold text-slate-400 uppercase tracking-wide">
+            Conversion Delta
+          </div>
+        </div>
+        
+        {/* Table Body */}
+        <div className="divide-y divide-slate-800">
+          {analyses.map((analysis) => (
+            <button
+              key={analysis.teamId}
+              onClick={() => setSelectedTeam(analysis)}
+              className="w-full grid grid-cols-3 gap-4 px-6 py-4 hover:bg-slate-800/50 transition-colors text-left"
+            >
+              {/* Column 1: Team */}
+              <div>
+                <p className="text-sm font-medium text-white">{analysis.teamName}</p>
+                <p className="text-xs text-slate-500 mt-0.5">
+                  Net xG: <span className={`font-mono ${analysis.netXG >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
+                    {analysis.netXG > 0 ? '+' : ''}{analysis.netXG}
+                  </span>
+                </p>
+              </div>
+              
+              {/* Column 2: System Health */}
+              <div className="flex items-center">
+                <SystemHealthBar score={analysis.fundamentalScore} />
+              </div>
+              
+              {/* Column 3: Conversion Delta */}
+              <div className="flex items-center">
+                <ConversionBadge status={analysis.conversionStatus} />
+              </div>
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Insight Modal */}
+      {selectedTeam && (
+        <InsightModal
+          analysis={selectedTeam}
+          onClose={() => setSelectedTeam(null)}
+        />
+      )}
+    </>
+  );
+}
+
+// Demo data for testing
+export const demoAnalyses: TeamAnalysis[] = [
+  {
+    teamId: 1,
+    teamName: 'Manchester City',
+    fundamentalScore: 78,
+    conversionStatus: 'OVER',
+    conversionDelta: 6.2,
+    netXG: 18.5,
+    diagnosis: 'Diagnosis: **Peak Performance.** Strong underlying metrics combined with clinical finishing. Monitor for natural regression in conversion rates.',
+    riskLevel: 'MEDIUM',
+  },
+  {
+    teamId: 2,
+    teamName: 'Arsenal',
+    fundamentalScore: 72,
+    conversionStatus: 'UNDER',
+    conversionDelta: -5.8,
+    netXG: 15.2,
+    diagnosis: 'Diagnosis: **Value Opportunity.** System is creating dominant chances, but finishing is poor. Expect positive regression.',
+    riskLevel: 'LOW',
+  },
+  {
+    teamId: 3,
+    teamName: 'Liverpool',
+    fundamentalScore: 68,
+    conversionStatus: 'MEAN',
+    conversionDelta: 1.2,
+    netXG: 12.8,
+    diagnosis: 'Diagnosis: **Stable Foundation.** Strong underlying metrics with sustainable conversion. Low volatility expected.',
+    riskLevel: 'LOW',
+  },
+  {
+    teamId: 4,
+    teamName: 'Newcastle',
+    fundamentalScore: 35,
+    conversionStatus: 'OVER',
+    conversionDelta: 7.5,
+    netXG: -2.3,
+    diagnosis: 'Diagnosis: **Fragile Structure.** Points are currently sustained by elite finishing (>20% above expectation). High risk of regression if form drops.',
+    riskLevel: 'HIGH',
+  },
+  {
+    teamId: 5,
+    teamName: 'Chelsea',
+    fundamentalScore: 52,
+    conversionStatus: 'MEAN',
+    conversionDelta: 0.8,
+    netXG: 3.1,
+    diagnosis: 'Diagnosis: **Balanced Profile.** Performance aligns with underlying metrics. No significant regression expected.',
+    riskLevel: 'MEDIUM',
+  },
+];

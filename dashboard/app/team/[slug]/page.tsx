@@ -81,7 +81,7 @@ export default async function TeamPage({ params }: { params: Promise<{ slug: str
       <div className="mb-8">
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-sm font-medium text-slate-600 hover:text-indigo-600 transition-colors"
+          className="inline-flex items-center gap-2 text-sm font-medium text-slate-400 hover:text-emerald-400 transition-colors"
         >
           <span>←</span>
           <span>Back to Dashboard</span>
@@ -92,19 +92,19 @@ export default async function TeamPage({ params }: { params: Promise<{ slug: str
       <div className="card p-8 mb-10">
         <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
           <div className="flex-1">
-            <h1 className="text-4xl font-semibold text-slate-900 mb-4 tracking-tight">{team.Team}</h1>
+            <h1 className="text-4xl font-semibold text-white mb-4 tracking-tight">{team.Team}</h1>
             <div className="flex flex-wrap gap-6 text-sm">
               <div>
                 <span className="text-slate-500">Position</span>
-                <p className="text-2xl font-semibold text-slate-900 mt-1">#{team.Position_Actual}</p>
+                <p className="text-2xl font-semibold text-white mt-1">#{team.Position_Actual}</p>
               </div>
               <div>
                 <span className="text-slate-500">Matches</span>
-                <p className="text-2xl font-semibold text-slate-900 mt-1">{team.Matches}</p>
+                <p className="text-2xl font-semibold text-white mt-1">{team.Matches}</p>
               </div>
               <div>
                 <span className="text-slate-500">Points</span>
-                <p className="text-2xl font-semibold text-slate-900 mt-1">{team.Actual_Points}</p>
+                <p className="text-2xl font-semibold text-white mt-1">{team.Actual_Points}</p>
               </div>
             </div>
           </div>
@@ -116,24 +116,24 @@ export default async function TeamPage({ params }: { params: Promise<{ slug: str
 
       {/* Performance Status Alert */}
       {team.Performance_Status === 'Overperforming' && team.Risk_Score >= 70 && (
-        <div className="card bg-linear-to-br from-red-50 to-red-100/50 border-red-200 p-6 mb-10">
+        <div className="card bg-rose-500/10 border-rose-500/30 p-6 mb-10">
           <div className="flex gap-4">
             <div className="flex-shrink-0">
-              <div className="w-10 h-10 rounded-lg bg-red-100 flex items-center justify-center">
-                <span className="text-red-600 font-semibold text-lg">!</span>
+              <div className="w-10 h-10 rounded-lg bg-rose-500/20 flex items-center justify-center">
+                <span className="text-rose-400 font-semibold text-lg">!</span>
               </div>
             </div>
             <div className="flex-1">
-              <h3 className="text-base font-semibold text-red-900 mb-2">High Regression Risk - Results Flattering Performance</h3>
-              <p className="text-sm text-red-700 leading-relaxed mb-3">
+              <h3 className="text-base font-semibold text-rose-300 mb-2">High Regression Risk - Results Flattering Performance</h3>
+              <p className="text-sm text-rose-200/80 leading-relaxed mb-3">
                 <strong>Warning:</strong> This team is getting better results than their underlying performance suggests they should.
                 They have <strong>{team.Actual_Points}</strong> points but based on chances created/allowed (xG),
-                they should have closer to <strong>{team.xPTS.toFixed(1)}</strong> points.
+                they should have closer to <strong className="text-rose-300">{team.xPTS.toFixed(1)}</strong> points.
               </p>
-              <p className="text-sm text-red-700 leading-relaxed">
-                <strong>Why this matters:</strong> The {(team.Variance).toFixed(1)} point difference is likely due to unsustainable finishing luck or goalkeeping.
+              <p className="text-sm text-rose-200/80 leading-relaxed">
+                <strong className="text-rose-300">Why this matters:</strong> The {(team.Variance).toFixed(1)} point difference is likely due to unsustainable finishing luck or goalkeeping.
                 When performance normalizes (regression to mean), they could drop {Math.abs(team.Variance * 0.7).toFixed(0)}-{Math.abs(team.Variance * 0.9).toFixed(0)} points
-                (<strong>{(team.Regression_Probability * 100).toFixed(0)}% probability</strong>).
+                (<strong className="text-rose-300">{(team.Regression_Probability * 100).toFixed(0)}% probability</strong>).
               </p>
             </div>
           </div>
@@ -141,24 +141,24 @@ export default async function TeamPage({ params }: { params: Promise<{ slug: str
       )}
 
       {team.Performance_Status === 'Underperforming' && (
-        <div className="card bg-linear-to-br from-blue-50 to-blue-100/50 border-blue-200 p-6 mb-10">
+        <div className="card bg-emerald-500/10 border-emerald-500/30 p-6 mb-10">
           <div className="flex gap-4">
             <div className="flex-shrink-0">
-              <div className="w-10 h-10 rounded-lg bg-blue-100 flex items-center justify-center">
-                <svg className="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+              <div className="w-10 h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                <svg className="w-5 h-5 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
                 </svg>
               </div>
             </div>
             <div className="flex-1">
-              <h3 className="text-base font-semibold text-blue-900 mb-2">Improvement Potential - Unlucky But Creating Quality</h3>
-              <p className="text-sm text-blue-700 leading-relaxed mb-3">
+              <h3 className="text-base font-semibold text-emerald-300 mb-2">Improvement Potential - Unlucky But Creating Quality</h3>
+              <p className="text-sm text-emerald-200/80 leading-relaxed mb-3">
                 <strong>Good news:</strong> This team is getting worse results than their performance deserves.
                 They have <strong>{team.Actual_Points}</strong> points but based on chances created/allowed (xG),
-                they should have closer to <strong>{team.xPTS.toFixed(1)}</strong> points.
+                they should have closer to <strong className="text-emerald-300">{team.xPTS.toFixed(1)}</strong> points.
               </p>
-              <p className="text-sm text-blue-700 leading-relaxed">
-                <strong>Why this matters:</strong> The {Math.abs(team.Variance).toFixed(1)} point gap suggests poor finishing luck or goalkeeping errors.
+              <p className="text-sm text-emerald-200/80 leading-relaxed">
+                <strong className="text-emerald-300">Why this matters:</strong> The {Math.abs(team.Variance).toFixed(1)} point gap suggests poor finishing luck or goalkeeping errors.
                 Natural improvement likely as performance normalizes - potential to gain {Math.abs(team.Variance * 0.5).toFixed(0)}-{Math.abs(team.Variance * 0.7).toFixed(0)} points
                 without major changes to tactics or squad.
               </p>
@@ -171,21 +171,21 @@ export default async function TeamPage({ params }: { params: Promise<{ slug: str
       <div className="grid grid-cols-2 md:grid-cols-4 gap-5 mb-10">
         <div className="card p-6">
           <div className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">Actual Points</div>
-          <div className="text-3xl font-semibold text-slate-900">{team.Actual_Points}</div>
+          <div className="text-3xl font-semibold text-white">{team.Actual_Points}</div>
         </div>
         <div className="card p-6">
           <div className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">Expected Points</div>
-          <div className="text-3xl font-semibold text-slate-900">{team.xPTS.toFixed(1)}</div>
+          <div className="text-3xl font-semibold text-white">{team.xPTS.toFixed(1)}</div>
         </div>
         <div className="card p-6">
           <div className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">Goals For</div>
-          <div className="text-3xl font-semibold text-slate-900 mb-1">{team.Goals_For}</div>
-          <div className="text-xs text-slate-500">xG: <span className="font-semibold">{team.xG_For.toFixed(1)}</span></div>
+          <div className="text-3xl font-semibold text-white mb-1">{team.Goals_For}</div>
+          <div className="text-xs text-slate-400">xG: <span className="font-semibold text-white">{team.xG_For.toFixed(1)}</span></div>
         </div>
         <div className="card p-6">
           <div className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">Goals Against</div>
-          <div className="text-3xl font-semibold text-slate-900 mb-1">{team.Goals_Against}</div>
-          <div className="text-xs text-slate-500">xGA: <span className="font-semibold">{team.xG_Against.toFixed(1)}</span></div>
+          <div className="text-3xl font-semibold text-white mb-1">{team.Goals_Against}</div>
+          <div className="text-xs text-slate-400">xGA: <span className="font-semibold text-white">{team.xG_Against.toFixed(1)}</span></div>
         </div>
       </div>
 
@@ -193,44 +193,44 @@ export default async function TeamPage({ params }: { params: Promise<{ slug: str
       <TeamChart team={team} />
 
       {/* What This Means in Plain English */}
-      <div className="card bg-linear-to-br from-indigo-50/30 to-blue-50/20 p-8 mt-10 border-indigo-200/40">
-        <h3 className="text-xl font-semibold text-slate-900 mb-4 tracking-tight">What This Means in Plain English</h3>
-        <div className="prose prose-sm max-w-none text-slate-700 space-y-3">
+      <div className="card bg-slate-800/50 p-8 mt-10 border-slate-700">
+        <h3 className="text-xl font-semibold text-white mb-4 tracking-tight">What This Means in Plain English</h3>
+        <div className="prose prose-sm max-w-none text-slate-300 space-y-3">
           <p>
-            <strong className="text-slate-900">{team.Team}</strong> has earned <strong>{team.Actual_Points} points</strong> from {team.Matches} matches
+            <strong className="text-white">{team.Team}</strong> has earned <strong className="text-white">{team.Actual_Points} points</strong> from {team.Matches} matches
             (position #{team.Position_Actual}).
           </p>
           <p>
-            However, based on the quality of chances they've created ({team.xG_For.toFixed(1)} xG) and conceded ({team.xG_Against.toFixed(1)} xGA),
-            statistical models predict they should have closer to <strong>{team.xPTS.toFixed(1)} points</strong> (position #{team.Position_Expected}).
+            However, based on the quality of chances they&apos;ve created ({team.xG_For.toFixed(1)} xG) and conceded ({team.xG_Against.toFixed(1)} xGA),
+            statistical models predict they should have closer to <strong className="text-white">{team.xPTS.toFixed(1)} points</strong> (position #{team.Position_Expected}).
           </p>
-          <p className={team.Variance > 3 ? 'text-red-800' : team.Variance < -3 ? 'text-blue-800' : 'text-slate-700'}>
+          <p className={team.Variance > 3 ? 'text-rose-300' : team.Variance < -3 ? 'text-emerald-300' : 'text-slate-300'}>
             {team.Variance > 3 ? (
               <>
-                This means they're getting <strong>{team.Variance.toFixed(1)} more points than their performance suggests</strong> -
+                This means they&apos;re getting <strong className="text-white">{team.Variance.toFixed(1)} more points than their performance suggests</strong> -
                 likely due to exceptional finishing (converting low-quality chances) or outstanding goalkeeping (saving shots that typically go in).
-                This level of luck is <strong>difficult to sustain</strong>. Expect results to worsen as finishing/goalkeeping normalizes.
+                This level of luck is <strong className="text-white">difficult to sustain</strong>. Expect results to worsen as finishing/goalkeeping normalizes.
               </>
             ) : team.Variance < -3 ? (
               <>
-                This means they're getting <strong>{Math.abs(team.Variance).toFixed(1)} fewer points than their performance suggests</strong> -
+                This means they&apos;re getting <strong className="text-white">{Math.abs(team.Variance).toFixed(1)} fewer points than their performance suggests</strong> -
                 likely due to poor finishing (missing good chances) or unlucky goalkeeping (conceding from weak shots).
-                The good news: This is usually <strong>temporary bad luck</strong>. Expect natural improvement as finishing/goalkeeping normalizes,
+                The good news: This is usually <strong className="text-white">temporary bad luck</strong>. Expect natural improvement as finishing/goalkeeping normalizes,
                 without needing major tactical changes or expensive signings.
               </>
             ) : (
               <>
-                This means their results closely match their underlying performance quality. They're getting roughly the points their
-                chance creation and defense deserves. This is <strong>sustainable</strong> - no major regression or improvement expected based on luck alone.
+                This means their results closely match their underlying performance quality. They&apos;re getting roughly the points their
+                chance creation and defense deserves. This is <strong className="text-white">sustainable</strong> - no major regression or improvement expected based on luck alone.
               </>
             )}
           </p>
           <p>
-            <strong className="text-slate-900">Bottom line:</strong>
+            <strong className="text-white">Bottom line:</strong>
             {team.Variance > 3 ? (
-              <> Don't be fooled by current position. Performance quality suggests a drop is coming. Avoid panic buys - the issue isn't lack of talent, it's unsustainable luck running out.</>
+              <> Don&apos;t be fooled by current position. Performance quality suggests a drop is coming. Avoid panic buys - the issue isn&apos;t lack of talent, it&apos;s unsustainable luck running out.</>
             ) : team.Variance < -3 ? (
-              <> Don't panic about current position. Performance quality suggests improvement is coming naturally. Avoid hasty managerial changes - the issue is bad luck, not tactics.</>
+              <> Don&apos;t panic about current position. Performance quality suggests improvement is coming naturally. Avoid hasty managerial changes - the issue is bad luck, not tactics.</>
             ) : (
               <> Current position accurately reflects performance quality. Any improvement will require genuine tactical or squad upgrades, not just waiting for luck to change.</>
             )}
@@ -240,47 +240,47 @@ export default async function TeamPage({ params }: { params: Promise<{ slug: str
 
       {/* Recommendations */}
       <div className="card p-8 mt-10">
-        <h3 className="text-xl font-semibold text-slate-900 mb-6 tracking-tight">Strategic Recommendations</h3>
+        <h3 className="text-xl font-semibold text-white mb-6 tracking-tight">Strategic Recommendations</h3>
         <div className="space-y-4">
           {team.Risk_Score >= 90 && (
-            <div className="flex gap-3 p-4 rounded-lg bg-red-50 border border-red-200">
-              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-red-200 flex items-center justify-center">
-                <span className="text-red-700 text-xs font-bold">!</span>
+            <div className="flex gap-3 p-4 rounded-lg bg-rose-500/10 border border-rose-500/30">
+              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-rose-500/20 flex items-center justify-center">
+                <span className="text-rose-400 text-xs font-bold">!</span>
               </div>
-              <p className="text-sm text-red-900">
-                <strong className="font-semibold">Critical Risk:</strong> Monitor closely for regression. Avoid panic decisions if performance normalizes.
+              <p className="text-sm text-rose-200">
+                <strong className="font-semibold text-rose-300">Critical Risk:</strong> Monitor closely for regression. Avoid panic decisions if performance normalizes.
               </p>
             </div>
           )}
           {team.Risk_Score >= 70 && team.Risk_Score < 90 && (
-            <div className="flex gap-3 p-4 rounded-lg bg-orange-50 border border-orange-200">
-              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-orange-200 flex items-center justify-center">
-                <span className="text-orange-700 text-xs font-bold">!</span>
+            <div className="flex gap-3 p-4 rounded-lg bg-orange-500/10 border border-orange-500/30">
+              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-orange-500/20 flex items-center justify-center">
+                <span className="text-orange-400 text-xs font-bold">!</span>
               </div>
-              <p className="text-sm text-orange-900">
-                <strong className="font-semibold">High Risk:</strong> Performance may regress to mean. Focus on underlying xG metrics.
+              <p className="text-sm text-orange-200">
+                <strong className="font-semibold text-orange-300">High Risk:</strong> Performance may regress to mean. Focus on underlying xG metrics.
               </p>
             </div>
           )}
           {team.Variance < -3 && (
-            <div className="flex gap-3 p-4 rounded-lg bg-blue-50 border border-blue-200">
-              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-blue-200 flex items-center justify-center">
-                <svg className="w-3 h-3 text-blue-700" fill="currentColor" viewBox="0 0 20 20">
+            <div className="flex gap-3 p-4 rounded-lg bg-emerald-500/10 border border-emerald-500/30">
+              <div className="flex-shrink-0 w-6 h-6 rounded-full bg-emerald-500/20 flex items-center justify-center">
+                <svg className="w-3 h-3 text-emerald-400" fill="currentColor" viewBox="0 0 20 20">
                   <path fillRule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
                 </svg>
               </div>
-              <p className="text-sm text-blue-900">
-                <strong className="font-semibold">Underperforming:</strong> Expected to improve naturally. Review finishing efficiency.
+              <p className="text-sm text-emerald-200">
+                <strong className="font-semibold text-emerald-300">Underperforming:</strong> Expected to improve naturally. Review finishing efficiency.
               </p>
             </div>
           )}
-          <div className="flex gap-3 p-4 rounded-lg bg-slate-50 border border-slate-200">
-            <div className="flex-shrink-0 w-6 h-6 rounded-full bg-slate-200 flex items-center justify-center">
-              <span className="text-slate-700 text-xs font-bold">i</span>
+          <div className="flex gap-3 p-4 rounded-lg bg-slate-700/50 border border-slate-600">
+            <div className="flex-shrink-0 w-6 h-6 rounded-full bg-slate-600 flex items-center justify-center">
+              <span className="text-slate-300 text-xs font-bold">i</span>
             </div>
-            <p className="text-sm text-slate-700">
-              <strong className="font-semibold">Key Insight:</strong> Expected position based on xG is <strong>#{team.Position_Expected}</strong>,
-               current position is <strong>#{team.Position_Actual}</strong>.
+            <p className="text-sm text-slate-300">
+              <strong className="font-semibold text-white">Key Insight:</strong> Expected position based on xG is <strong className="text-white">#{team.Position_Expected}</strong>,
+               current position is <strong className="text-white">#{team.Position_Actual}</strong>.
             </p>
           </div>
         </div>
