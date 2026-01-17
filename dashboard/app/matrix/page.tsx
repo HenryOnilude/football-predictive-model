@@ -1,35 +1,39 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import TeamMatrix from '@/components/TeamMatrix';
-import { analyzeAllTeams, TeamStats } from '@/lib/TeamAnalysis';
-
-// Mock team data with logos - in production, fetch from API
-const mockTeamStats: TeamStats[] = [
-  { teamId: 1, teamName: 'Manchester City', teamLogo: 'https://resources.premierleague.com/premierleague/badges/t43.png', goalsFor: 45, goalsAgainst: 18, xGFor: 50.2, xGAgainst: 15.8, matchesPlayed: 20, points: 48 },
-  { teamId: 2, teamName: 'Arsenal', teamLogo: 'https://resources.premierleague.com/premierleague/badges/t3.png', goalsFor: 42, goalsAgainst: 16, xGFor: 38.5, xGAgainst: 20.1, matchesPlayed: 20, points: 46 },
-  { teamId: 3, teamName: 'Liverpool', teamLogo: 'https://resources.premierleague.com/premierleague/badges/t14.png', goalsFor: 48, goalsAgainst: 20, xGFor: 52.3, xGAgainst: 18.2, matchesPlayed: 20, points: 50 },
-  { teamId: 4, teamName: 'Aston Villa', teamLogo: 'https://resources.premierleague.com/premierleague/badges/t7.png', goalsFor: 38, goalsAgainst: 25, xGFor: 35.1, xGAgainst: 28.5, matchesPlayed: 20, points: 38 },
-  { teamId: 5, teamName: 'Tottenham', teamLogo: 'https://resources.premierleague.com/premierleague/badges/t6.png', goalsFor: 35, goalsAgainst: 28, xGFor: 40.2, xGAgainst: 24.1, matchesPlayed: 20, points: 35 },
-  { teamId: 6, teamName: 'Newcastle', teamLogo: 'https://resources.premierleague.com/premierleague/badges/t4.png', goalsFor: 32, goalsAgainst: 22, xGFor: 28.5, xGAgainst: 26.8, matchesPlayed: 20, points: 34 },
-  { teamId: 7, teamName: 'Manchester United', teamLogo: 'https://resources.premierleague.com/premierleague/badges/t1.png', goalsFor: 28, goalsAgainst: 30, xGFor: 32.1, xGAgainst: 25.5, matchesPlayed: 20, points: 28 },
-  { teamId: 8, teamName: 'Chelsea', teamLogo: 'https://resources.premierleague.com/premierleague/badges/t8.png', goalsFor: 40, goalsAgainst: 26, xGFor: 36.8, xGAgainst: 28.2, matchesPlayed: 20, points: 36 },
-  { teamId: 9, teamName: 'Brighton', teamLogo: 'https://resources.premierleague.com/premierleague/badges/t36.png', goalsFor: 35, goalsAgainst: 32, xGFor: 38.5, xGAgainst: 28.1, matchesPlayed: 20, points: 32 },
-  { teamId: 10, teamName: 'West Ham', teamLogo: 'https://resources.premierleague.com/premierleague/badges/t21.png', goalsFor: 28, goalsAgainst: 35, xGFor: 25.2, xGAgainst: 32.5, matchesPlayed: 20, points: 26 },
-  { teamId: 11, teamName: 'Brentford', teamLogo: 'https://resources.premierleague.com/premierleague/badges/t94.png', goalsFor: 30, goalsAgainst: 28, xGFor: 32.5, xGAgainst: 30.1, matchesPlayed: 20, points: 30 },
-  { teamId: 12, teamName: 'Crystal Palace', teamLogo: 'https://resources.premierleague.com/premierleague/badges/t31.png', goalsFor: 22, goalsAgainst: 30, xGFor: 26.8, xGAgainst: 28.5, matchesPlayed: 20, points: 24 },
-  { teamId: 13, teamName: 'Fulham', teamLogo: 'https://resources.premierleague.com/premierleague/badges/t54.png', goalsFor: 28, goalsAgainst: 32, xGFor: 30.2, xGAgainst: 28.8, matchesPlayed: 20, points: 28 },
-  { teamId: 14, teamName: 'Wolves', teamLogo: 'https://resources.premierleague.com/premierleague/badges/t39.png', goalsFor: 25, goalsAgainst: 35, xGFor: 22.1, xGAgainst: 32.2, matchesPlayed: 20, points: 22 },
-  { teamId: 15, teamName: 'Bournemouth', teamLogo: 'https://resources.premierleague.com/premierleague/badges/t91.png', goalsFor: 30, goalsAgainst: 38, xGFor: 28.5, xGAgainst: 35.2, matchesPlayed: 20, points: 26 },
-  { teamId: 16, teamName: 'Nottingham Forest', teamLogo: 'https://resources.premierleague.com/premierleague/badges/t17.png', goalsFor: 22, goalsAgainst: 32, xGFor: 25.8, xGAgainst: 30.1, matchesPlayed: 20, points: 24 },
-  { teamId: 17, teamName: 'Everton', teamLogo: 'https://resources.premierleague.com/premierleague/badges/t11.png', goalsFor: 20, goalsAgainst: 28, xGFor: 24.5, xGAgainst: 32.8, matchesPlayed: 20, points: 20 },
-  { teamId: 18, teamName: 'Leicester City', teamLogo: 'https://resources.premierleague.com/premierleague/badges/t13.png', goalsFor: 26, goalsAgainst: 40, xGFor: 28.2, xGAgainst: 36.5, matchesPlayed: 20, points: 18 },
-  { teamId: 19, teamName: 'Ipswich Town', teamLogo: 'https://resources.premierleague.com/premierleague/badges/t40.png', goalsFor: 18, goalsAgainst: 42, xGFor: 22.5, xGAgainst: 38.2, matchesPlayed: 20, points: 14 },
-  { teamId: 20, teamName: 'Southampton', teamLogo: 'https://resources.premierleague.com/premierleague/badges/t20.png', goalsFor: 15, goalsAgainst: 45, xGFor: 20.8, xGAgainst: 40.5, matchesPlayed: 20, points: 10 },
-];
+import { TeamAnalysis } from '@/lib/TeamAnalysis';
+import { 
+  fetchFPLData, 
+  transformTeams, 
+  convertToTeamAnalysis,
+  getCurrentGameweek,
+} from '@/lib/fpl';
 
 export default function MatrixPage() {
-  // Analyze all teams using the 5-tier model
-  const analyzedTeams = analyzeAllTeams(mockTeamStats);
+  const [analyzedTeams, setAnalyzedTeams] = useState<TeamAnalysis[]>([]);
+  const [gameweek, setGameweek] = useState<number>(1);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    async function loadData() {
+      try {
+        setLoading(true);
+        const data = await fetchFPLData();
+        const teams = transformTeams(data);
+        const analyzed = convertToTeamAnalysis(teams);
+        setAnalyzedTeams(analyzed);
+        setGameweek(getCurrentGameweek(data));
+      } catch (err) {
+        console.error('Failed to fetch FPL data:', err);
+        setError('Failed to load data from FPL API');
+      } finally {
+        setLoading(false);
+      }
+    }
+    loadData();
+  }, []);
 
   // Count verdicts for summary
   const verdictCounts = {
@@ -41,15 +45,49 @@ export default function MatrixPage() {
     CRITICAL: analyzedTeams.filter(t => t.marketVerdict === 'CRITICAL').length,
   };
 
+  if (loading) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div className="flex items-center justify-center min-h-[400px]">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto mb-4" />
+            <p className="text-slate-400">Loading FPL data...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <div className="bg-red-900/20 border border-red-800 rounded-xl p-6 text-center">
+          <p className="text-red-400 font-medium">{error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="mt-4 px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+          >
+            Retry
+          </button>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-semibold text-white tracking-tight mb-2">
-          Health vs. Heat Matrix
-        </h1>
+        <div className="flex items-center gap-3 mb-2">
+          <h1 className="text-3xl font-semibold text-white tracking-tight">
+            Health vs. Heat Matrix
+          </h1>
+          <span className="px-3 py-1 bg-emerald-600/20 border border-emerald-600/40 text-emerald-400 text-sm font-medium rounded-full">
+            GW{gameweek}
+          </span>
+        </div>
         <p className="text-slate-400">
-          5-tier efficiency gradient analysis combining sustainability (xG structure) with conversion efficiency
+          5-tier efficiency gradient analysis • Live data from Official FPL API
         </p>
       </div>
 
