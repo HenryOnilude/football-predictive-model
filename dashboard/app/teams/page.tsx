@@ -2,74 +2,104 @@
 
 import { useEffect, useState } from 'react';
 import TeamMatrix from '@/components/TeamMatrix';
-import MarketIntelligenceTable from '@/components/MarketIntelligenceTable';
+import TeamSentimentCard from '@/components/TeamSentimentCard';
 import { TeamAnalysis } from '@/lib/TeamAnalysis';
+import { TeamLuckResult } from '@/lib/TeamLuck';
 import { 
   fetchFPLData, 
   transformTeams, 
   convertToTeamAnalysis,
   getCurrentGameweek,
+  TeamHealthHeat,
 } from '@/lib/fpl';
 
-interface StandingTeam {
-  position: number;
-  team: {
-    id: number;
-    name: string;
-    shortName: string;
-    tla: string;
-    crest: string;
-  };
-  points: number;
-}
+// Convert TeamHealthHeat to TeamLuckResult for sentiment cards
+function convertToTeamLuck(team: TeamHealthHeat): TeamLuckResult {
+  const attackingLuck = team.goalDelta;
+  const defensiveLuck = team.cleanSheetLuck;
+  
+  const attackVerdict: TeamLuckResult['attackVerdict'] = 
+    attackingLuck <= -1 ? 'TARGET_ATTACKERS' : 
+    attackingLuck >= 1 ? 'AVOID_ATTACKERS' : 'NEUTRAL';
+  
+  const defenseVerdict: TeamLuckResult['defenseVerdict'] = 
+    defensiveLuck >= 1 ? 'BUY_DEFENSE' : 
+    defensiveLuck <= -1 ? 'AVOID_DEFENSE' : 'NEUTRAL';
+  
+  let quadrant: TeamLuckResult['quadrant'];
+  if (attackVerdict === 'TARGET_ATTACKERS' && defenseVerdict === 'BUY_DEFENSE') {
+    quadrant = 'DOUBLE_VALUE';
+  } else if (defenseVerdict === 'BUY_DEFENSE') {
+    quadrant = 'CLEAN_SHEET_CHASER';
+  } else if (attackVerdict === 'TARGET_ATTACKERS') {
+    quadrant = 'GOAL_CHASER';
+  } else if (attackVerdict === 'AVOID_ATTACKERS' || defenseVerdict === 'AVOID_DEFENSE') {
+    quadrant = 'AVOID';
+  } else {
+    quadrant = 'NEUTRAL';
+  }
 
-interface HybridTeamData extends StandingTeam {
-  analysis: TeamAnalysis | null;
+  const attackLabel = attackingLuck <= -3 ? 'EXPLOSIVE' : 
+    attackingLuck <= -1 ? 'VALUE BUY' : 
+    attackingLuck >= 3 ? 'COOLDOWN' : 
+    attackingLuck >= 1 ? 'OVERHEATED' : 'STABLE';
+  
+  const defenseLabel = defensiveLuck >= 3 ? 'BUY DIP' : 
+    defensiveLuck >= 1 ? 'UNDERVALUED' : 
+    defensiveLuck <= -3 ? 'FRAGILE' : 
+    defensiveLuck <= -1 ? 'RISKY' : 'STABLE';
+
+  return {
+    teamId: team.id,
+    teamName: team.name,
+    teamShort: team.shortName,
+    logo: team.logo,
+    attackingLuck,
+    attackVerdict,
+    attackLabel,
+    attackDescription: attackingLuck <= -1 
+      ? 'Underperforming xG. Attackers are due goals.'
+      : attackingLuck >= 1 
+      ? 'Overperforming xG. Regression likely.'
+      : 'Performing as expected.',
+    defensiveLuck,
+    defenseVerdict,
+    defenseLabel,
+    defenseDescription: defensiveLuck >= 1
+      ? 'Conceding cheap goals. Clean sheets due.'
+      : defensiveLuck <= -1
+      ? 'Keepers saving them. Goals coming.'
+      : 'Defense performing as expected.',
+    quadrant,
+    goalsFor: team.totalGoals,
+    goalsAgainst: Math.round(team.totalXGC),
+    xGFor: team.totalXG,
+    xGAgainst: team.totalXGC,
+    matchesPlayed: 20,
+  };
 }
 
 export default function TeamsPage() {
   const [analyzedTeams, setAnalyzedTeams] = useState<TeamAnalysis[]>([]);
-  const [hybridStandings, setHybridStandings] = useState<HybridTeamData[]>([]);
+  const [sentimentTeams, setSentimentTeams] = useState<TeamLuckResult[]>([]);
   const [gameweek, setGameweek] = useState<number>(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Single data fetch at page level - fetch both FPL data and standings
+  // Single data fetch at page level - shared by both components
   useEffect(() => {
     async function loadData() {
       try {
         setLoading(true);
-        
-        // Fetch FPL data and standings in parallel
-        const [fplData, standingsRes] = await Promise.all([
-          fetchFPLData(),
-          fetch('/api/standings').then(r => r.json())
-        ]);
-        
+        const fplData = await fetchFPLData();
         const teams = transformTeams(fplData);
+        
+        // Convert to both formats from single data source
         const analyzed = convertToTeamAnalysis(teams);
-        
-        // Get standings table
-        const standingsTable = standingsRes.standings?.[0]?.table || [];
-        
-        // Merge standings with TeamAnalysis data for Hybrid table
-        const mergedStandings: HybridTeamData[] = standingsTable.map((standing: StandingTeam & { playedGames?: number }) => {
-          // Find matching analysis by team name (fuzzy match)
-          const analysis = analyzed.find(a => 
-            a.teamName.toLowerCase().includes(standing.team.shortName.toLowerCase()) ||
-            standing.team.name.toLowerCase().includes(a.teamName.toLowerCase())
-          ) || null;
-          
-          return {
-            position: standing.position,
-            team: standing.team,
-            points: standing.points,
-            analysis,
-          };
-        });
+        const sentiment = teams.map(convertToTeamLuck);
         
         setAnalyzedTeams(analyzed);
-        setHybridStandings(mergedStandings);
+        setSentimentTeams(sentiment);
         setGameweek(getCurrentGameweek(fplData));
       } catch (err) {
         console.error('Failed to fetch data:', err);
@@ -129,9 +159,24 @@ export default function TeamsPage() {
         </p>
       </div>
 
-      {/* ========== UNIFIED TABLE: STANDINGS + SENTIMENT ========== */}
-      <div className="mb-10">
-        <MarketIntelligenceTable standings={hybridStandings} />
+      {/* ========== SECTION A: MARKET SENTIMENT (THE DASHBOARD) ========== */}
+      <div className="mb-6">
+        <h2 className="text-xl font-semibold text-white tracking-tight mb-2">
+          📊 Market Sentiment Dashboard
+        </h2>
+        <p className="text-slate-400 text-sm">
+          Actionable Buy/Sell signals based on xG variance • Click a card for details
+        </p>
+      </div>
+
+      {/* Sentiment Cards Grid - Responsive: Stack on mobile, 2 cols on tablet, 3 on desktop */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
+        {sentimentTeams
+          .filter(t => t.quadrant !== 'NEUTRAL')
+          .slice(0, 6)
+          .map((team) => (
+            <TeamSentimentCard key={team.teamId} team={team} />
+          ))}
       </div>
 
       {/* ========== VISUAL DIVIDER ========== */}
@@ -148,8 +193,8 @@ export default function TeamsPage() {
 
       {/* ========== SECTION B: THE MATRIX (THE EVIDENCE) ========== */}
       <div className="mb-6">
-        <h2 className="text-2xl font-semibold text-white tracking-tight mb-2">
-          Health vs. Heat Matrix
+        <h2 className="text-xl font-semibold text-white tracking-tight mb-2">
+          🔬 Health vs. Heat Matrix
         </h2>
         <p className="text-slate-400 text-sm">
           Verify sentiment signals with raw performance numbers
@@ -164,15 +209,15 @@ export default function TeamsPage() {
           <div className="space-y-1.5 text-xs">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-emerald-500" />
-              <span className="text-slate-300">70-100: Elite structure</span>
+              <span className="text-slate-300">75+: Elite structure</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-amber-500" />
-              <span className="text-slate-300">40-70: Average structure</span>
+              <span className="text-slate-300">45-75: Average structure</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-rose-500" />
-              <span className="text-slate-300">0-40: Broken structure</span>
+              <span className="text-slate-300">&lt;45: Broken structure</span>
             </div>
           </div>
         </div>
