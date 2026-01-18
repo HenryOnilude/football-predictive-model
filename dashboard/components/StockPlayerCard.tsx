@@ -147,7 +147,7 @@ export default function StockPlayerCard({
           <div className="flex items-center justify-between mb-4">
             <div className={`px-3 py-1.5 rounded-lg ${signalBg} border`}>
               <span className={`text-sm font-semibold ${signalColor}`}>
-                {signal === 'BUY' ? '📈 BUY SIGNAL' : signal === 'SELL' ? '📉 SELL SIGNAL' : '➡️ HOLD'}
+                {signal === 'BUY' ? 'BUY SIGNAL' : signal === 'SELL' ? 'SELL SIGNAL' : 'HOLD'}
               </span>
             </div>
             
@@ -259,7 +259,7 @@ export default function StockPlayerCard({
 
 // Demo data for testing
 export const demoContextBadges: ContextBadge[] = [
-  { emoji: '⚠️', label: 'No Rodri', type: 'warning' },
-  { emoji: '🔥', label: 'Hot Form', type: 'positive' },
-  { emoji: '🏠', label: 'Home Fixture', type: 'neutral' },
+  { emoji: '', label: 'No Rodri', type: 'warning' },
+  { emoji: '', label: 'Hot Form', type: 'positive' },
+  { emoji: '', label: 'Home Fixture', type: 'neutral' },
 ];

@@ -251,7 +251,7 @@ export default function TeamsPage() {
       {/* ========== SECTION A: MARKET SENTIMENT (THE DASHBOARD) ========== */}
       <div className="mb-6">
         <h2 className="text-xl font-semibold text-white tracking-tight mb-2">
-          📊 Market Sentiment Dashboard
+          Market Sentiment Dashboard
         </h2>
         <p className="text-slate-400 text-sm">
           Actionable Buy/Sell signals based on xG variance • Click a card for details
@@ -266,19 +266,19 @@ export default function TeamsPage() {
             <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Team Categories</h4>
             <div className="space-y-2 text-xs">
               <div className="flex items-start gap-2">
-                <span className="text-emerald-400 font-semibold whitespace-nowrap">💎 DOUBLE VALUE</span>
+                <span className="text-emerald-400 font-semibold whitespace-nowrap">DOUBLE VALUE</span>
                 <span className="text-slate-400">Team is unlucky in attack AND defense. Their players should score more goals AND keep more clean sheets soon.</span>
               </div>
               <div className="flex items-start gap-2">
-                <span className="text-cyan-400 font-semibold whitespace-nowrap">🛡️ CS CHASER</span>
+                <span className="text-cyan-400 font-semibold whitespace-nowrap">CS CHASER</span>
                 <span className="text-slate-400">Defense is conceding cheap goals they shouldn&apos;t be. Buy their defenders/goalkeeper — clean sheets are coming.</span>
               </div>
               <div className="flex items-start gap-2">
-                <span className="text-orange-400 font-semibold whitespace-nowrap">⚽ GOAL CHASER</span>
+                <span className="text-orange-400 font-semibold whitespace-nowrap">GOAL CHASER</span>
                 <span className="text-slate-400">Attackers are missing chances they should score. Buy their forwards/midfielders — goals are coming.</span>
               </div>
               <div className="flex items-start gap-2">
-                <span className="text-rose-400 font-semibold whitespace-nowrap">🚫 AVOID</span>
+                <span className="text-rose-400 font-semibold whitespace-nowrap">AVOID</span>
                 <span className="text-slate-400">Team is overperforming their stats. Their luck will run out — expect fewer goals or more goals conceded soon.</span>
               </div>
             </div>

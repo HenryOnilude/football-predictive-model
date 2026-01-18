@@ -72,7 +72,7 @@ export default async function LuckPage() {
               <div className="grid md:grid-cols-2 gap-4 text-xs">
                 <div className="space-y-3">
                   <div className="flex items-start gap-2">
-                    <span className="px-2 py-0.5 rounded bg-emerald-600 text-white font-semibold whitespace-nowrap text-[10px]">DUE A HAUL 🔥</span>
+                    <span className="px-2 py-0.5 rounded bg-emerald-600 text-white font-semibold whitespace-nowrap text-[10px]">DUE A HAUL</span>
                     <span className="text-slate-400">This player is getting good chances but not scoring. Statistics say they WILL score soon — buy them now before they explode.</span>
                   </div>
                   <div className="flex items-start gap-2">
@@ -82,7 +82,7 @@ export default async function LuckPage() {
                 </div>
                 <div className="space-y-3">
                   <div className="flex items-start gap-2">
-                    <span className="px-2 py-0.5 rounded bg-rose-600 text-white font-semibold whitespace-nowrap text-[10px]">REGRESSION RISK ⚠️</span>
+                    <span className="px-2 py-0.5 rounded bg-rose-600 text-white font-semibold whitespace-nowrap text-[10px]">REGRESSION RISK</span>
                     <span className="text-slate-400">DANGER: This player is heavily overperforming. They&apos;re scoring goals they statistically shouldn&apos;t be. Their output WILL drop — avoid buying at all costs.</span>
                   </div>
                   <div className="flex items-start gap-2">

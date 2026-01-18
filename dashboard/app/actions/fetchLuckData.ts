@@ -101,11 +101,11 @@ function getVerdict(luckScore: number): { verdict: 'BUY' | 'TRAP' | 'HOLD'; labe
   // POSITIVE luckScore = Player is "Overperforming" = TRAP (outperforming xG)
   
   if (luckScore <= -1.5) {
-    return { verdict: 'BUY', label: 'DUE A HAUL 🔥' };
+    return { verdict: 'BUY', label: 'DUE A HAUL' };
   } else if (luckScore <= -0.5) {
     return { verdict: 'BUY', label: 'UNDERVALUED' };
   } else if (luckScore >= 1.5) {
-    return { verdict: 'TRAP', label: 'REGRESSION RISK ⚠️' };
+    return { verdict: 'TRAP', label: 'REGRESSION RISK' };
   } else if (luckScore >= 0.5) {
     return { verdict: 'TRAP', label: 'SELL HIGH' };
   }

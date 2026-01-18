@@ -485,10 +485,10 @@ function generateInsightNote(team: TeamHealthHeat): string {
     return `${team.name} are underperforming their underlying numbers. With ${delta.toFixed(1)} goal luck deficit, regression to the mean should bring returns.`;
   }
   if (team.marketVerdict === 'OVERHEATED') {
-    return `⚠️ ${team.name} are outperforming xG by ${delta.toFixed(1)} goals. Their structure doesn't support current output. Regression risk is high.`;
+    return `${team.name} are outperforming xG by ${delta.toFixed(1)} goals. Their structure doesn't support current output. Regression risk is high.`;
   }
   if (team.marketVerdict === 'CRITICAL') {
-    return `🚨 ${team.name} in trouble. Poor xG structure (${sust}/100) combined with cold finishing (${delta.toFixed(1)}). Avoid their assets.`;
+    return `${team.name} in trouble. Poor xG structure (${sust}/100) combined with cold finishing (${delta.toFixed(1)}). Avoid their assets.`;
   }
   if (team.marketVerdict === 'STABLE') {
     return `${team.name} performing as expected. Solid structure at ${sust}/100 sustainability. Reliable but not explosive.`;

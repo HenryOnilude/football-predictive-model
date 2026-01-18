@@ -34,15 +34,15 @@ export default function TeamSentimentCard({ team }: TeamSentimentCardProps) {
   const getQuadrantBadge = () => {
     switch (team.quadrant) {
       case 'DOUBLE_VALUE':
-        return { label: 'DOUBLE VALUE', icon: '💎', style: 'bg-purple-500/20 text-purple-400 border-purple-500/30' };
+        return { label: 'DOUBLE VALUE', icon: '', style: 'bg-purple-500/20 text-purple-400 border-purple-500/30' };
       case 'CLEAN_SHEET_CHASER':
-        return { label: 'CS CHASER', icon: '🛡️', style: 'bg-blue-500/20 text-blue-400 border-blue-500/30' };
+        return { label: 'CS CHASER', icon: '', style: 'bg-blue-500/20 text-blue-400 border-blue-500/30' };
       case 'GOAL_CHASER':
-        return { label: 'GOAL CHASER', icon: '🔫', style: 'bg-orange-500/20 text-orange-400 border-orange-500/30' };
+        return { label: 'GOAL CHASER', icon: '', style: 'bg-orange-500/20 text-orange-400 border-orange-500/30' };
       case 'AVOID':
-        return { label: 'AVOID', icon: '⚠️', style: 'bg-rose-500/20 text-rose-400 border-rose-500/30' };
+        return { label: 'AVOID', icon: '', style: 'bg-rose-500/20 text-rose-400 border-rose-500/30' };
       default:
-        return { label: 'NEUTRAL', icon: '➡️', style: 'bg-slate-700/50 text-slate-400 border-slate-600' };
+        return { label: 'NEUTRAL', icon: '', style: 'bg-slate-700/50 text-slate-400 border-slate-600' };
     }
   };
 
@@ -113,7 +113,7 @@ export default function TeamSentimentCard({ team }: TeamSentimentCardProps) {
           
           {/* Defense Badge */}
           <div className={`inline-flex px-2.5 py-1.5 rounded-md border text-xs font-semibold ${getDefenseBadgeStyle()}`}>
-            {team.defenseVerdict === 'BUY_DEFENSE' ? '🛡️' : team.defenseVerdict === 'AVOID_DEFENSE' ? '⚠️' : '➡️'} {team.defenseLabel}
+             {team.defenseLabel}
           </div>
           
           <p className="text-xs text-slate-500 mt-2 leading-relaxed">
@@ -151,7 +151,7 @@ export default function TeamSentimentCard({ team }: TeamSentimentCardProps) {
           
           {/* Attack Badge */}
           <div className={`inline-flex px-2.5 py-1.5 rounded-md border text-xs font-semibold ${getAttackBadgeStyle()}`}>
-            {team.attackVerdict === 'TARGET_ATTACKERS' ? '🚀' : team.attackVerdict === 'AVOID_ATTACKERS' ? '🧊' : '➡️'} {team.attackLabel}
+             {team.attackLabel}
           </div>
           
           <p className="text-xs text-slate-500 mt-2 leading-relaxed">

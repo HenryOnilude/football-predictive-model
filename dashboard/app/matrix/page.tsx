@@ -94,7 +94,7 @@ export default function MatrixPage() {
       {/* Legend Cards */}
       <div className="grid md:grid-cols-2 gap-4 mb-8">
         <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4">
-          <h3 className="text-sm font-semibold text-white mb-3">📊 Structure (Health)</h3>
+          <h3 className="text-sm font-semibold text-white mb-3">Structure (Health)</h3>
           <p className="text-xs text-slate-400 mb-2">Net xG per 90 — predicts long-term reliability</p>
           <div className="space-y-1.5 text-xs">
             <div className="flex items-center gap-2">
@@ -113,7 +113,7 @@ export default function MatrixPage() {
         </div>
 
         <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4">
-          <h3 className="text-sm font-semibold text-white mb-3">🔥 Form (Heat)</h3>
+          <h3 className="text-sm font-semibold text-white mb-3">Form (Heat)</h3>
           <p className="text-xs text-slate-400 mb-2">Goals - xG — predicts short-term regression</p>
           <div className="space-y-1.5 text-xs">
             <div className="flex items-center gap-2">
@@ -150,7 +150,7 @@ export default function MatrixPage() {
           </div>
           <div className="text-center p-3 rounded-lg bg-purple-900/20 border border-purple-800">
             <div className="text-xl font-bold text-purple-400">{verdictCounts.PRIME_BUY}</div>
-            <p className="text-xs text-purple-400/80 font-medium">💎 PRIME BUY</p>
+            <p className="text-xs text-purple-400/80 font-medium">PRIME BUY</p>
           </div>
           <div className="text-center p-3 rounded-lg bg-slate-800/50 border border-slate-700">
             <div className="text-xl font-bold text-slate-400">{verdictCounts.STABLE}</div>
@@ -162,11 +162,11 @@ export default function MatrixPage() {
           </div>
           <div className="text-center p-3 rounded-lg bg-amber-900/20 border border-amber-800">
             <div className="text-xl font-bold text-amber-400">{verdictCounts.OVERHEATED}</div>
-            <p className="text-xs text-amber-400/80 font-medium">⚠️ OVERHEATED</p>
+            <p className="text-xs text-amber-400/80 font-medium">OVERHEATED</p>
           </div>
           <div className="text-center p-3 rounded-lg bg-red-900/20 border border-red-800">
             <div className="text-xl font-bold text-red-400">{verdictCounts.CRITICAL}</div>
-            <p className="text-xs text-red-400/80 font-medium">🚨 CRITICAL</p>
+            <p className="text-xs text-red-400/80 font-medium">CRITICAL</p>
           </div>
         </div>
       </div>

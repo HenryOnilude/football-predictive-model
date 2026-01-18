@@ -26,8 +26,8 @@ export type EfficiencyStatus =
 // Market Verdict Archetypes
 export type MarketVerdict = 
   | 'DOMINANT'    // High Sust + Hot (Trust)
-  | 'OVERHEATED'  // Low Sust + Hot (⚠️ Warning)
-  | 'PRIME_BUY'   // High Sust + Cold (💎 Opportunity)
+  | 'OVERHEATED'  // Low Sust + Hot (Warning)
+  | 'PRIME_BUY'   // High Sust + Cold (Opportunity)
   | 'CRITICAL'    // Low Sust + Cold (Relegation Form)
   | 'STABLE'      // High Sust + Sustainable
   | 'FRAGILE';    // Low Sust + Sustainable
@@ -264,13 +264,13 @@ export function getVerdictConfig(verdict: MarketVerdict): {
 } {
   switch (verdict) {
     case 'DOMINANT':
-      return { label: 'DOMINANT', icon: '💎', color: 'text-emerald-400' };
+      return { label: 'DOMINANT', icon: '', color: 'text-emerald-400' };
     case 'OVERHEATED':
-      return { label: 'OVERHEATED', icon: '⚠️', color: 'text-amber-400' };
+      return { label: 'OVERHEATED', icon: '', color: 'text-amber-400' };
     case 'PRIME_BUY':
-      return { label: 'PRIME BUY', icon: '💎', color: 'text-purple-400' };
+      return { label: 'PRIME BUY', icon: '', color: 'text-purple-400' };
     case 'CRITICAL':
-      return { label: 'CRITICAL', icon: '🚨', color: 'text-red-400' };
+      return { label: 'CRITICAL', icon: '', color: 'text-red-400' };
     case 'STABLE':
       return { label: 'STABLE', icon: '', color: 'text-slate-400' };
     case 'FRAGILE':
