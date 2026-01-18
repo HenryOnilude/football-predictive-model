@@ -332,6 +332,87 @@ export default function TeamsPage() {
       </div>
 
       {/* ========== SECTION B: HYBRID INTELLIGENCE TABLE ========== */}
+      
+      {/* Table Legend - Explains all columns and status labels */}
+      <div className="mb-6 p-4 bg-slate-900/50 border border-slate-800 rounded-xl">
+        <h3 className="text-sm font-semibold text-white mb-4">Understanding The Table</h3>
+        
+        <div className="grid md:grid-cols-2 gap-6">
+          {/* Column Definitions */}
+          <div>
+            <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Column Definitions</h4>
+            <div className="space-y-2 text-xs">
+              <div>
+                <span className="text-white font-semibold">SYSTEM HEALTH</span>
+                <span className="text-slate-400 ml-2">A 0-100 score measuring how good the team&apos;s underlying stats are. Higher = better chance creation and defensive structure.</span>
+              </div>
+              <div>
+                <span className="text-white font-semibold">FINISHING HEAT</span>
+                <span className="text-slate-400 ml-2">Shows if a team is scoring more or less than expected. Positive = overperforming (hot), Negative = underperforming (cold).</span>
+              </div>
+              <div>
+                <span className="text-white font-semibold">ACTION</span>
+                <span className="text-slate-400 ml-2">Our recommendation based on combining System Health + Finishing Heat. Tells you what to do with their players.</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Finishing Heat Labels */}
+          <div>
+            <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Finishing Heat Status</h4>
+            <div className="space-y-2 text-xs">
+              <div className="flex items-start gap-2">
+                <span className="px-2 py-0.5 rounded bg-red-600 text-white font-mono text-[10px] whitespace-nowrap">CRIT OVER</span>
+                <span className="text-slate-400">Scoring 6+ goals more than expected. Extremely unsustainable — big regression coming.</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="px-2 py-0.5 rounded bg-orange-500 text-white font-mono text-[10px] whitespace-nowrap">HEATING UP</span>
+                <span className="text-slate-400">Scoring 2-6 goals more than expected. Running hot — may cool down soon.</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="px-2 py-0.5 rounded bg-slate-600 text-white font-mono text-[10px] whitespace-nowrap">FAIR VALUE</span>
+                <span className="text-slate-400">Scoring roughly as expected (-2 to +2). Sustainable, no edge here.</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="px-2 py-0.5 rounded bg-cyan-600 text-white font-mono text-[10px] whitespace-nowrap">COLD</span>
+                <span className="text-slate-400">Scoring 2-6 goals less than expected. Unlucky — goals are coming soon.</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="px-2 py-0.5 rounded bg-purple-600 text-white font-mono text-[10px] whitespace-nowrap">EXTREME VAL</span>
+                <span className="text-slate-400">Scoring 6+ goals less than expected. Severely unlucky — huge upside potential.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Action Labels */}
+        <div className="mt-4 pt-4 border-t border-slate-700">
+          <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Action Recommendations</h4>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-2 text-xs">
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-0.5 rounded bg-emerald-600 text-white font-semibold whitespace-nowrap">DOMINANT</span>
+              <span className="text-slate-400">Elite team, trust them</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-0.5 rounded bg-purple-600 text-white font-semibold whitespace-nowrap">PRIME BUY</span>
+              <span className="text-slate-400">Strong team running cold — BUY</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-0.5 rounded bg-slate-600 text-white font-semibold whitespace-nowrap">FRAGILE</span>
+              <span className="text-slate-400">Weak structure, hold/avoid</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-0.5 rounded bg-amber-600 text-white font-semibold whitespace-nowrap">OVERHEATED</span>
+              <span className="text-slate-400">Running too hot — SELL</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-0.5 rounded bg-rose-600 text-white font-semibold whitespace-nowrap">CRITICAL</span>
+              <span className="text-slate-400">Poor structure + cold — AVOID</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
         <div className="min-w-[700px]">
           <MarketIntelligenceTable standings={hybridStandings} />
