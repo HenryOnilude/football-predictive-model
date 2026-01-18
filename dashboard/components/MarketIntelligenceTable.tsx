@@ -140,6 +140,49 @@ export default function MarketIntelligenceTable({ standings, loading }: MarketIn
         </div>
       </div>
 
+      {/* Column & Sort Explanations */}
+      <div className="px-6 py-3 bg-slate-950/50 border-b border-slate-800">
+        <div className="grid md:grid-cols-2 gap-4 text-xs">
+          {/* Column Explanations */}
+          <div>
+            <h4 className="text-slate-500 font-semibold uppercase tracking-wider mb-2">Table Columns</h4>
+            <div className="space-y-1.5">
+              <div className="flex items-start gap-2">
+                <span className="text-emerald-400 font-semibold whitespace-nowrap">SYSTEM HEALTH</span>
+                <span className="text-slate-400">0-100 score based on xG created minus xG conceded. Higher = better long-term prospects. Elite teams score 75+.</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-amber-400 font-semibold whitespace-nowrap">FINISHING HEAT</span>
+                <span className="text-slate-400">How efficiently a team is converting chances. &quot;Hot&quot; = overperforming (regression risk). &quot;Cold&quot; = underperforming (goals due).</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="text-purple-400 font-semibold whitespace-nowrap">ACTION</span>
+                <span className="text-slate-400">FPL transfer recommendation combining health + heat. DOMINANT = buy, CRITICAL = avoid, PRIME BUY = undervalued.</span>
+              </div>
+            </div>
+          </div>
+          
+          {/* Sort Explanations */}
+          <div>
+            <h4 className="text-slate-500 font-semibold uppercase tracking-wider mb-2">Sort Options</h4>
+            <div className="space-y-1.5">
+              <div className="flex items-start gap-2">
+                <span className="px-2 py-0.5 rounded bg-emerald-600 text-white font-semibold">Health</span>
+                <span className="text-slate-400">Sort by System Health score — shows structurally best teams first (best xG difference).</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="px-2 py-0.5 rounded bg-slate-700 text-slate-300 font-semibold">Pts</span>
+                <span className="text-slate-400">Sort by league points — shows teams with most points at the top.</span>
+              </div>
+              <div className="flex items-start gap-2">
+                <span className="px-2 py-0.5 rounded bg-slate-700 text-slate-300 font-semibold">Rank</span>
+                <span className="text-slate-400">Sort by league position — shows actual Premier League standings (1st to 20th).</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Table */}
       <div className="overflow-x-auto">
         <table className="w-full">
