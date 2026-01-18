@@ -3,7 +3,6 @@
 import { useEffect, useState } from 'react';
 import MarketIntelligenceTable from '@/components/MarketIntelligenceTable';
 import TeamSentimentCard from '@/components/TeamSentimentCard';
-import MethodologyModal, { MethodologyButton } from '@/components/MethodologyModal';
 import { TeamAnalysis } from '@/lib/TeamAnalysis';
 import { TeamLuckResult } from '@/lib/TeamLuck';
 import { 
@@ -102,7 +101,6 @@ export default function TeamsPage() {
   const [gameweek, setGameweek] = useState<number>(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [showMethodology, setShowMethodology] = useState(false);
 
   // Calculate summary stats for mini-ticker
   const summaryStats = {
@@ -215,8 +213,6 @@ export default function TeamsPage() {
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-      {/* ========== METHODOLOGY MODAL ========== */}
-      <MethodologyModal isOpen={showMethodology} onClose={() => setShowMethodology(false)} />
 
       {/* ========== MINI-TICKER (Summary Stats) ========== */}
       <div className="mb-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm">
@@ -239,16 +235,13 @@ export default function TeamsPage() {
 
       {/* ========== PAGE HEADER ========== */}
       <div className="mb-8">
-        <div className="flex items-center justify-between mb-2">
-          <div className="flex items-center gap-3">
-            <h1 className="text-3xl font-semibold text-white tracking-tight">
-              Market Intelligence
-            </h1>
-            <span className="px-3 py-1 bg-emerald-600/20 border border-emerald-600/40 text-emerald-400 text-sm font-medium rounded-full">
-              GW{gameweek}
-            </span>
-          </div>
-          <MethodologyButton onClick={() => setShowMethodology(true)} />
+        <div className="flex items-center gap-3 mb-2">
+          <h1 className="text-3xl font-semibold text-white tracking-tight">
+            Market Intelligence
+          </h1>
+          <span className="px-3 py-1 bg-emerald-600/20 border border-emerald-600/40 text-emerald-400 text-sm font-medium rounded-full">
+            GW{gameweek}
+          </span>
         </div>
         <p className="text-slate-400">
           Live Premier League standings with actionable Buy/Sell signals • Official FPL API
