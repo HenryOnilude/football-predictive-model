@@ -34,8 +34,43 @@ export default async function LuckPage() {
             </p>
           </div>
 
+          {/* Key Terms Explanation */}
+          <div className="mt-10 p-5 rounded-xl bg-slate-800/40 border border-slate-700/50 max-w-4xl mx-auto">
+            <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4 text-center">Understanding The Data</h3>
+            <div className="grid md:grid-cols-2 gap-4 text-xs">
+              <div className="space-y-3">
+                <div className="flex items-start gap-2">
+                  <span className="text-emerald-400 font-semibold whitespace-nowrap">xG (Expected Goals)</span>
+                  <span className="text-slate-400">A stat measuring the quality of chances a player gets. If a player has 5.0 xG but only 3 goals, they&apos;re underperforming — more goals should come.</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-cyan-400 font-semibold whitespace-nowrap">LUCK SCORE</span>
+                  <span className="text-slate-400">Goals minus xG. Negative = unlucky (scoring less than expected). Positive = lucky (scoring more than expected). Luck evens out over time.</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-amber-400 font-semibold whitespace-nowrap">DUE A HAUL</span>
+                  <span className="text-slate-400">Players with negative luck scores are &quot;due&quot; — they&apos;re getting good chances but not converting. Statistically, their goals will come.</span>
+                </div>
+              </div>
+              <div className="space-y-3">
+                <div className="flex items-start gap-2">
+                  <span className="text-purple-400 font-semibold whitespace-nowrap">DIFFERENTIAL %</span>
+                  <span className="text-slate-400">How many FPL managers own this player. Lower = bigger rank boost if they score. High differential picks can win you mini-leagues.</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-emerald-400 font-semibold whitespace-nowrap">HAUL POT. %</span>
+                  <span className="text-slate-400">Probability of a big points haul (10+ pts) based on xG, fixtures, and form. Higher = more likely to explode soon.</span>
+                </div>
+                <div className="flex items-start gap-2">
+                  <span className="text-rose-400 font-semibold whitespace-nowrap">TRAP RISK %</span>
+                  <span className="text-slate-400">Chance the player is overperforming and will regress. High trap risk = avoid buying, their output will likely drop.</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
           {/* Quick Stats */}
-          <div className="grid grid-cols-3 gap-4 max-w-xl mx-auto mt-10">
+          <div className="grid grid-cols-3 gap-4 max-w-xl mx-auto mt-8">
             <div className="text-center p-4 rounded-xl bg-slate-800/30 border border-slate-700/50">
               <div className="flex items-center justify-center gap-1.5 mb-1">
                 <TrendingUp className="w-4 h-4 text-emerald-400" />
