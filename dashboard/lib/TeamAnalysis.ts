@@ -55,12 +55,12 @@ export type ConversionStatus = 'OVER' | 'UNDER' | 'MEAN';
  * - Mid Table: ~0.0 Net xG per 90 → ~50
  * - Relegation Tier: ~-1.5 Net xG per 90 → ~0
  * 
- * Formula: (Net_xG_Per90 + 1.5) / 3.0 * 100, clamped to 0-99
+ * Formula: (Net_xG_Per90 + 1.5) / 3.0 * 100, clamped to 1-99
  */
 function calculateSustainabilityScore(netXGPer90: number): number {
-  // Linear scale from -1.5 (0) to +1.5 (100)
+  // Linear scale from -1.5 (1) to +1.5 (99)
   const rawScore = ((netXGPer90 + 1.5) / 3.0) * 100;
-  return Math.round(Math.min(Math.max(rawScore, 0), 99));
+  return Math.round(Math.min(Math.max(rawScore, 1), 99));
 }
 
 /**
