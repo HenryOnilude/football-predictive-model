@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import TeamMatrix from '@/components/TeamMatrix';
+import MarketIntelligenceTable from '@/components/MarketIntelligenceTable';
 import TeamSentimentCard from '@/components/TeamSentimentCard';
 import { TeamAnalysis } from '@/lib/TeamAnalysis';
 import { TeamLuckResult } from '@/lib/TeamLuck';
@@ -12,6 +12,22 @@ import {
   getCurrentGameweek,
   TeamHealthHeat,
 } from '@/lib/fpl';
+
+interface StandingTeam {
+  position: number;
+  team: {
+    id: number;
+    name: string;
+    shortName: string;
+    tla: string;
+    crest: string;
+  };
+  points: number;
+}
+
+interface HybridTeamData extends StandingTeam {
+  analysis: TeamAnalysis | null;
+}
 
 // Convert TeamHealthHeat to TeamLuckResult for sentiment cards
 function convertToTeamLuck(team: TeamHealthHeat): TeamLuckResult {
@@ -80,7 +96,7 @@ function convertToTeamLuck(team: TeamHealthHeat): TeamLuckResult {
 }
 
 export default function TeamsPage() {
-  const [analyzedTeams, setAnalyzedTeams] = useState<TeamAnalysis[]>([]);
+  const [hybridStandings, setHybridStandings] = useState<HybridTeamData[]>([]);
   const [sentimentTeams, setSentimentTeams] = useState<TeamLuckResult[]>([]);
   const [gameweek, setGameweek] = useState<number>(1);
   const [loading, setLoading] = useState(true);
@@ -91,14 +107,28 @@ export default function TeamsPage() {
     async function loadData() {
       try {
         setLoading(true);
-        const fplData = await fetchFPLData();
-        const teams = transformTeams(fplData);
         
-        // Convert to both formats from single data source
+        // Fetch FPL data and standings in parallel
+        const [fplData, standingsRes] = await Promise.all([
+          fetchFPLData(),
+          fetch('/api/standings').then(r => r.json())
+        ]);
+        
+        const teams = transformTeams(fplData);
         const analyzed = convertToTeamAnalysis(teams);
         const sentiment = teams.map(convertToTeamLuck);
         
-        setAnalyzedTeams(analyzed);
+        // Get standings table and merge with analysis
+        const standingsTable = standingsRes.standings?.[0]?.table || [];
+        const merged: HybridTeamData[] = standingsTable.map((s: StandingTeam) => {
+          const analysis = analyzed.find(a => 
+            a.teamName.toLowerCase().includes(s.team.shortName.toLowerCase()) ||
+            s.team.name.toLowerCase().includes(a.teamName.toLowerCase())
+          ) || null;
+          return { position: s.position, team: s.team, points: s.points, analysis };
+        });
+        
+        setHybridStandings(merged);
         setSentimentTeams(sentiment);
         setGameweek(getCurrentGameweek(fplData));
       } catch (err) {
@@ -191,57 +221,10 @@ export default function TeamsPage() {
         </div>
       </div>
 
-      {/* ========== SECTION B: THE MATRIX (THE EVIDENCE) ========== */}
-      <div className="mb-6">
-        <h2 className="text-xl font-semibold text-white tracking-tight mb-2">
-          🔬 Health vs. Heat Matrix
-        </h2>
-        <p className="text-slate-400 text-sm">
-          Verify sentiment signals with raw performance numbers
-        </p>
-      </div>
-
-      {/* Matrix Legend Cards */}
-      <div className="grid md:grid-cols-2 gap-4 mb-6">
-        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4">
-          <h3 className="text-sm font-semibold text-white mb-3">📊 Structure (Health)</h3>
-          <p className="text-xs text-slate-400 mb-2">Net xG per 90 — predicts long-term reliability</p>
-          <div className="space-y-1.5 text-xs">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-emerald-500" />
-              <span className="text-slate-300">75+: Elite structure</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-amber-500" />
-              <span className="text-slate-300">45-75: Average structure</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-rose-500" />
-              <span className="text-slate-300">&lt;45: Broken structure</span>
-            </div>
-          </div>
-        </div>
-
-        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4">
-          <h3 className="text-sm font-semibold text-white mb-3">🔥 Form (Heat)</h3>
-          <p className="text-xs text-slate-400 mb-2">Goals - xG — predicts short-term regression</p>
-          <div className="space-y-1.5 text-xs">
-            <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 rounded bg-red-600 text-white font-mono text-[10px]">CRIT OVER</span>
-              <span className="text-slate-300">+6.0 or more</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 rounded bg-purple-600 text-white font-mono text-[10px]">EXTREME VAL</span>
-              <span className="text-slate-300">-6.0 or less</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Matrix Table - Horizontal scroll on mobile */}
+      {/* ========== SECTION B: HYBRID INTELLIGENCE TABLE ========== */}
       <div className="overflow-x-auto -mx-4 px-4 md:mx-0 md:px-0">
-        <div className="min-w-[600px]">
-          <TeamMatrix teams={analyzedTeams} />
+        <div className="min-w-[700px]">
+          <MarketIntelligenceTable standings={hybridStandings} />
         </div>
       </div>
     </div>

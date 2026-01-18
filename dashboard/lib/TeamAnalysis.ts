@@ -51,15 +51,15 @@ export type ConversionStatus = 'OVER' | 'UNDER' | 'MEAN';
 /**
  * Calculate Sustainability Score (Health) based on Net xG per 90
  * Calibrated for Premier League range:
- * - Top Tier (City/Arsenal): ~+1.5 Net xG per 90 → ~100
+ * - Elite (City/Arsenal): ~+1.2 Net xG per 90 → ~100
  * - Mid Table: ~0.0 Net xG per 90 → ~50
- * - Relegation Tier: ~-1.5 Net xG per 90 → ~0
+ * - Relegation Tier: ~-1.2 Net xG per 90 → ~0
  * 
- * Formula: (Net_xG_Per90 + 1.5) / 3.0 * 100, clamped to 1-99
+ * Formula: (Net_xG_Per90 + 1.2) / 2.4 * 100, clamped to 1-99
  */
 function calculateSustainabilityScore(netXGPer90: number): number {
-  // Linear scale from -1.5 (1) to +1.5 (99)
-  const rawScore = ((netXGPer90 + 1.5) / 3.0) * 100;
+  // Linear scale from -1.2 (1) to +1.2 (99)
+  const rawScore = ((netXGPer90 + 1.2) / 2.4) * 100;
   return Math.round(Math.min(Math.max(rawScore, 1), 99));
 }
 
