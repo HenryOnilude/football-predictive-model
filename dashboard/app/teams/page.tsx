@@ -260,49 +260,49 @@ export default function TeamsPage() {
 
       {/* ========== CARD LEGEND (Always Visible) ========== */}
       <div className="mb-6 p-4 bg-slate-900/50 border border-slate-800 rounded-xl">
-        <div className="grid md:grid-cols-2 gap-4">
+        <div className="grid md:grid-cols-2 gap-6">
           {/* Quadrant Badges */}
           <div>
-            <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Card Badges</h4>
-            <div className="flex flex-wrap gap-2 text-[10px]">
-              <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-emerald-500/10 border border-emerald-500/20">
-                <span className="text-emerald-400 font-semibold">💎 DOUBLE VALUE</span>
-                <span className="text-slate-500">Attack + Defense due</span>
+            <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Team Categories</h4>
+            <div className="space-y-2 text-xs">
+              <div className="flex items-start gap-2">
+                <span className="text-emerald-400 font-semibold whitespace-nowrap">💎 DOUBLE VALUE</span>
+                <span className="text-slate-400">Team is unlucky in attack AND defense. Their players should score more goals AND keep more clean sheets soon.</span>
               </div>
-              <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-cyan-500/10 border border-cyan-500/20">
-                <span className="text-cyan-400 font-semibold">🛡️ CS CHASER</span>
-                <span className="text-slate-500">Clean sheets due</span>
+              <div className="flex items-start gap-2">
+                <span className="text-cyan-400 font-semibold whitespace-nowrap">🛡️ CS CHASER</span>
+                <span className="text-slate-400">Defense is conceding cheap goals they shouldn&apos;t be. Buy their defenders/goalkeeper — clean sheets are coming.</span>
               </div>
-              <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-orange-500/10 border border-orange-500/20">
-                <span className="text-orange-400 font-semibold">⚽ GOAL CHASER</span>
-                <span className="text-slate-500">Goals due</span>
+              <div className="flex items-start gap-2">
+                <span className="text-orange-400 font-semibold whitespace-nowrap">⚽ GOAL CHASER</span>
+                <span className="text-slate-400">Attackers are missing chances they should score. Buy their forwards/midfielders — goals are coming.</span>
               </div>
-              <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-rose-500/10 border border-rose-500/20">
-                <span className="text-rose-400 font-semibold">🚫 AVOID</span>
-                <span className="text-slate-500">Regression likely</span>
+              <div className="flex items-start gap-2">
+                <span className="text-rose-400 font-semibold whitespace-nowrap">🚫 AVOID</span>
+                <span className="text-slate-400">Team is overperforming their stats. Their luck will run out — expect fewer goals or more goals conceded soon.</span>
               </div>
             </div>
           </div>
           
           {/* Action Labels */}
           <div>
-            <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Action Labels</h4>
-            <div className="flex flex-wrap gap-2 text-[10px]">
-              <div className="flex items-center gap-1.5">
-                <span className="px-1.5 py-0.5 rounded bg-emerald-600 text-white font-semibold">BUY DIP</span>
-                <span className="text-slate-500">Defense value</span>
+            <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Card Signals</h4>
+            <div className="space-y-2 text-xs">
+              <div className="flex items-start gap-2">
+                <span className="px-1.5 py-0.5 rounded bg-emerald-600 text-white font-semibold whitespace-nowrap">BUY DIP</span>
+                <span className="text-slate-400">Defense underperforming. Great time to buy their defenders.</span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <span className="px-1.5 py-0.5 rounded bg-purple-600 text-white font-semibold">EXPLOSIVE</span>
-                <span className="text-slate-500">Attack value</span>
+              <div className="flex items-start gap-2">
+                <span className="px-1.5 py-0.5 rounded bg-purple-600 text-white font-semibold whitespace-nowrap">EXPLOSIVE</span>
+                <span className="text-slate-400">Attack severely underperforming. Goals coming — buy attackers now.</span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <span className="px-1.5 py-0.5 rounded bg-amber-600 text-white font-semibold">COOLDOWN</span>
-                <span className="text-slate-500">Sell high</span>
+              <div className="flex items-start gap-2">
+                <span className="px-1.5 py-0.5 rounded bg-amber-600 text-white font-semibold whitespace-nowrap">COOLDOWN</span>
+                <span className="text-slate-400">Attack overperforming luck. Consider selling before regression.</span>
               </div>
-              <div className="flex items-center gap-1.5">
-                <span className="px-1.5 py-0.5 rounded bg-slate-600 text-white font-semibold">STABLE</span>
-                <span className="text-slate-500">Hold</span>
+              <div className="flex items-start gap-2">
+                <span className="px-1.5 py-0.5 rounded bg-slate-600 text-white font-semibold whitespace-nowrap">STABLE</span>
+                <span className="text-slate-400">Performing as expected. No major moves needed — hold position.</span>
               </div>
             </div>
           </div>
