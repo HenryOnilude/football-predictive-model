@@ -1,9 +1,8 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import TeamSentimentCard from '@/components/TeamSentimentCard';
 import TeamMatrix from '@/components/TeamMatrix';
-import PremierLeagueTable from '@/components/PremierLeagueTable';
+import MarketIntelligenceTable from '@/components/MarketIntelligenceTable';
 import { TeamLuckResult } from '@/lib/TeamLuck';
 import { TeamAnalysis } from '@/lib/TeamAnalysis';
 import { 
@@ -14,16 +13,6 @@ import {
   TeamHealthHeat,
 } from '@/lib/fpl';
 
-type QuadrantFilter = 'ALL' | 'DOUBLE_VALUE' | 'CLEAN_SHEET_CHASER' | 'GOAL_CHASER' | 'AVOID' | 'NEUTRAL';
-
-const filterOptions: { value: QuadrantFilter; label: string; icon: string; description: string }[] = [
-  { value: 'ALL', label: 'All Teams', icon: '📊', description: 'View all teams' },
-  { value: 'DOUBLE_VALUE', label: 'Double Value', icon: '💎', description: 'Unlucky Attack + Defense' },
-  { value: 'CLEAN_SHEET_CHASER', label: 'Clean Sheet Chasers', icon: '🛡️', description: 'Best defensive value' },
-  { value: 'GOAL_CHASER', label: 'Goal Chasers', icon: '🔫', description: 'Best attacking value' },
-  { value: 'AVOID', label: 'Avoid', icon: '⚠️', description: 'Overperforming - regression due' },
-  { value: 'NEUTRAL', label: 'Neutral', icon: '➡️', description: 'Performing as expected' },
-];
 
 // Convert TeamHealthHeat to TeamLuckResult for sentiment cards
 function convertToTeamLuck(team: TeamHealthHeat): TeamLuckResult {
@@ -100,53 +89,80 @@ function convertToTeamLuck(team: TeamHealthHeat): TeamLuckResult {
   };
 }
 
+interface StandingTeam {
+  position: number;
+  team: {
+    id: number;
+    name: string;
+    shortName: string;
+    tla: string;
+    crest: string;
+  };
+  playedGames: number;
+  form: string | null;
+  won: number;
+  draw: number;
+  lost: number;
+  points: number;
+  goalsFor: number;
+  goalsAgainst: number;
+  goalDifference: number;
+}
+
+interface StandingWithSentiment extends StandingTeam {
+  sentiment: TeamLuckResult | null;
+}
+
 export default function TeamsPage() {
-  const [filter, setFilter] = useState<QuadrantFilter>('ALL');
-  const [teamsData, setTeamsData] = useState<TeamHealthHeat[]>([]);
   const [analyzedTeams, setAnalyzedTeams] = useState<TeamAnalysis[]>([]);
+  const [standings, setStandings] = useState<StandingWithSentiment[]>([]);
   const [gameweek, setGameweek] = useState<number>(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Single data fetch at page level
+  // Single data fetch at page level - fetch both FPL data and standings
   useEffect(() => {
     async function loadData() {
       try {
         setLoading(true);
-        const data = await fetchFPLData();
-        const teams = transformTeams(data);
-        const analyzed = convertToTeamAnalysis(teams);
         
-        setTeamsData(teams);
+        // Fetch FPL data and standings in parallel
+        const [fplData, standingsRes] = await Promise.all([
+          fetchFPLData(),
+          fetch('/api/standings').then(r => r.json())
+        ]);
+        
+        const teams = transformTeams(fplData);
+        const analyzed = convertToTeamAnalysis(teams);
+        const teamsWithLuck = teams.map(convertToTeamLuck);
+        
+        // Get standings table
+        const standingsTable: StandingTeam[] = standingsRes.standings?.[0]?.table || [];
+        
+        // Merge standings with sentiment data
+        const mergedStandings: StandingWithSentiment[] = standingsTable.map(standing => {
+          // Find matching sentiment by team name (fuzzy match)
+          const sentiment = teamsWithLuck.find(t => 
+            t.teamName.toLowerCase().includes(standing.team.shortName.toLowerCase()) ||
+            standing.team.name.toLowerCase().includes(t.teamName.toLowerCase()) ||
+            standing.team.shortName.toLowerCase() === t.teamShort.toLowerCase()
+          ) || null;
+          
+          return { ...standing, sentiment };
+        });
+        
         setAnalyzedTeams(analyzed);
-        setGameweek(getCurrentGameweek(data));
+        setStandings(mergedStandings);
+        setGameweek(getCurrentGameweek(fplData));
       } catch (err) {
-        console.error('Failed to fetch FPL data:', err);
-        setError('Failed to load data from FPL API');
+        console.error('Failed to fetch data:', err);
+        setError('Failed to load data');
       } finally {
         setLoading(false);
       }
     }
     loadData();
   }, []);
-
-  // Convert to TeamLuckResult for sentiment cards
-  const teamsWithLuck: TeamLuckResult[] = teamsData.map(convertToTeamLuck);
-
-  // Filter teams based on quadrant
-  const filteredTeams = filter === 'ALL' 
-    ? teamsWithLuck 
-    : teamsWithLuck.filter(t => t.quadrant === filter);
-
-  // Count teams in each quadrant
-  const quadrantCounts = {
-    ALL: teamsWithLuck.length,
-    DOUBLE_VALUE: teamsWithLuck.filter(t => t.quadrant === 'DOUBLE_VALUE').length,
-    CLEAN_SHEET_CHASER: teamsWithLuck.filter(t => t.quadrant === 'CLEAN_SHEET_CHASER').length,
-    GOAL_CHASER: teamsWithLuck.filter(t => t.quadrant === 'GOAL_CHASER').length,
-    AVOID: teamsWithLuck.filter(t => t.quadrant === 'AVOID').length,
-    NEUTRAL: teamsWithLuck.filter(t => t.quadrant === 'NEUTRAL').length,
-  };
 
   // Loading state
   if (loading) {
@@ -192,116 +208,13 @@ export default function TeamsPage() {
           </span>
         </div>
         <p className="text-slate-400">
-          Actionable insights backed by granular performance data • Live from Official FPL API
+          Live Premier League standings with actionable Buy/Sell signals • Official FPL API
         </p>
       </div>
 
-      {/* ========== PREMIER LEAGUE TABLE ========== */}
+      {/* ========== UNIFIED TABLE: STANDINGS + SENTIMENT ========== */}
       <div className="mb-10">
-        <PremierLeagueTable />
-      </div>
-
-      {/* ========== SECTION A: MARKET SENTIMENT (THE DASHBOARD) ========== */}
-      <div className="mb-6">
-        <h2 className="text-2xl font-semibold text-white tracking-tight mb-2">
-          Market Sentiment
-        </h2>
-        <p className="text-slate-400 text-sm">
-          Immediate Buy/Sell signals based on xG variance analysis
-        </p>
-      </div>
-
-      {/* Quadrant Filter */}
-      <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4 mb-6">
-        <div className="flex items-center gap-2 mb-3">
-          <span className="text-xs font-medium text-slate-500 uppercase tracking-wide">Market Sentiment Filter</span>
-        </div>
-        <div className="flex flex-wrap gap-2">
-          {filterOptions.map((option) => (
-            <button
-              key={option.value}
-              onClick={() => setFilter(option.value)}
-              className={`
-                px-4 py-2 rounded-lg text-sm font-medium transition-all
-                ${filter === option.value
-                  ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/50'
-                  : 'bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-600 hover:text-slate-300'
-                }
-              `}
-            >
-              <span className="mr-1.5">{option.icon}</span>
-              {option.label}
-              <span className="ml-2 px-1.5 py-0.5 rounded bg-slate-900/50 text-xs">
-                {quadrantCounts[option.value]}
-              </span>
-            </button>
-          ))}
-        </div>
-        {filter !== 'ALL' && (
-          <p className="text-xs text-slate-500 mt-3">
-            {filterOptions.find(o => o.value === filter)?.description}
-          </p>
-        )}
-      </div>
-
-      {/* Legend */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-4 mb-6">
-        <div className="grid md:grid-cols-2 gap-4 text-xs">
-          <div>
-            <p className="font-semibold text-white mb-2">Attacking Luck (xG Delta)</p>
-            <div className="space-y-1 text-slate-400">
-              <p><span className="text-emerald-400 font-semibold">Negative:</span> Unlucky - missing chances. <strong className="text-white">TARGET ATTACKERS</strong></p>
-              <p><span className="text-rose-400 font-semibold">Positive:</span> Lucky - scoring worldies. <strong className="text-white">AVOID ATTACKERS</strong></p>
-            </div>
-          </div>
-          <div>
-            <p className="font-semibold text-white mb-2">Defensive Luck (xGA Delta)</p>
-            <div className="space-y-1 text-slate-400">
-              <p><span className="text-emerald-400 font-semibold">Positive:</span> Unlucky - conceding cheap goals. <strong className="text-white">BUY DEFENSE</strong></p>
-              <p><span className="text-rose-400 font-semibold">Negative:</span> Lucky - keepers saving them. <strong className="text-white">AVOID DEFENSE</strong></p>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Sentiment Cards Grid - Mobile: stack vertically */}
-      {filteredTeams.length === 0 ? (
-        <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-12 text-center mb-8">
-          <p className="text-slate-400">No teams match this filter</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-          {filteredTeams.map((team) => (
-            <TeamSentimentCard key={team.teamId} team={team} />
-          ))}
-        </div>
-      )}
-
-      {/* Quick Summary Stats */}
-      <div className="bg-slate-800/50 border border-slate-700 rounded-xl p-6 mb-12">
-        <h3 className="text-sm font-semibold text-white mb-4">Sentiment Summary</h3>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          <div className="text-center">
-            <div className="text-2xl font-bold text-purple-400">{quadrantCounts.DOUBLE_VALUE}</div>
-            <p className="text-xs text-slate-500">💎 Double Value</p>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-blue-400">{quadrantCounts.CLEAN_SHEET_CHASER}</div>
-            <p className="text-xs text-slate-500">🛡️ CS Chasers</p>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-orange-400">{quadrantCounts.GOAL_CHASER}</div>
-            <p className="text-xs text-slate-500">🔫 Goal Chasers</p>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-rose-400">{quadrantCounts.AVOID}</div>
-            <p className="text-xs text-slate-500">⚠️ Avoid</p>
-          </div>
-          <div className="text-center">
-            <div className="text-2xl font-bold text-slate-400">{quadrantCounts.NEUTRAL}</div>
-            <p className="text-xs text-slate-500">➡️ Neutral</p>
-          </div>
-        </div>
+        <MarketIntelligenceTable standings={standings} />
       </div>
 
       {/* ========== VISUAL DIVIDER ========== */}
