@@ -94,47 +94,59 @@ export default function MatrixPage() {
       {/* Legend Cards */}
       <div className="grid md:grid-cols-2 gap-4 mb-8">
         <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4">
-          <h3 className="text-sm font-semibold text-white mb-3">Structure (Health)</h3>
-          <p className="text-xs text-slate-400 mb-2">Net xG per 90 — predicts long-term reliability</p>
-          <div className="space-y-1.5 text-xs">
+          <h3 className="text-sm font-semibold text-white mb-2">Structure (Health)</h3>
+          <p className="text-xs text-slate-400 mb-3">
+            <strong className="text-slate-300">What it measures:</strong> How good is this team at creating chances AND preventing them? 
+            We calculate xG created minus xG conceded per game. Higher score = better overall quality.
+          </p>
+          <p className="text-xs text-slate-400 mb-3">
+            <strong className="text-slate-300">Why it matters:</strong> Teams with high Structure scores are fundamentally good — their results are sustainable long-term.
+          </p>
+          <div className="space-y-1.5 text-xs border-t border-slate-700 pt-3">
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-emerald-500" />
-              <span className="text-slate-300">70-100: Elite structure</span>
+              <span className="text-slate-300"><strong>70-100:</strong> Elite — title contenders, trust their players</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-amber-500" />
-              <span className="text-slate-300">40-70: Average structure</span>
+              <span className="text-slate-300"><strong>40-70:</strong> Average — mid-table, selective picks only</span>
             </div>
             <div className="flex items-center gap-2">
               <div className="w-3 h-3 rounded-full bg-rose-500" />
-              <span className="text-slate-300">0-40: Broken structure</span>
+              <span className="text-slate-300"><strong>0-40:</strong> Broken — relegation candidates, avoid</span>
             </div>
           </div>
         </div>
 
         <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4">
-          <h3 className="text-sm font-semibold text-white mb-3">Form (Heat)</h3>
-          <p className="text-xs text-slate-400 mb-2">Goals - xG — predicts short-term regression</p>
-          <div className="space-y-1.5 text-xs">
+          <h3 className="text-sm font-semibold text-white mb-2">Form (Heat)</h3>
+          <p className="text-xs text-slate-400 mb-3">
+            <strong className="text-slate-300">What it measures:</strong> Are they scoring more or less than expected? 
+            We subtract xG from actual goals. Positive = overperforming, Negative = underperforming.
+          </p>
+          <p className="text-xs text-slate-400 mb-3">
+            <strong className="text-slate-300">Why it matters:</strong> Hot teams will cool down, cold teams will heat up. This predicts short-term regression.
+          </p>
+          <div className="space-y-1.5 text-xs border-t border-slate-700 pt-3">
             <div className="flex items-center gap-2">
               <span className="px-2 py-0.5 rounded bg-red-600 text-white font-mono text-[10px]">CRIT OVER</span>
-              <span className="text-slate-300">+6.0 or more</span>
+              <span className="text-slate-300">+6 goals above xG — unsustainable, will drop</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="px-2 py-0.5 rounded bg-orange-500 text-white font-mono text-[10px]">HEATING UP</span>
-              <span className="text-slate-300">+2.0 to +6.0</span>
+              <span className="text-slate-300">+2 to +6 above — running hot, caution</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="px-2 py-0.5 rounded bg-slate-700 text-slate-400 font-mono text-[10px]">FAIR VALUE</span>
-              <span className="text-slate-300">-2.0 to +2.0</span>
+              <span className="text-slate-300">-2 to +2 — scoring as expected, stable</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="px-2 py-0.5 rounded bg-blue-300 text-blue-900 font-mono text-[10px]">COLD</span>
-              <span className="text-slate-300">-6.0 to -2.0</span>
+              <span className="text-slate-300">-2 to -6 below — unlucky, goals coming</span>
             </div>
             <div className="flex items-center gap-2">
               <span className="px-2 py-0.5 rounded bg-purple-600 text-white font-mono text-[10px]">EXTREME VAL</span>
-              <span className="text-slate-300">-6.0 or less</span>
+              <span className="text-slate-300">-6+ below — severely unlucky, BUY NOW</span>
             </div>
           </div>
         </div>
