@@ -265,6 +265,57 @@ export default function TeamsPage() {
         </p>
       </div>
 
+      {/* ========== CARD LEGEND (Always Visible) ========== */}
+      <div className="mb-6 p-4 bg-slate-900/50 border border-slate-800 rounded-xl">
+        <div className="grid md:grid-cols-2 gap-4">
+          {/* Quadrant Badges */}
+          <div>
+            <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Card Badges</h4>
+            <div className="flex flex-wrap gap-2 text-[10px]">
+              <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-emerald-500/10 border border-emerald-500/20">
+                <span className="text-emerald-400 font-semibold">💎 DOUBLE VALUE</span>
+                <span className="text-slate-500">Attack + Defense due</span>
+              </div>
+              <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-cyan-500/10 border border-cyan-500/20">
+                <span className="text-cyan-400 font-semibold">🛡️ CS CHASER</span>
+                <span className="text-slate-500">Clean sheets due</span>
+              </div>
+              <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-orange-500/10 border border-orange-500/20">
+                <span className="text-orange-400 font-semibold">⚽ GOAL CHASER</span>
+                <span className="text-slate-500">Goals due</span>
+              </div>
+              <div className="flex items-center gap-1.5 px-2 py-1 rounded bg-rose-500/10 border border-rose-500/20">
+                <span className="text-rose-400 font-semibold">🚫 AVOID</span>
+                <span className="text-slate-500">Regression likely</span>
+              </div>
+            </div>
+          </div>
+          
+          {/* Action Labels */}
+          <div>
+            <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Action Labels</h4>
+            <div className="flex flex-wrap gap-2 text-[10px]">
+              <div className="flex items-center gap-1.5">
+                <span className="px-1.5 py-0.5 rounded bg-emerald-600 text-white font-semibold">BUY DIP</span>
+                <span className="text-slate-500">Defense value</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="px-1.5 py-0.5 rounded bg-purple-600 text-white font-semibold">EXPLOSIVE</span>
+                <span className="text-slate-500">Attack value</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="px-1.5 py-0.5 rounded bg-amber-600 text-white font-semibold">COOLDOWN</span>
+                <span className="text-slate-500">Sell high</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <span className="px-1.5 py-0.5 rounded bg-slate-600 text-white font-semibold">STABLE</span>
+                <span className="text-slate-500">Hold</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Sentiment Cards Grid - Responsive: Stack on mobile, 2 cols on tablet, 3 on desktop */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-10">
         {sentimentTeams
