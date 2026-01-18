@@ -3,91 +3,13 @@
 import { useEffect, useState } from 'react';
 import TeamMatrix from '@/components/TeamMatrix';
 import MarketIntelligenceTable from '@/components/MarketIntelligenceTable';
-import { TeamLuckResult } from '@/lib/TeamLuck';
 import { TeamAnalysis } from '@/lib/TeamAnalysis';
 import { 
   fetchFPLData, 
   transformTeams, 
   convertToTeamAnalysis,
   getCurrentGameweek,
-  TeamHealthHeat,
 } from '@/lib/fpl';
-
-
-// Convert TeamHealthHeat to TeamLuckResult for sentiment cards
-function convertToTeamLuck(team: TeamHealthHeat): TeamLuckResult {
-  // goalDelta = goals - xG (positive = overperforming, negative = underperforming)
-  const attackingLuck = team.goalDelta;
-  // For defense, we use clean sheet luck (positive = unlucky, negative = lucky)
-  const defensiveLuck = team.cleanSheetLuck;
-  
-  // Determine verdicts based on luck values
-  const attackVerdict: TeamLuckResult['attackVerdict'] = 
-    attackingLuck <= -1 ? 'TARGET_ATTACKERS' : 
-    attackingLuck >= 1 ? 'AVOID_ATTACKERS' : 'NEUTRAL';
-  
-  const defenseVerdict: TeamLuckResult['defenseVerdict'] = 
-    defensiveLuck >= 1 ? 'BUY_DEFENSE' : 
-    defensiveLuck <= -1 ? 'AVOID_DEFENSE' : 'NEUTRAL';
-  
-  // Determine quadrant
-  let quadrant: TeamLuckResult['quadrant'];
-  if (attackVerdict === 'TARGET_ATTACKERS' && defenseVerdict === 'BUY_DEFENSE') {
-    quadrant = 'DOUBLE_VALUE';
-  } else if (defenseVerdict === 'BUY_DEFENSE') {
-    quadrant = 'CLEAN_SHEET_CHASER';
-  } else if (attackVerdict === 'TARGET_ATTACKERS') {
-    quadrant = 'GOAL_CHASER';
-  } else if (attackVerdict === 'AVOID_ATTACKERS' || defenseVerdict === 'AVOID_DEFENSE') {
-    quadrant = 'AVOID';
-  } else {
-    quadrant = 'NEUTRAL';
-  }
-
-  // Get labels based on luck values
-  const attackLabel = attackingLuck <= -3 ? 'EXPLOSIVE' : 
-    attackingLuck <= -1 ? 'VALUE BUY' : 
-    attackingLuck >= 3 ? 'COOLDOWN' : 
-    attackingLuck >= 1 ? 'OVERHEATED' : 'STABLE';
-  
-  const defenseLabel = defensiveLuck >= 3 ? 'BUY DIP' : 
-    defensiveLuck >= 1 ? 'UNDERVALUED' : 
-    defensiveLuck <= -3 ? 'FRAGILE' : 
-    defensiveLuck <= -1 ? 'RISKY' : 'STABLE';
-
-  return {
-    teamId: team.id,
-    teamName: team.name,
-    teamShort: team.shortName,
-    logo: team.logo,
-    
-    attackingLuck,
-    attackVerdict,
-    attackLabel,
-    attackDescription: attackingLuck <= -1 
-      ? 'Underperforming xG. Attackers are due goals.'
-      : attackingLuck >= 1 
-      ? 'Overperforming xG. Regression likely.'
-      : 'Performing as expected.',
-    
-    defensiveLuck,
-    defenseVerdict,
-    defenseLabel,
-    defenseDescription: defensiveLuck >= 1
-      ? 'Conceding cheap goals. Clean sheets due.'
-      : defensiveLuck <= -1
-      ? 'Keepers saving them. Goals coming.'
-      : 'Defense performing as expected.',
-    
-    quadrant,
-    
-    goalsFor: team.totalGoals,
-    goalsAgainst: Math.round(team.totalXGC),
-    xGFor: team.totalXG,
-    xGAgainst: team.totalXGC,
-    matchesPlayed: 20,
-  };
-}
 
 interface StandingTeam {
   position: number;
@@ -98,24 +20,16 @@ interface StandingTeam {
     tla: string;
     crest: string;
   };
-  playedGames: number;
-  form: string | null;
-  won: number;
-  draw: number;
-  lost: number;
   points: number;
-  goalsFor: number;
-  goalsAgainst: number;
-  goalDifference: number;
 }
 
-interface StandingWithSentiment extends StandingTeam {
-  sentiment: TeamLuckResult | null;
+interface HybridTeamData extends StandingTeam {
+  analysis: TeamAnalysis | null;
 }
 
 export default function TeamsPage() {
   const [analyzedTeams, setAnalyzedTeams] = useState<TeamAnalysis[]>([]);
-  const [standings, setStandings] = useState<StandingWithSentiment[]>([]);
+  const [hybridStandings, setHybridStandings] = useState<HybridTeamData[]>([]);
   const [gameweek, setGameweek] = useState<number>(1);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -134,25 +48,28 @@ export default function TeamsPage() {
         
         const teams = transformTeams(fplData);
         const analyzed = convertToTeamAnalysis(teams);
-        const teamsWithLuck = teams.map(convertToTeamLuck);
         
         // Get standings table
-        const standingsTable: StandingTeam[] = standingsRes.standings?.[0]?.table || [];
+        const standingsTable = standingsRes.standings?.[0]?.table || [];
         
-        // Merge standings with sentiment data
-        const mergedStandings: StandingWithSentiment[] = standingsTable.map(standing => {
-          // Find matching sentiment by team name (fuzzy match)
-          const sentiment = teamsWithLuck.find(t => 
-            t.teamName.toLowerCase().includes(standing.team.shortName.toLowerCase()) ||
-            standing.team.name.toLowerCase().includes(t.teamName.toLowerCase()) ||
-            standing.team.shortName.toLowerCase() === t.teamShort.toLowerCase()
+        // Merge standings with TeamAnalysis data for Hybrid table
+        const mergedStandings: HybridTeamData[] = standingsTable.map((standing: StandingTeam & { playedGames?: number }) => {
+          // Find matching analysis by team name (fuzzy match)
+          const analysis = analyzed.find(a => 
+            a.teamName.toLowerCase().includes(standing.team.shortName.toLowerCase()) ||
+            standing.team.name.toLowerCase().includes(a.teamName.toLowerCase())
           ) || null;
           
-          return { ...standing, sentiment };
+          return {
+            position: standing.position,
+            team: standing.team,
+            points: standing.points,
+            analysis,
+          };
         });
         
         setAnalyzedTeams(analyzed);
-        setStandings(mergedStandings);
+        setHybridStandings(mergedStandings);
         setGameweek(getCurrentGameweek(fplData));
       } catch (err) {
         console.error('Failed to fetch data:', err);
@@ -214,7 +131,7 @@ export default function TeamsPage() {
 
       {/* ========== UNIFIED TABLE: STANDINGS + SENTIMENT ========== */}
       <div className="mb-10">
-        <MarketIntelligenceTable standings={standings} />
+        <MarketIntelligenceTable standings={hybridStandings} />
       </div>
 
       {/* ========== VISUAL DIVIDER ========== */}

@@ -1,9 +1,10 @@
 'use client';
 
+import { useState } from 'react';
 import Image from 'next/image';
-import { TeamLuckResult } from '@/lib/TeamLuck';
+import { TeamAnalysis, getEfficiencyBadgeConfig, getSustainabilityColor, getVerdictConfig } from '@/lib/TeamAnalysis';
 
-interface StandingWithSentiment {
+interface HybridTeamData {
   position: number;
   team: {
     id: number;
@@ -12,70 +13,88 @@ interface StandingWithSentiment {
     tla: string;
     crest: string;
   };
-  playedGames: number;
-  won: number;
-  draw: number;
-  lost: number;
   points: number;
-  goalsFor: number;
-  goalsAgainst: number;
-  goalDifference: number;
-  form: string | null;
-  sentiment: TeamLuckResult | null;
+  analysis: TeamAnalysis | null;
 }
 
 interface MarketIntelligenceTableProps {
-  standings: StandingWithSentiment[];
+  standings: HybridTeamData[];
   loading?: boolean;
 }
 
-function FormBadge({ result }: { result: string }) {
-  const colors: Record<string, string> = {
-    W: 'bg-emerald-500 text-white',
-    D: 'bg-slate-500 text-white',
-    L: 'bg-rose-500 text-white',
-  };
-  return (
-    <span className={`w-5 h-5 flex items-center justify-center text-[10px] font-bold rounded ${colors[result] || 'bg-slate-700'}`}>
-      {result}
-    </span>
-  );
-}
+type SortField = 'position' | 'points' | 'systemHealth';
 
-function SentimentBadge({ sentiment }: { sentiment: TeamLuckResult }) {
-  const config: Record<string, { label: string; icon: string; style: string }> = {
-    DOUBLE_VALUE: { label: 'DOUBLE VALUE', icon: '💎', style: 'bg-purple-500/20 text-purple-400 border-purple-500/30' },
-    CLEAN_SHEET_CHASER: { label: 'CS CHASER', icon: '🛡️', style: 'bg-blue-500/20 text-blue-400 border-blue-500/30' },
-    GOAL_CHASER: { label: 'GOAL CHASER', icon: '🔫', style: 'bg-orange-500/20 text-orange-400 border-orange-500/30' },
-    AVOID: { label: 'AVOID', icon: '⚠️', style: 'bg-rose-500/20 text-rose-400 border-rose-500/30' },
-    NEUTRAL: { label: 'NEUTRAL', icon: '➡️', style: 'bg-slate-700/50 text-slate-400 border-slate-600' },
-  };
-  
-  const badge = config[sentiment.quadrant] || config.NEUTRAL;
+// System Health Progress Bar
+function SystemHealthBar({ score }: { score: number }) {
+  const color = getSustainabilityColor(score);
+  const label = score >= 70 ? 'Elite' : score >= 40 ? 'Average' : 'Weak';
   
   return (
-    <span className={`inline-flex items-center gap-1 px-2 py-1 rounded border text-[10px] font-semibold ${badge.style}`}>
-      {badge.icon} {badge.label}
-    </span>
-  );
-}
-
-function LuckIndicator({ value, type }: { value: number; type: 'attack' | 'defense' }) {
-  const isGood = type === 'attack' ? value < 0 : value > 0;
-  const color = isGood ? 'text-emerald-400' : value === 0 ? 'text-slate-400' : 'text-rose-400';
-  const label = type === 'attack' ? 'xG Δ' : 'xGA Δ';
-  
-  return (
-    <div className="text-center">
-      <div className={`text-sm font-bold font-mono ${color}`}>
-        {value > 0 ? '+' : ''}{value.toFixed(1)}
+    <div className="flex items-center gap-2">
+      <div className="w-20 h-2.5 bg-slate-800 rounded-full overflow-hidden">
+        <div
+          className={`h-full ${color} transition-all duration-300`}
+          style={{ width: `${score}%` }}
+        />
       </div>
-      <div className="text-[9px] text-slate-500">{label}</div>
+      <span className="text-slate-400 text-xs font-mono w-8">{score}</span>
+      <span className="text-slate-500 text-[10px] hidden sm:inline">{label}</span>
     </div>
   );
 }
 
+// Finishing Heat Badge
+function HeatBadge({ status, delta }: { status: string; delta: number }) {
+  const config = getEfficiencyBadgeConfig(status as Parameters<typeof getEfficiencyBadgeConfig>[0]);
+  
+  return (
+    <div className="flex items-center gap-2">
+      <span className={`px-2 py-1 rounded font-mono text-[10px] font-bold ${config.bgColor} ${config.textColor}`}>
+        {config.label}
+      </span>
+      <span className="text-slate-500 text-[10px] hidden sm:inline">
+        ({delta > 0 ? '+' : ''}{delta.toFixed(1)})
+      </span>
+    </div>
+  );
+}
+
+// Action Badge (Market Signal)
+function ActionBadge({ verdict }: { verdict: string }) {
+  const config = getVerdictConfig(verdict as Parameters<typeof getVerdictConfig>[0]);
+  
+  const styleMap: Record<string, string> = {
+    DOMINANT: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+    PRIME_BUY: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+    STABLE: 'bg-slate-700/50 text-slate-400 border-slate-600',
+    OVERHEATED: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+    CRITICAL: 'bg-rose-500/20 text-rose-400 border-rose-500/30',
+    FRAGILE: 'bg-slate-700/50 text-slate-500 border-slate-600',
+  };
+  
+  return (
+    <span className={`inline-flex items-center gap-1 px-2 py-1 rounded border text-[10px] font-semibold ${styleMap[verdict] || styleMap.STABLE}`}>
+      {config.icon && <span>{config.icon}</span>} {config.label}
+    </span>
+  );
+}
+
 export default function MarketIntelligenceTable({ standings, loading }: MarketIntelligenceTableProps) {
+  const [sortBy, setSortBy] = useState<SortField>('systemHealth');
+
+  // Sort standings based on selected field
+  const sortedStandings = [...standings].sort((a, b) => {
+    switch (sortBy) {
+      case 'systemHealth':
+        return (b.analysis?.sustainabilityScore || 0) - (a.analysis?.sustainabilityScore || 0);
+      case 'points':
+        return b.points - a.points;
+      case 'position':
+      default:
+        return a.position - b.position;
+    }
+  });
+
   if (loading) {
     return (
       <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-8">
@@ -90,25 +109,33 @@ export default function MarketIntelligenceTable({ standings, loading }: MarketIn
     <div className="bg-slate-900/50 border border-slate-800 rounded-xl overflow-hidden">
       {/* Header */}
       <div className="px-6 py-4 border-b border-slate-800">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-600 to-purple-700 flex items-center justify-center">
               <span className="text-white text-sm font-bold">PL</span>
             </div>
             <div>
-              <h2 className="text-lg font-semibold text-white">Premier League Standings</h2>
-              <p className="text-xs text-slate-500">Live results with Market Sentiment signals</p>
+              <h2 className="text-lg font-semibold text-white">Hybrid Intelligence Table</h2>
+              <p className="text-xs text-slate-500">Live standings merged with xG analytics</p>
             </div>
           </div>
-          <div className="hidden md:flex items-center gap-4 text-xs">
-            <div className="flex items-center gap-1.5">
-              <span className="text-emerald-400">●</span>
-              <span className="text-slate-400">Undervalued</span>
-            </div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-rose-400">●</span>
-              <span className="text-slate-400">Overvalued</span>
-            </div>
+          
+          {/* Sort Controls */}
+          <div className="flex items-center gap-2">
+            <span className="text-slate-500 text-xs">Sort:</span>
+            {(['systemHealth', 'points', 'position'] as const).map((option) => (
+              <button
+                key={option}
+                onClick={() => setSortBy(option)}
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                  sortBy === option
+                    ? 'bg-emerald-600 text-white'
+                    : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
+                }`}
+              >
+                {option === 'systemHealth' ? 'Health' : option === 'points' ? 'Pts' : 'Rank'}
+              </button>
+            ))}
           </div>
         </div>
       </div>
@@ -120,22 +147,14 @@ export default function MarketIntelligenceTable({ standings, loading }: MarketIn
             <tr className="border-b border-slate-800 text-xs text-slate-500 uppercase tracking-wider">
               <th className="px-3 py-3 text-left font-medium">#</th>
               <th className="px-3 py-3 text-left font-medium">Team</th>
-              <th className="px-3 py-3 text-center font-medium">P</th>
-              <th className="px-3 py-3 text-center font-medium hidden sm:table-cell">W</th>
-              <th className="px-3 py-3 text-center font-medium hidden sm:table-cell">D</th>
-              <th className="px-3 py-3 text-center font-medium hidden sm:table-cell">L</th>
-              <th className="px-3 py-3 text-center font-medium hidden md:table-cell">GF</th>
-              <th className="px-3 py-3 text-center font-medium hidden md:table-cell">GA</th>
-              <th className="px-3 py-3 text-center font-medium">GD</th>
               <th className="px-3 py-3 text-center font-medium">Pts</th>
-              <th className="px-3 py-3 text-center font-medium hidden lg:table-cell">Form</th>
-              <th className="px-3 py-3 text-center font-medium">Attack</th>
-              <th className="px-3 py-3 text-center font-medium">Defense</th>
-              <th className="px-3 py-3 text-center font-medium">Signal</th>
+              <th className="px-4 py-3 text-left font-medium">System Health</th>
+              <th className="px-4 py-3 text-left font-medium">Finishing Heat</th>
+              <th className="px-3 py-3 text-center font-medium">Action</th>
             </tr>
           </thead>
           <tbody>
-            {standings.map((team) => {
+            {sortedStandings.map((team) => {
               let positionClass = 'text-slate-400';
               let rowClass = '';
               
@@ -155,16 +174,19 @@ export default function MarketIntelligenceTable({ standings, loading }: MarketIn
                   key={team.team.id}
                   className={`border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors ${rowClass}`}
                 >
-                  <td className={`px-3 py-3 font-bold text-sm ${positionClass}`}>
+                  {/* Column 1: Rank */}
+                  <td className={`px-3 py-4 font-bold text-sm ${positionClass}`}>
                     {team.position}
                   </td>
-                  <td className="px-3 py-3">
+                  
+                  {/* Column 2: Team */}
+                  <td className="px-3 py-4">
                     <div className="flex items-center gap-2">
                       <Image
                         src={team.team.crest}
                         alt={team.team.name}
-                        width={24}
-                        height={24}
+                        width={28}
+                        height={28}
                         className="object-contain"
                         unoptimized
                       />
@@ -174,40 +196,37 @@ export default function MarketIntelligenceTable({ standings, loading }: MarketIn
                       </span>
                     </div>
                   </td>
-                  <td className="px-3 py-3 text-center text-slate-400 text-sm">{team.playedGames}</td>
-                  <td className="px-3 py-3 text-center text-slate-400 text-sm hidden sm:table-cell">{team.won}</td>
-                  <td className="px-3 py-3 text-center text-slate-400 text-sm hidden sm:table-cell">{team.draw}</td>
-                  <td className="px-3 py-3 text-center text-slate-400 text-sm hidden sm:table-cell">{team.lost}</td>
-                  <td className="px-3 py-3 text-center text-slate-400 text-sm hidden md:table-cell">{team.goalsFor}</td>
-                  <td className="px-3 py-3 text-center text-slate-400 text-sm hidden md:table-cell">{team.goalsAgainst}</td>
-                  <td className={`px-3 py-3 text-center font-medium text-sm ${team.goalDifference > 0 ? 'text-emerald-400' : team.goalDifference < 0 ? 'text-rose-400' : 'text-slate-400'}`}>
-                    {team.goalDifference > 0 ? '+' : ''}{team.goalDifference}
+                  
+                  {/* Column 3: Points */}
+                  <td className="px-3 py-4 text-center font-bold text-white text-lg">
+                    {team.points}
                   </td>
-                  <td className="px-3 py-3 text-center font-bold text-white">{team.points}</td>
-                  <td className="px-3 py-3 hidden lg:table-cell">
-                    <div className="flex items-center justify-center gap-0.5">
-                      {team.form?.split(',').slice(0, 5).map((result: string, i: number) => (
-                        <FormBadge key={i} result={result.trim()} />
-                      ))}
-                    </div>
-                  </td>
-                  <td className="px-3 py-3">
-                    {team.sentiment ? (
-                      <LuckIndicator value={team.sentiment.attackingLuck} type="attack" />
+                  
+                  {/* Column 4: System Health (Structure Progress Bar) */}
+                  <td className="px-4 py-4">
+                    {team.analysis ? (
+                      <SystemHealthBar score={team.analysis.sustainabilityScore} />
                     ) : (
-                      <span className="text-slate-600">-</span>
+                      <span className="text-slate-600 text-xs">-</span>
                     )}
                   </td>
-                  <td className="px-3 py-3">
-                    {team.sentiment ? (
-                      <LuckIndicator value={team.sentiment.defensiveLuck} type="defense" />
+                  
+                  {/* Column 5: Finishing Heat (Heat Badge) */}
+                  <td className="px-4 py-4">
+                    {team.analysis ? (
+                      <HeatBadge 
+                        status={team.analysis.efficiencyStatus} 
+                        delta={team.analysis.efficiencyDelta} 
+                      />
                     ) : (
-                      <span className="text-slate-600">-</span>
+                      <span className="text-slate-600 text-xs">-</span>
                     )}
                   </td>
-                  <td className="px-3 py-3">
-                    {team.sentiment ? (
-                      <SentimentBadge sentiment={team.sentiment} />
+                  
+                  {/* Column 6: Action (Market Signal) */}
+                  <td className="px-3 py-4 text-center">
+                    {team.analysis ? (
+                      <ActionBadge verdict={team.analysis.marketVerdict} />
                     ) : (
                       <span className="text-slate-600 text-xs">-</span>
                     )}
@@ -220,24 +239,39 @@ export default function MarketIntelligenceTable({ standings, loading }: MarketIn
       </div>
 
       {/* Legend */}
-      <div className="px-6 py-3 border-t border-slate-800 flex flex-wrap gap-4 text-xs text-slate-500">
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-sm bg-blue-500" />
-          <span>Champions League</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-sm bg-orange-500" />
-          <span>Europa League</span>
-        </div>
-        <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded-sm bg-rose-500" />
-          <span>Relegation</span>
-        </div>
-        <div className="ml-auto flex gap-4">
-          <span>💎 Double Value</span>
-          <span>🛡️ CS Chaser</span>
-          <span>🔫 Goal Chaser</span>
-          <span>⚠️ Avoid</span>
+      <div className="px-6 py-3 border-t border-slate-800">
+        <div className="flex flex-wrap gap-x-6 gap-y-2 text-xs">
+          {/* Position Legend */}
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1.5">
+              <div className="w-2.5 h-2.5 rounded-sm bg-blue-500" />
+              <span className="text-slate-400">UCL</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-2.5 h-2.5 rounded-sm bg-orange-500" />
+              <span className="text-slate-400">UEL</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-2.5 h-2.5 rounded-sm bg-rose-500" />
+              <span className="text-slate-400">Relegation</span>
+            </div>
+          </div>
+          
+          {/* Health Legend */}
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-1.5">
+              <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
+              <span className="text-slate-400">Elite (70+)</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-2.5 h-2.5 rounded-full bg-amber-500" />
+              <span className="text-slate-400">Average (40-70)</span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              <div className="w-2.5 h-2.5 rounded-full bg-rose-500" />
+              <span className="text-slate-400">Weak (&lt;40)</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
