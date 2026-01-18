@@ -27,7 +27,7 @@ type SortField = 'position' | 'points' | 'systemHealth';
 // System Health Progress Bar
 function SystemHealthBar({ score }: { score: number }) {
   const color = getSustainabilityColor(score);
-  const label = score >= 70 ? 'Elite' : score >= 40 ? 'Average' : 'Weak';
+  const label = score > 75 ? 'Elite' : score >= 45 ? 'Average' : 'Weak';
   
   return (
     <div className="flex items-center gap-2">
@@ -261,15 +261,15 @@ export default function MarketIntelligenceTable({ standings, loading }: MarketIn
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-1.5">
               <div className="w-2.5 h-2.5 rounded-full bg-emerald-500" />
-              <span className="text-slate-400">Elite (70+)</span>
+              <span className="text-slate-400">Elite (75+)</span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-2.5 h-2.5 rounded-full bg-amber-500" />
-              <span className="text-slate-400">Average (40-70)</span>
+              <span className="text-slate-400">Average (45-75)</span>
             </div>
             <div className="flex items-center gap-1.5">
               <div className="w-2.5 h-2.5 rounded-full bg-rose-500" />
-              <span className="text-slate-400">Weak (&lt;40)</span>
+              <span className="text-slate-400">Weak (&lt;45)</span>
             </div>
           </div>
         </div>

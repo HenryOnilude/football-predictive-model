@@ -50,25 +50,17 @@ export type ConversionStatus = 'OVER' | 'UNDER' | 'MEAN';
 
 /**
  * Calculate Sustainability Score (Health) based on Net xG per 90
- * Scale: 0-100 where 50 is average
- * Net xG > +0.5: 80-100 (Elite)
- * Net xG ~0.0: 50 (Average)
- * Net xG < -0.5: 0-20 (Broken)
+ * Calibrated for Premier League range:
+ * - Top Tier (City/Arsenal): ~+1.5 Net xG per 90 → ~100
+ * - Mid Table: ~0.0 Net xG per 90 → ~50
+ * - Relegation Tier: ~-1.5 Net xG per 90 → ~0
+ * 
+ * Formula: (Net_xG_Per90 + 1.5) / 3.0 * 100, clamped to 0-99
  */
 function calculateSustainabilityScore(netXGPer90: number): number {
-  if (netXGPer90 >= 0.5) {
-    // Elite: 80-100 (linear from 0.5 to 1.5)
-    const normalized = Math.min(1, (netXGPer90 - 0.5) / 1.0);
-    return Math.round(80 + normalized * 20);
-  } else if (netXGPer90 >= -0.5) {
-    // Average: 20-80 (linear from -0.5 to 0.5)
-    const normalized = (netXGPer90 + 0.5) / 1.0;
-    return Math.round(20 + normalized * 60);
-  } else {
-    // Broken: 0-20 (linear from -1.5 to -0.5)
-    const normalized = Math.max(0, (netXGPer90 + 1.5) / 1.0);
-    return Math.round(normalized * 20);
-  }
+  // Linear scale from -1.5 (0) to +1.5 (100)
+  const rawScore = ((netXGPer90 + 1.5) / 3.0) * 100;
+  return Math.round(Math.min(Math.max(rawScore, 0), 99));
 }
 
 /**
@@ -89,20 +81,44 @@ function determineEfficiencyStatus(efficiencyDelta: number): EfficiencyStatus {
 
 /**
  * Derive Market Verdict based on Sustainability + Efficiency
+ * 
+ * Calibrated thresholds:
+ * - DOMINANT: Elite teams (Health > 80) that are hot - they can sustain it
+ * - CRITICAL: Weak teams (Health < 40) that are hot - unsustainable luck
+ * - PRIME_BUY: Good teams (Health > 60) that are cold - buy the dip
+ * - OVERHEATED: Average teams (40-80) that are hot - regression likely
+ * - STABLE: Good teams performing as expected
+ * - FRAGILE: Weak teams performing as expected
  */
 function deriveMarketVerdict(
   sustainabilityScore: number,
   efficiencyStatus: EfficiencyStatus
 ): MarketVerdict {
-  const isHighSustainability = sustainabilityScore >= 60;
+  const isElite = sustainabilityScore > 80;
+  const isGood = sustainabilityScore > 60;
+  const isWeak = sustainabilityScore < 40;
   const isHot = efficiencyStatus === 'CRITICAL_OVER' || efficiencyStatus === 'RUNNING_HOT';
   const isCold = efficiencyStatus === 'CRITICAL_VALUE' || efficiencyStatus === 'COLD';
 
-  if (isHighSustainability && isHot) return 'DOMINANT';
-  if (!isHighSustainability && isHot) return 'OVERHEATED';
-  if (isHighSustainability && isCold) return 'PRIME_BUY';
-  if (!isHighSustainability && isCold) return 'CRITICAL';
-  if (isHighSustainability) return 'STABLE';
+  // Elite teams that are hot = DOMINANT (they can sustain it)
+  if (isElite && isHot) return 'DOMINANT';
+  
+  // Weak teams that are hot = CRITICAL (unsustainable luck)
+  if (isWeak && isHot) return 'CRITICAL';
+  
+  // Average/mid teams that are hot = OVERHEATED (regression likely)
+  if (isHot) return 'OVERHEATED';
+  
+  // Good teams that are cold = PRIME_BUY (buy the dip)
+  if (isGood && isCold) return 'PRIME_BUY';
+  
+  // Weak teams that are cold = CRITICAL (bad and unlucky)
+  if (isWeak && isCold) return 'CRITICAL';
+  
+  // Good teams performing as expected = STABLE
+  if (isGood) return 'STABLE';
+  
+  // Everyone else = FRAGILE
   return 'FRAGILE';
 }
 
@@ -221,10 +237,11 @@ export function getEfficiencyBadgeConfig(status: EfficiencyStatus): {
 
 /**
  * Get sustainability score color based on value
+ * Calibrated thresholds: Green > 75, Yellow 45-75, Red < 45
  */
 export function getSustainabilityColor(score: number): string {
-  if (score >= 70) return 'bg-emerald-500';
-  if (score >= 40) return 'bg-amber-500';
+  if (score > 75) return 'bg-emerald-500';
+  if (score >= 45) return 'bg-amber-500';
   return 'bg-rose-500';
 }
 
@@ -238,7 +255,7 @@ export function getVerdictConfig(verdict: MarketVerdict): {
 } {
   switch (verdict) {
     case 'DOMINANT':
-      return { label: 'DOMINANT', icon: '', color: 'text-emerald-400' };
+      return { label: 'DOMINANT', icon: '💎', color: 'text-emerald-400' };
     case 'OVERHEATED':
       return { label: 'OVERHEATED', icon: '⚠️', color: 'text-amber-400' };
     case 'PRIME_BUY':
