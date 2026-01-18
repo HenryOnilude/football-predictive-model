@@ -12,6 +12,12 @@ import {
   MatchLuckScore,
   PL_TEAM_IDS,
 } from '@/lib/fplTypes';
+import { 
+  fetchFPLDataServer, 
+  FPLElement, 
+  FPLTeam,
+  getCurrentGameweek as getFPLGameweek,
+} from '@/lib/fpl';
 
 const API_FOOTBALL_BASE = 'https://v3.football.api-sports.io';
 const PREMIER_LEAGUE_ID = 39;
@@ -300,23 +306,77 @@ async function fetchPlayersFromAPI(): Promise<PlayerLuckData[]> {
   return luckData;
 }
 
-// Generate demo data when API is not available
-// Uses Premier League official photo URLs with correct player IDs for 2025-26 season
+// Fetch live player data from Official FPL API
+async function fetchPlayersFromFPLAPI(): Promise<PlayerLuckData[]> {
+  const data = await fetchFPLDataServer();
+  const gameweek = getFPLGameweek(data);
+  
+  // Create team lookup map
+  const teamMap = new Map<number, FPLTeam>(data.teams.map(t => [t.id, t]));
+  
+  // Position mapping
+  const positionMap: Record<number, string> = {
+    1: 'Goalkeeper',
+    2: 'Defender', 
+    3: 'Midfielder',
+    4: 'Attacker',
+  };
+  
+  // Filter players with goals or significant xG, sort by goals
+  const relevantPlayers = data.elements
+    .filter((el: FPLElement) => {
+      const xG = parseFloat(el.expected_goals) || 0;
+      return el.goals_scored > 0 || xG > 1.0;
+    })
+    .sort((a: FPLElement, b: FPLElement) => b.goals_scored - a.goals_scored)
+    .slice(0, 30); // Top 30 players
+  
+  return relevantPlayers.map((el: FPLElement) => {
+    const team = teamMap.get(el.team);
+    const teamName = team?.name || 'Unknown';
+    const xG = parseFloat(el.expected_goals) || 0;
+    const actualGoals = el.goals_scored;
+    const luckScore = calculateLuckScore(actualGoals, xG);
+    const { verdict, label } = getVerdict(luckScore);
+    const metrics = calculateMetrics(luckScore);
+    
+    return {
+      id: el.id,
+      name: el.web_name,
+      team: teamName,
+      teamShort: team?.short_name || teamName.slice(0, 3).toUpperCase(),
+      position: positionMap[el.element_type] || 'Attacker',
+      photo: `https://resources.premierleague.com/premierleague/photos/players/110x140/p${el.code}.png`,
+      price: el.now_cost / 10,
+      actualGoals,
+      xG: Number(xG.toFixed(2)),
+      luckScore,
+      verdict,
+      verdictLabel: label,
+      differentialValue: metrics.differentialValue,
+      haulPotential: metrics.haulPotential,
+      trapIndicator: metrics.trapIndicator,
+      fixtures: generateMockFixtures(),
+      gameweek,
+    };
+  });
+}
+
+// Fallback demo data when FPL API fails
 function generateDemoData(): PlayerLuckData[] {
   const gameweek = getCurrentGameweek();
   
-  // 2025-26 Season Players with correct Premier League photo IDs
   const demoPlayers = [
-    { id: 223094, name: 'E. Haaland', team: 'Manchester City', position: 'Attacker', photoId: 'p223094', price: 15.0, actualGoals: 15, xG: 12.5 },
-    { id: 118748, name: 'M. Salah', team: 'Liverpool', position: 'Attacker', photoId: 'p118748', price: 13.5, actualGoals: 10, xG: 8.3 },
-    { id: 492774, name: 'C. Palmer', team: 'Chelsea', position: 'Midfielder', photoId: 'p492774', price: 10.8, actualGoals: 9, xG: 7.1 },
-    { id: 467169, name: 'A. Isak', team: 'Newcastle United', position: 'Attacker', photoId: 'p467169', price: 8.5, actualGoals: 8, xG: 9.2 },
-    { id: 448334, name: 'B. Saka', team: 'Arsenal', position: 'Midfielder', photoId: 'p448334', price: 10.0, actualGoals: 6, xG: 5.8 },
-    { id: 447072, name: 'O. Watkins', team: 'Aston Villa', position: 'Attacker', photoId: 'p447072', price: 9.0, actualGoals: 7, xG: 8.0 },
-    { id: 482605, name: 'D. Núñez', team: 'Liverpool', position: 'Attacker', photoId: 'p482605', price: 7.5, actualGoals: 5, xG: 6.5 },
-    { id: 447201, name: 'D. Solanke', team: 'Tottenham Hotspur', position: 'Attacker', photoId: 'p447201', price: 7.8, actualGoals: 4, xG: 5.2 },
-    { id: 515747, name: 'N. Jackson', team: 'Chelsea', position: 'Attacker', photoId: 'p515747', price: 7.3, actualGoals: 8, xG: 6.8 },
-    { id: 493105, name: 'A. Gordon', team: 'Newcastle United', position: 'Midfielder', photoId: 'p493105', price: 7.5, actualGoals: 6, xG: 7.8 },
+    { id: 223094, code: 223094, name: 'E. Haaland', team: 'Manchester City', position: 'Attacker', price: 15.0, actualGoals: 15, xG: 12.5 },
+    { id: 118748, code: 118748, name: 'M. Salah', team: 'Liverpool', position: 'Attacker', price: 13.5, actualGoals: 10, xG: 8.3 },
+    { id: 492774, code: 492774, name: 'C. Palmer', team: 'Chelsea', position: 'Midfielder', price: 10.8, actualGoals: 9, xG: 7.1 },
+    { id: 467169, code: 467169, name: 'A. Isak', team: 'Newcastle United', position: 'Attacker', price: 8.5, actualGoals: 8, xG: 9.2 },
+    { id: 448334, code: 448334, name: 'B. Saka', team: 'Arsenal', position: 'Midfielder', price: 10.0, actualGoals: 6, xG: 5.8 },
+    { id: 447072, code: 447072, name: 'O. Watkins', team: 'Aston Villa', position: 'Attacker', price: 9.0, actualGoals: 7, xG: 8.0 },
+    { id: 482605, code: 482605, name: 'D. Núñez', team: 'Liverpool', position: 'Attacker', price: 7.5, actualGoals: 5, xG: 6.5 },
+    { id: 447201, code: 447201, name: 'D. Solanke', team: 'Tottenham Hotspur', position: 'Attacker', price: 7.8, actualGoals: 4, xG: 5.2 },
+    { id: 515747, code: 515747, name: 'N. Jackson', team: 'Chelsea', position: 'Attacker', price: 7.3, actualGoals: 8, xG: 6.8 },
+    { id: 493105, code: 493105, name: 'A. Gordon', team: 'Newcastle United', position: 'Midfielder', price: 7.5, actualGoals: 6, xG: 7.8 },
   ];
 
   return demoPlayers.map((p) => {
@@ -330,7 +390,7 @@ function generateDemoData(): PlayerLuckData[] {
       team: p.team,
       teamShort: TEAM_SHORT_NAMES[p.team] || p.team.slice(0, 3).toUpperCase(),
       position: p.position,
-      photo: `https://resources.premierleague.com/premierleague/photos/players/110x140/${p.photoId}.png`,
+      photo: `https://resources.premierleague.com/premierleague/photos/players/110x140/p${p.code}.png`,
       price: p.price,
       actualGoals: p.actualGoals,
       xG: p.xG,
@@ -604,20 +664,30 @@ export async function fetchLuckData(): Promise<LuckDataResponse> {
     console.log('Cache unavailable, proceeding with API fetch');
   }
 
-  // 2. Fetch fresh data from API-Football
+  // 2. Fetch fresh data from Official FPL API (primary) or API-Football (fallback)
   let players: PlayerLuckData[];
   
   try {
-    if (process.env.API_FOOTBALL_KEY) {
-      players = await fetchPlayersFromAPI();
-    } else {
-      // Use demo data if no API key
-      console.log('API_FOOTBALL_KEY not set, using demo data');
+    // Always try Official FPL API first - it's free and has real-time data
+    console.log('Fetching from Official FPL API...');
+    players = await fetchPlayersFromFPLAPI();
+    console.log(`Loaded ${players.length} players from FPL API`);
+  } catch (fplError) {
+    console.error('FPL API fetch failed:', fplError);
+    
+    // Fallback to API-Football if available
+    try {
+      if (process.env.API_FOOTBALL_KEY) {
+        console.log('Falling back to API-Football...');
+        players = await fetchPlayersFromAPI();
+      } else {
+        console.log('Using demo data as final fallback');
+        players = generateDemoData();
+      }
+    } catch (apiError) {
+      console.error('All API fetches failed, using demo data:', apiError);
       players = generateDemoData();
     }
-  } catch (error) {
-    console.error('API fetch failed, using demo data:', error);
-    players = generateDemoData();
   }
 
   // 3. Save to Supabase cache
