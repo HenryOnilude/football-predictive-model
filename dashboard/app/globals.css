@@ -1,5 +1,27 @@
 @import "tailwindcss";
 
+@theme {
+  /* Semantic Color Tokens */
+  --color-background: rgb(var(--background) / <alpha-value>);
+  --color-surface: rgb(var(--surface) / <alpha-value>);
+  --color-surface-highlight: rgb(var(--surface-highlight) / <alpha-value>);
+  --color-text-primary: rgb(var(--text-primary) / <alpha-value>);
+  --color-text-secondary: rgb(var(--text-secondary) / <alpha-value>);
+  --color-text-muted: rgb(var(--text-muted) / <alpha-value>);
+  
+  /* Semantic Signal Colors */
+  --color-elite: rgb(var(--signal-elite) / <alpha-value>);
+  --color-warning: rgb(var(--signal-warning) / <alpha-value>);
+  --color-critical: rgb(var(--signal-critical) / <alpha-value>);
+  --color-cold: rgb(var(--signal-cold) / <alpha-value>);
+  --color-purple: rgb(var(--signal-purple) / <alpha-value>);
+  
+  /* Card & Border */
+  --color-card-bg: rgb(var(--card-bg) / <alpha-value>);
+  --color-card-border: rgb(var(--card-border) / <alpha-value>);
+  --color-border-subtle: rgb(var(--border-subtle) / <alpha-value>);
+}
+
 @layer base {
   :root {
     /* LIGHT MODE (Positive Polarity - High Acuity for Astigmatism) */
