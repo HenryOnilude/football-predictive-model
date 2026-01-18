@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Inter } from "next/font/google";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import "./globals.css";
 
 const inter = Inter({ 
@@ -19,9 +20,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`dark ${inter.variable}`}>
-      <body className="bg-slate-950 text-slate-50 font-sans">
-        <nav className="bg-slate-950/90 backdrop-blur-md border-b border-slate-800/60 sticky top-0 z-50">
+    <html lang="en" className={inter.variable} suppressHydrationWarning>
+      <body className="bg-[rgb(var(--background))] text-[rgb(var(--text-primary))] font-sans">
+        <ThemeProvider>
+        <nav className="bg-[rgb(var(--background))]/90 backdrop-blur-md border-b border-[rgb(var(--surface-highlight))]/60 sticky top-0 z-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
               <Link href="/luck" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
@@ -85,6 +87,7 @@ export default function RootLayout({
             </div>
           </div>
         </footer>
+        </ThemeProvider>
       </body>
     </html>
   );
