@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+/* stylelint-disable at-rule-no-unknown */
 @theme {
   /* Semantic Color Tokens */
   --color-background: rgb(var(--background) / <alpha-value>);
