@@ -119,12 +119,44 @@ export default function TeamsPage() {
         const sentiment = teams.map(convertToTeamLuck);
         
         // Get standings table and merge with analysis
+        // Name mapping for teams with different names in FPL vs football-data.org
+        const nameMap: Record<string, string[]> = {
+          'Man Utd': ['Manchester United', 'Man United', 'Manchester Utd'],
+          'Spurs': ['Tottenham', 'Tottenham Hotspur'],
+          'Man City': ['Manchester City'],
+          'Nott\'m Forest': ['Nottingham Forest', 'Nottingham'],
+          'Newcastle': ['Newcastle United'],
+          'West Ham': ['West Ham United'],
+          'Wolves': ['Wolverhampton', 'Wolverhampton Wanderers'],
+          'Brighton': ['Brighton & Hove Albion', 'Brighton and Hove Albion'],
+          'Leicester': ['Leicester City'],
+        };
+        
         const standingsTable = standingsRes.standings?.[0]?.table || [];
         const merged: HybridTeamData[] = standingsTable.map((s: StandingTeam) => {
-          const analysis = analyzed.find(a => 
-            a.teamName.toLowerCase().includes(s.team.shortName.toLowerCase()) ||
-            s.team.name.toLowerCase().includes(a.teamName.toLowerCase())
-          ) || null;
+          const standingName = s.team.name.toLowerCase();
+          const standingShort = s.team.shortName.toLowerCase();
+          
+          const analysis = analyzed.find(a => {
+            const analysisName = a.teamName.toLowerCase();
+            
+            // Direct match
+            if (analysisName.includes(standingShort) || standingName.includes(analysisName)) {
+              return true;
+            }
+            
+            // Check name mapping
+            for (const [fplName, altNames] of Object.entries(nameMap)) {
+              if (analysisName.includes(fplName.toLowerCase())) {
+                if (altNames.some(alt => standingName.includes(alt.toLowerCase()))) {
+                  return true;
+                }
+              }
+            }
+            
+            return false;
+          }) || null;
+          
           return { position: s.position, team: s.team, points: s.points, analysis };
         });
         
