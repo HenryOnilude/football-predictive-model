@@ -135,6 +135,62 @@ export default function MethodologyModal({ isOpen, onClose }: MethodologyModalPr
             </div>
           </section>
 
+          {/* Section: Team Quadrants */}
+          <section>
+            <h3 className="text-base font-semibold text-white mb-2 flex items-center gap-2">
+              <span className="text-cyan-400">🏷️</span> Team Quadrants (Card Badges)
+            </h3>
+            <p className="text-sm text-slate-300 leading-relaxed mb-3">
+              Teams are classified based on attacking and defensive xG variance:
+            </p>
+            <div className="space-y-2 text-xs">
+              <div className="flex items-center gap-3">
+                <span className="px-2 py-1 rounded bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 font-semibold">💎 DOUBLE VALUE</span>
+                <span className="text-slate-400">Both attack and defense underperforming xG. Best value picks.</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="px-2 py-1 rounded bg-cyan-500/20 text-cyan-400 border border-cyan-500/30 font-semibold">🛡️ CS CHASER</span>
+                <span className="text-slate-400">Defense conceding cheap goals. Clean sheets are due.</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="px-2 py-1 rounded bg-orange-500/20 text-orange-400 border border-orange-500/30 font-semibold">⚽ GOAL CHASER</span>
+                <span className="text-slate-400">Attackers underperforming xG. Goals are due.</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="px-2 py-1 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30 font-semibold">🚫 AVOID</span>
+                <span className="text-slate-400">Overperforming in attack or defense. Regression likely.</span>
+              </div>
+            </div>
+          </section>
+
+          {/* Section: Card Labels */}
+          <section>
+            <h3 className="text-base font-semibold text-white mb-2 flex items-center gap-2">
+              <span className="text-amber-400">🔖</span> Card Action Labels
+            </h3>
+            <p className="text-sm text-slate-300 leading-relaxed mb-3">
+              Individual labels on sentiment cards indicate specific opportunities:
+            </p>
+            <div className="grid grid-cols-2 gap-2 text-xs">
+              <div className="flex items-center gap-2">
+                <span className="px-2 py-0.5 rounded bg-emerald-600 text-white font-semibold">BUY DIP</span>
+                <span className="text-slate-400">Defense due clean sheets</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="px-2 py-0.5 rounded bg-purple-600 text-white font-semibold">EXPLOSIVE</span>
+                <span className="text-slate-400">Attack severely underperforming</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="px-2 py-0.5 rounded bg-amber-600 text-white font-semibold">COOLDOWN</span>
+                <span className="text-slate-400">Attack overperforming, sell high</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="px-2 py-0.5 rounded bg-slate-600 text-white font-semibold">STABLE</span>
+                <span className="text-slate-400">Performing as expected</span>
+              </div>
+            </div>
+          </section>
+
           {/* Section: Market Verdicts */}
           <section>
             <h3 className="text-base font-semibold text-white mb-2 flex items-center gap-2">
@@ -163,6 +219,30 @@ export default function MethodologyModal({ isOpen, onClose }: MethodologyModalPr
               <div className="flex items-center gap-3">
                 <span className="px-2 py-1 rounded bg-rose-500/20 text-rose-400 border border-rose-500/30 font-semibold">🚨 CRITICAL</span>
                 <span className="text-slate-400">Poor health + hot finishing. Avoid completely.</span>
+              </div>
+            </div>
+          </section>
+
+          {/* Section: Sort Options */}
+          <section>
+            <h3 className="text-base font-semibold text-white mb-2 flex items-center gap-2">
+              <span className="text-slate-400">🔄</span> Table Sort Options
+            </h3>
+            <p className="text-sm text-slate-300 leading-relaxed mb-3">
+              Use the sort buttons to reorder the Hybrid Intelligence Table:
+            </p>
+            <div className="space-y-2 text-xs">
+              <div className="flex items-center gap-3">
+                <span className="px-3 py-1 rounded bg-emerald-600 text-white font-semibold">Health</span>
+                <span className="text-slate-400">Sort by System Health score (best structural teams first)</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="px-3 py-1 rounded bg-slate-700 text-slate-300 font-semibold">Pts</span>
+                <span className="text-slate-400">Sort by league points (actual standings)</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="px-3 py-1 rounded bg-slate-700 text-slate-300 font-semibold">Rank</span>
+                <span className="text-slate-400">Sort by league position (1st to 20th)</span>
               </div>
             </div>
           </section>
