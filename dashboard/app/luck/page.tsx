@@ -37,7 +37,9 @@ export default async function LuckPage() {
           {/* Key Terms Explanation */}
           <div className="mt-10 p-5 rounded-xl bg-slate-800/40 border border-slate-700/50 max-w-4xl mx-auto">
             <h3 className="text-sm font-semibold text-slate-400 uppercase tracking-wider mb-4 text-center">Understanding The Data</h3>
-            <div className="grid md:grid-cols-2 gap-4 text-xs">
+            
+            {/* Core Stats */}
+            <div className="grid md:grid-cols-2 gap-4 text-xs mb-6">
               <div className="space-y-3">
                 <div className="flex items-start gap-2">
                   <span className="text-emerald-400 font-semibold whitespace-nowrap">xG (Expected Goals)</span>
@@ -48,15 +50,11 @@ export default async function LuckPage() {
                   <span className="text-slate-400">Goals minus xG. Negative = unlucky (scoring less than expected). Positive = lucky (scoring more than expected). Luck evens out over time.</span>
                 </div>
                 <div className="flex items-start gap-2">
-                  <span className="text-amber-400 font-semibold whitespace-nowrap">DUE A HAUL</span>
-                  <span className="text-slate-400">Players with negative luck scores are &quot;due&quot; — they&apos;re getting good chances but not converting. Statistically, their goals will come.</span>
-                </div>
-              </div>
-              <div className="space-y-3">
-                <div className="flex items-start gap-2">
                   <span className="text-purple-400 font-semibold whitespace-nowrap">DIFFERENTIAL %</span>
                   <span className="text-slate-400">How many FPL managers own this player. Lower = bigger rank boost if they score. High differential picks can win you mini-leagues.</span>
                 </div>
+              </div>
+              <div className="space-y-3">
                 <div className="flex items-start gap-2">
                   <span className="text-emerald-400 font-semibold whitespace-nowrap">HAUL POT. %</span>
                   <span className="text-slate-400">Probability of a big points haul (10+ pts) based on xG, fixtures, and form. Higher = more likely to explode soon.</span>
@@ -64,6 +62,33 @@ export default async function LuckPage() {
                 <div className="flex items-start gap-2">
                   <span className="text-rose-400 font-semibold whitespace-nowrap">TRAP RISK %</span>
                   <span className="text-slate-400">Chance the player is overperforming and will regress. High trap risk = avoid buying, their output will likely drop.</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Action Buttons Explanation */}
+            <div className="border-t border-slate-700 pt-4">
+              <h4 className="text-xs font-semibold text-slate-500 uppercase tracking-wider mb-3">Card Action Buttons</h4>
+              <div className="grid md:grid-cols-2 gap-4 text-xs">
+                <div className="space-y-3">
+                  <div className="flex items-start gap-2">
+                    <span className="px-2 py-0.5 rounded bg-emerald-600 text-white font-semibold whitespace-nowrap text-[10px]">DUE A HAUL 🔥</span>
+                    <span className="text-slate-400">This player is getting good chances but not scoring. Statistics say they WILL score soon — buy them now before they explode.</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="px-2 py-0.5 rounded bg-amber-600 text-white font-semibold whitespace-nowrap text-[10px]">SELL HIGH</span>
+                    <span className="text-slate-400">This player is scoring MORE than their chances suggest. They&apos;re on a lucky streak that won&apos;t last — sell them now while their price is high.</span>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex items-start gap-2">
+                    <span className="px-2 py-0.5 rounded bg-rose-600 text-white font-semibold whitespace-nowrap text-[10px]">REGRESSION RISK ⚠️</span>
+                    <span className="text-slate-400">DANGER: This player is heavily overperforming. They&apos;re scoring goals they statistically shouldn&apos;t be. Their output WILL drop — avoid buying at all costs.</span>
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <span className="px-2 py-0.5 rounded bg-slate-600 text-white font-semibold whitespace-nowrap text-[10px]">FAIR VALUE</span>
+                    <span className="text-slate-400">This player is performing exactly as expected. No edge here — their output should stay consistent.</span>
+                  </div>
                 </div>
               </div>
             </div>
