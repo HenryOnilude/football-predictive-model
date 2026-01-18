@@ -2,24 +2,31 @@
 
 import { useEffect, useState } from 'react';
 import Image from 'next/image';
-import { fetchFPLData, FPLTeam } from '@/lib/fpl';
 
 interface TeamStanding {
   position: number;
-  team: FPLTeam;
-  played: number;
+  team: {
+    id: number;
+    name: string;
+    shortName: string;
+    tla: string;
+    crest: string;
+  };
+  playedGames: number;
+  form: string | null;
   won: number;
-  drawn: number;
+  draw: number;
   lost: number;
+  points: number;
   goalsFor: number;
   goalsAgainst: number;
   goalDifference: number;
-  points: number;
-  form: string[];
 }
 
-function getTeamLogo(code: number): string {
-  return `https://resources.premierleague.com/premierleague/badges/50/t${code}.png`;
+interface StandingsData {
+  competition: { name: string };
+  season: { currentMatchday: number };
+  standings: Array<{ table: TeamStanding[] }>;
 }
 
 function FormBadge({ result }: { result: string }) {
@@ -38,6 +45,7 @@ function FormBadge({ result }: { result: string }) {
 
 export default function PremierLeagueTable() {
   const [standings, setStandings] = useState<TeamStanding[]>([]);
+  const [matchday, setMatchday] = useState<number>(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -45,45 +53,19 @@ export default function PremierLeagueTable() {
     async function loadStandings() {
       try {
         setLoading(true);
-        const data = await fetchFPLData();
         
-        // Calculate standings from team data
-        // FPL API doesn't provide direct standings, so we estimate from team strength
-        // In a real app, you'd fetch from a standings API
-        const teamStandings: TeamStanding[] = data.teams
-          .map((team, index) => {
-            // Estimate stats based on team strength (simplified)
-            const strength = team.strength;
-            const played = 20; // Approximate mid-season
-            const baseWins = Math.round((strength / 5) * 10);
-            const won = Math.min(played, Math.max(0, baseWins + Math.floor(Math.random() * 4) - 2));
-            const lost = Math.min(played - won, Math.max(0, Math.round((5 - strength) * 2) + Math.floor(Math.random() * 3)));
-            const drawn = played - won - lost;
-            const goalsFor = Math.round(won * 2.2 + drawn * 0.8 + Math.random() * 10);
-            const goalsAgainst = Math.round(lost * 2.0 + drawn * 0.9 + Math.random() * 8);
-            
-            return {
-              position: index + 1,
-              team,
-              played,
-              won,
-              drawn,
-              lost,
-              goalsFor,
-              goalsAgainst,
-              goalDifference: goalsFor - goalsAgainst,
-              points: won * 3 + drawn,
-              form: ['W', 'D', 'L', 'W', 'W'].sort(() => Math.random() - 0.5).slice(0, 5),
-            };
-          })
-          .sort((a, b) => {
-            if (b.points !== a.points) return b.points - a.points;
-            if (b.goalDifference !== a.goalDifference) return b.goalDifference - a.goalDifference;
-            return b.goalsFor - a.goalsFor;
-          })
-          .map((team, index) => ({ ...team, position: index + 1 }));
+        // Fetch from our standings API route
+        const response = await fetch('/api/standings');
+        if (!response.ok) {
+          throw new Error('Failed to fetch standings');
+        }
         
-        setStandings(teamStandings);
+        const data: StandingsData = await response.json();
+        
+        // Get the main league table (TOTAL standings)
+        const table = data.standings?.[0]?.table || [];
+        setStandings(table);
+        setMatchday(data.season?.currentMatchday || 0);
       } catch (err) {
         console.error('Failed to fetch standings:', err);
         setError('Failed to load standings');
@@ -123,7 +105,7 @@ export default function PremierLeagueTable() {
           </div>
           <div>
             <h2 className="text-lg font-semibold text-white">Premier League Table</h2>
-            <p className="text-xs text-slate-500">2025-26 Season Standings</p>
+            <p className="text-xs text-slate-500">2025-26 Season • Matchday {matchday}</p>
           </div>
         </div>
       </div>
@@ -174,7 +156,7 @@ export default function PremierLeagueTable() {
                   <td className="px-4 py-3">
                     <div className="flex items-center gap-3">
                       <Image
-                        src={getTeamLogo(team.team.code)}
+                        src={team.team.crest}
                         alt={team.team.name}
                         width={24}
                         height={24}
@@ -183,13 +165,13 @@ export default function PremierLeagueTable() {
                       />
                       <span className="font-medium text-white text-sm">
                         <span className="hidden sm:inline">{team.team.name}</span>
-                        <span className="sm:hidden">{team.team.short_name}</span>
+                        <span className="sm:hidden">{team.team.tla}</span>
                       </span>
                     </div>
                   </td>
-                  <td className="px-4 py-3 text-center text-slate-400 text-sm">{team.played}</td>
+                  <td className="px-4 py-3 text-center text-slate-400 text-sm">{team.playedGames}</td>
                   <td className="px-4 py-3 text-center text-slate-400 text-sm hidden sm:table-cell">{team.won}</td>
-                  <td className="px-4 py-3 text-center text-slate-400 text-sm hidden sm:table-cell">{team.drawn}</td>
+                  <td className="px-4 py-3 text-center text-slate-400 text-sm hidden sm:table-cell">{team.draw}</td>
                   <td className="px-4 py-3 text-center text-slate-400 text-sm hidden sm:table-cell">{team.lost}</td>
                   <td className="px-4 py-3 text-center text-slate-400 text-sm hidden md:table-cell">{team.goalsFor}</td>
                   <td className="px-4 py-3 text-center text-slate-400 text-sm hidden md:table-cell">{team.goalsAgainst}</td>
@@ -199,7 +181,7 @@ export default function PremierLeagueTable() {
                   <td className="px-4 py-3 text-center font-bold text-white">{team.points}</td>
                   <td className="px-4 py-3 hidden lg:table-cell">
                     <div className="flex items-center justify-center gap-1">
-                      {team.form.map((result, i) => (
+                      {team.form?.split(',').slice(0, 5).map((result: string, i: number) => (
                         <FormBadge key={i} result={result} />
                       ))}
                     </div>
