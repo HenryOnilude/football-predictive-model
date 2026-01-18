@@ -171,6 +171,27 @@ export default function MatrixPage() {
         </div>
       </div>
 
+      {/* Sort Options Explanation */}
+      <div className="mb-4 p-3 bg-slate-900/30 border border-slate-800 rounded-lg">
+        <div className="flex flex-wrap items-start gap-4 text-xs">
+          <span className="text-slate-500 font-medium pt-1">Sort by:</span>
+          <div className="flex flex-wrap gap-3">
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-1 rounded bg-emerald-600 text-white font-semibold">Structure</span>
+              <span className="text-slate-400">Ranks teams by their underlying quality (best xG structure first)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-1 rounded bg-slate-700 text-slate-300 font-semibold">Form</span>
+              <span className="text-slate-400">Ranks by current finishing heat (most overperforming first)</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-1 rounded bg-slate-700 text-slate-300 font-semibold">Verdict</span>
+              <span className="text-slate-400">Groups teams by action recommendation (DOMINANT → CRITICAL)</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Matrix Table */}
       <TeamMatrix teams={analyzedTeams} />
     </div>
