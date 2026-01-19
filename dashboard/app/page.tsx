@@ -12,10 +12,14 @@ function mapFPLToTeamData(fplTeams: Awaited<ReturnType<typeof getAllTeams>>): Da
     const variance = Number(team.goalDelta.toFixed(1));
     const riskScore = Math.round(Math.min(100, Math.abs(variance) * 15));
     
+    const playerCount = team.players?.length || 1;
+    const totalMinutes = team.players?.reduce((sum, p) => sum + (p.minutes || 0), 0) || 0;
+    const totalPoints = team.players?.reduce((sum, p) => sum + (p.totalPoints || 0), 0) || 0;
+    
     return {
-      Team: team.name,
-      Matches: Math.round(team.players.reduce((sum, p) => sum + p.minutes, 0) / 90 / team.players.length) || 19,
-      Actual_Points: team.players.reduce((sum, p) => sum + p.totalPoints, 0),
+      Team: team.name || team.shortName || 'Unknown',
+      Matches: Math.round(totalMinutes / 90 / playerCount) || 19,
+      Actual_Points: totalPoints,
       Goals_For: team.totalGoals,
       Goals_Against: 0, // FPL doesn't provide this at team level
       xG_For: team.totalXG,

@@ -20,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={inter.variable} suppressHydrationWarning>
+    <html lang="en" className={`${inter.variable} dark`} suppressHydrationWarning>
       <body className="bg-[rgb(var(--background))] text-[rgb(var(--text-primary))] font-sans">
         <ThemeProvider>
         <nav className="bg-[rgb(var(--background))]/90 backdrop-blur-md border-b border-[rgb(var(--surface-highlight))]/60 sticky top-0 z-50">
