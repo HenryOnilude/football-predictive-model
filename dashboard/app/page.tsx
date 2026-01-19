@@ -1,25 +1,66 @@
+import LeagueTable from '@/components/LeagueTable';
+import MarketMoversRow from '@/components/MarketMoversRow';
 import DeepDiveLinks from '@/components/DeepDiveLinks';
-import FPLPlayerCards from '@/components/FPLPlayerCards';
-import { getTopPerformers, getAllTeams, MappedTeamStats } from '@/lib/fpl-api';
-import Link from 'next/link';
+import { DashboardData, TeamData } from '@/lib/types';
+import { getAllTeams } from '@/lib/fpl-api';
 
 export const revalidate = 300; // Revalidate every 5 minutes
 
+// Map FPL team data to our TeamData format for LeagueTable
+function mapFPLToTeamData(fplTeams: Awaited<ReturnType<typeof getAllTeams>>): DashboardData {
+  const teams: TeamData[] = fplTeams.teams.map((team, index) => {
+    const variance = team.goalDelta;
+    const riskScore = Math.min(100, Math.abs(variance) * 15);
+    
+    return {
+      Team: team.name,
+      Matches: Math.round(team.players.reduce((sum, p) => sum + p.minutes, 0) / 90 / team.players.length) || 19,
+      Actual_Points: team.players.reduce((sum, p) => sum + p.totalPoints, 0),
+      Goals_For: team.totalGoals,
+      Goals_Against: 0, // FPL doesn't provide this at team level
+      xG_For: team.totalXG,
+      xG_Against: 0,
+      xPTS: team.totalXG * 2.5, // Rough estimate
+      Variance: variance,
+      Position_Actual: index + 1,
+      Position_Expected: index + 1,
+      Z_Score: variance / 2,
+      P_Value: 0.05,
+      Significant: Math.abs(variance) > 3,
+      Risk_Score: riskScore,
+      Risk_Category: riskScore >= 90 ? 'Critical' : riskScore >= 70 ? 'High' : riskScore >= 40 ? 'Moderate' : 'Low',
+      Regression_Probability: Math.min(0.95, Math.abs(variance) * 0.1),
+      Performance_Status: variance > 3 ? 'Overperforming' : variance < -3 ? 'Underperforming' : 'As Expected',
+    };
+  });
+
+  // Sort by total goals (proxy for league position)
+  teams.sort((a, b) => b.Goals_For - a.Goals_For);
+  teams.forEach((team, i) => {
+    team.Position_Actual = i + 1;
+    team.Position_Expected = i + 1;
+  });
+
+  return {
+    teams,
+    lastUpdated: fplTeams.lastUpdated,
+  };
+}
+
 export default async function HomePage() {
-  let playerData;
-  let teamData;
+  let data: DashboardData | null = null;
   let error: string | null = null;
+  let currentGameweek = 0;
 
   try {
-    [playerData, teamData] = await Promise.all([
-      getTopPerformers(10),
-      getAllTeams()
-    ]);
+    const fplData = await getAllTeams();
+    data = mapFPLToTeamData(fplData);
+    currentGameweek = fplData.currentGameweek;
   } catch (e) {
     error = e instanceof Error ? e.message : 'Failed to load FPL data';
   }
 
-  if (error || !playerData || !teamData) {
+  if (error || !data) {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="bg-rose-500/10 border border-rose-500/30 rounded-lg p-6">
@@ -35,17 +76,9 @@ export default async function HomePage() {
     );
   }
 
-  // Calculate team-level stats
-  const teamsWithStats = teamData.teams.map((team: MappedTeamStats) => ({
-    ...team,
-    riskLevel: Math.abs(team.goalDelta) >= 5 ? 'Critical' : 
-               Math.abs(team.goalDelta) >= 3 ? 'High' : 
-               Math.abs(team.goalDelta) >= 1.5 ? 'Moderate' : 'Low'
-  }));
-  
-  const highRiskCount = teamsWithStats.filter(t => t.riskLevel === 'Critical' || t.riskLevel === 'High').length;
-  const overperformingCount = teamsWithStats.filter(t => t.goalDelta > 3).length;
-  const underperformingCount = teamsWithStats.filter(t => t.goalDelta < -3).length;
+  const overperformingCount = data.teams.filter(t => t.Variance > 3).length;
+  const underperformingCount = data.teams.filter(t => t.Variance < -3).length;
+  const highRiskCount = data.teams.filter(t => t.Risk_Score >= 70).length;
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
@@ -62,9 +95,9 @@ export default async function HomePage() {
           </div>
           <div className="hidden md:block">
             <div className="text-right">
-              <p className="text-xs text-slate-400 uppercase tracking-wide mb-1">Gameweek {playerData.currentGameweek}</p>
+              <p className="text-xs text-slate-400 uppercase tracking-wide mb-1">Gameweek {currentGameweek}</p>
               <p className="text-sm font-medium text-emerald-400">
-                Live Data · {new Date(playerData.lastUpdated).toLocaleTimeString('en-GB', {
+                Live Data · {new Date(data.lastUpdated).toLocaleTimeString('en-GB', {
                   hour: '2-digit',
                   minute: '2-digit'
                 })}
@@ -78,7 +111,7 @@ export default async function HomePage() {
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
         <div className="card p-6 hover:border-slate-600 transition-colors">
           <div className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">Total Teams</div>
-          <div className="text-4xl font-semibold text-white">{teamData.teams.length}</div>
+          <div className="text-4xl font-semibold text-white">{data.teams.length}</div>
         </div>
         <div className="card p-6 bg-rose-500/10 border-rose-500/30 hover:border-rose-500/50 transition-colors">
           <div className="text-xs font-semibold text-rose-400 uppercase tracking-wide mb-2">High Risk</div>
@@ -214,71 +247,20 @@ export default async function HomePage() {
         </div>
       </div>
 
-      {/* Section 1: Market Movers - Unlucky Players */}
-      <FPLPlayerCards
-        title="🎯 Siege Mode Players"
-        subtitle="Underperforming xG - statistically due goals"
-        players={playerData.unlucky}
-        showMore="/fpl"
-      />
+      {/* Section 1: Market Movers (Top Teaser) */}
+      <MarketMoversRow />
 
-      {/* Section 2: Regression Candidates */}
-      <FPLPlayerCards
-        title="⚠️ Regression Risk"
-        subtitle="Overperforming xG - unsustainable luck"
-        players={playerData.lucky}
-        showMore="/fpl"
-      />
-
-      {/* Section 3: Top Form */}
-      <FPLPlayerCards
-        title="🔥 In-Form Players"
-        subtitle="Highest form rating this season"
-        players={playerData.byForm}
-        showMore="/fpl"
-      />
-
-      {/* Team Stats Summary */}
+      {/* Section 3: Anchor Table (Main Workspace) */}
       <div className="mb-8">
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-semibold text-[var(--text-primary-color)]">
-            Team Goal Analysis
+            League Performance Table
           </h3>
-          <Link 
-            href="/teams" 
-            className="text-sm font-medium text-emerald-400 hover:text-emerald-300 transition-colors"
-          >
-            View All Teams →
-          </Link>
+          <span className="text-xs text-[var(--text-muted-color)]">
+            {data.teams.length} teams · GW{currentGameweek}
+          </span>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3">
-          {teamsWithStats.slice(0, 10).map((team) => (
-            <div 
-              key={team.id}
-              className="bg-[var(--bg-card)] rounded-xl border border-[var(--border-subtle-color)] p-4"
-            >
-              <h4 className="text-sm font-semibold text-[var(--text-primary-color)] truncate mb-2">
-                {team.shortName}
-              </h4>
-              <div className="grid grid-cols-3 gap-1 text-center">
-                <div>
-                  <p className="text-xs font-mono text-slate-400">{team.totalXG.toFixed(1)}</p>
-                  <p className="text-[9px] text-[var(--text-muted-color)]">xG</p>
-                </div>
-                <div>
-                  <p className="text-xs font-mono text-emerald-400">{team.totalGoals}</p>
-                  <p className="text-[9px] text-[var(--text-muted-color)]">Goals</p>
-                </div>
-                <div>
-                  <p className={`text-xs font-mono ${team.goalDelta >= 0 ? 'text-emerald-400' : 'text-rose-400'}`}>
-                    {team.goalDelta > 0 ? '+' : ''}{team.goalDelta.toFixed(1)}
-                  </p>
-                  <p className="text-[9px] text-[var(--text-muted-color)]">Δ</p>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        <LeagueTable teams={data.teams} />
       </div>
 
       {/* Section 4: Deep Dive Links (Bottom) */}
