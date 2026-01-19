@@ -12,6 +12,45 @@ interface LeagueTableProps {
 type SortField = keyof TeamData;
 type SortDirection = 'asc' | 'desc';
 
+interface SortButtonProps {
+  field: SortField;
+  children: React.ReactNode;
+  currentSortField: SortField;
+  sortDirection: SortDirection;
+  onSort: (field: SortField) => void;
+}
+
+function SortButton({ field, children, currentSortField, sortDirection, onSort }: SortButtonProps) {
+  return (
+    <button
+      onClick={() => onSort(field)}
+      className="flex items-center gap-1.5 hover:text-emerald-400 transition-colors group"
+    >
+      {children}
+      {currentSortField === field && (
+        <span className="text-emerald-400">
+          {sortDirection === 'asc' ? (
+            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
+            </svg>
+          ) : (
+            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+              <path fillRule="evenodd" d="M14.707 12.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l2.293-2.293a1 1 0 011.414 0z" clipRule="evenodd" />
+            </svg>
+          )}
+        </span>
+      )}
+      {currentSortField !== field && (
+        <span className="text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity">
+          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M3 3a1 1 0 000 2h11a1 1 0 100-2H3zM3 7a1 1 0 000 2h5a1 1 0 000-2H3zM3 11a1 1 0 100 2h4a1 1 0 100-2H3zM13 16a1 1 0 102 0v-5.586l1.293 1.293a1 1 0 001.414-1.414l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 101.414 1.414L13 10.414V16z" />
+          </svg>
+        </span>
+      )}
+    </button>
+  );
+}
+
 export default function LeagueTable({ teams }: LeagueTableProps) {
   const [sortField, setSortField] = useState<SortField>('Position_Actual');
   const [sortDirection, setSortDirection] = useState<SortDirection>('asc');
@@ -53,35 +92,6 @@ export default function LeagueTable({ teams }: LeagueTableProps) {
     }
   };
 
-  const SortButton = ({ field, children }: { field: SortField; children: React.ReactNode }) => (
-    <button
-      onClick={() => handleSort(field)}
-      className="flex items-center gap-1.5 hover:text-emerald-400 transition-colors group"
-    >
-      {children}
-      {sortField === field && (
-        <span className="text-emerald-400">
-          {sortDirection === 'asc' ? (
-            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M5.293 7.707a1 1 0 010-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 01-1.414 1.414L11 5.414V17a1 1 0 11-2 0V5.414L6.707 7.707a1 1 0 01-1.414 0z" clipRule="evenodd" />
-            </svg>
-          ) : (
-            <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-              <path fillRule="evenodd" d="M14.707 12.293a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 111.414-1.414L9 14.586V3a1 1 0 012 0v11.586l2.293-2.293a1 1 0 011.414 0z" clipRule="evenodd" />
-            </svg>
-          )}
-        </span>
-      )}
-      {sortField !== field && (
-        <span className="text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity">
-          <svg className="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
-            <path d="M3 3a1 1 0 000 2h11a1 1 0 100-2H3zM3 7a1 1 0 000 2h5a1 1 0 000-2H3zM3 11a1 1 0 100 2h4a1 1 0 100-2H3zM13 16a1 1 0 102 0v-5.586l1.293 1.293a1 1 0 001.414-1.414l-3-3a1 1 0 00-1.414 0l-3 3a1 1 0 101.414 1.414L13 10.414V16z" />
-          </svg>
-        </span>
-      )}
-    </button>
-  );
-
   return (
     <div className="space-y-6">
       {/* Filter section */}
@@ -114,25 +124,25 @@ export default function LeagueTable({ teams }: LeagueTableProps) {
             <thead>
               <tr className="border-b border-slate-700 bg-slate-800/50">
                 <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                  <SortButton field="Position_Actual">Pos</SortButton>
+                  <SortButton field="Position_Actual" currentSortField={sortField} sortDirection={sortDirection} onSort={handleSort}>Pos</SortButton>
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                  <SortButton field="Team">Team</SortButton>
+                  <SortButton field="Team" currentSortField={sortField} sortDirection={sortDirection} onSort={handleSort}>Team</SortButton>
                 </th>
                 <th className="px-6 py-4 text-center text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                  <SortButton field="Matches">MP</SortButton>
+                  <SortButton field="Matches" currentSortField={sortField} sortDirection={sortDirection} onSort={handleSort}>MP</SortButton>
                 </th>
                 <th className="px-6 py-4 text-center text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                  <SortButton field="Actual_Points">Pts</SortButton>
+                  <SortButton field="Actual_Points" currentSortField={sortField} sortDirection={sortDirection} onSort={handleSort}>Pts</SortButton>
                 </th>
                 <th className="px-6 py-4 text-center text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                  <SortButton field="xPTS">xPTS</SortButton>
+                  <SortButton field="xPTS" currentSortField={sortField} sortDirection={sortDirection} onSort={handleSort}>xPTS</SortButton>
                 </th>
                 <th className="px-6 py-4 text-center text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                  <SortButton field="Variance">Var</SortButton>
+                  <SortButton field="Variance" currentSortField={sortField} sortDirection={sortDirection} onSort={handleSort}>Var</SortButton>
                 </th>
                 <th className="px-6 py-4 text-center text-xs font-semibold text-slate-400 uppercase tracking-wider">
-                  <SortButton field="Risk_Score">Risk</SortButton>
+                  <SortButton field="Risk_Score" currentSortField={sortField} sortDirection={sortDirection} onSort={handleSort}>Risk</SortButton>
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">
                   Status
