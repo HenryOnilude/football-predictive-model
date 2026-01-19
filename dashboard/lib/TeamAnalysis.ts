@@ -13,6 +13,9 @@ export interface TeamStats {
   xGAgainst: number;
   matchesPlayed: number;
   points: number;
+  // Post-Shot xG metrics (optional - for advanced analysis)
+  PSxG?: number;        // Post-Shot Expected Goals (shot quality)
+  xGOT?: number;        // Expected Goals On Target
 }
 
 // 5-Tier Efficiency Status
@@ -32,6 +35,14 @@ export type MarketVerdict =
   | 'STABLE'      // High Sust + Sustainable
   | 'FRAGILE';    // Low Sust + Sustainable
 
+// Finishing Badge (PSxG-based analysis)
+export type FinishingBadge = 
+  | 'SIEGE'      // Unlucky - great chances, can't convert
+  | 'SNIPER'     // Elite skill - clinical finishing
+  | 'FAIR'       // Sustainable - performing as expected
+  | 'WASTEFUL'   // Bad finishing - poor shot quality
+  | 'GHOST';     // Lucky - scoring from nothing
+
 export interface TeamAnalysis {
   teamId: number;
   teamName: string;
@@ -43,6 +54,9 @@ export interface TeamAnalysis {
   marketVerdict: MarketVerdict;
   chanceGrade: 'Elite' | 'Good' | 'Average' | 'Poor' | 'Broken';
   insightNote: string;
+  // PSxG-based advanced analysis (optional)
+  finishingBadge?: FinishingBadge;
+  hasPSxGData?: boolean;
 }
 
 // Legacy type for backwards compatibility
@@ -165,8 +179,51 @@ function generateInsightNote(efficiencyStatus: EfficiencyStatus, marketVerdict: 
 }
 
 /**
+ * Calculate finishing badge based on PSxG analysis
+ * Uses advanced logic when PSxG is available, falls back to basic logic otherwise
+ */
+function calculateFinishingBadge(teamStats: TeamStats): FinishingBadge {
+  // If no PSxG data, return FAIR as default (basic logic)
+  if (!teamStats.PSxG) {
+    return 'FAIR';
+  }
+
+  const goalDelta = teamStats.goalsFor - teamStats.xGFor;           // Overall luck
+  const psxgDelta = teamStats.PSxG - teamStats.xGFor;               // Shot quality (PSxG > xG = better shots)
+  const finishingDelta = teamStats.goalsFor - teamStats.PSxG;       // Finishing skill (Goals > PSxG = clinical)
+
+  // SIEGE: High quality chances (PSxG ≈ xG), but not converting (Goals << PSxG)
+  // They're hitting the target but keepers are saving or hitting woodwork
+  if (psxgDelta >= -2 && finishingDelta <= -5) {
+    return 'SIEGE';
+  }
+
+  // SNIPER: Better shots than expected (PSxG > xG) AND converting them (Goals ≥ PSxG)
+  // Elite finishing skill - taking AND making great chances
+  if (psxgDelta >= 3 && finishingDelta >= 0) {
+    return 'SNIPER';
+  }
+
+  // WASTEFUL: Poor shot quality (PSxG << xG) AND not converting (Goals ≈ PSxG)
+  // Taking bad shots and not getting lucky
+  if (psxgDelta <= -5 && Math.abs(finishingDelta) <= 3) {
+    return 'WASTEFUL';
+  }
+
+  // GHOST: Low xG, low PSxG, but high goals
+  // Scoring from nothing - scrappy goals, deflections
+  if (teamStats.xGFor <= 15 && goalDelta >= 5) {
+    return 'GHOST';
+  }
+
+  // FAIR: Everything roughly aligned
+  return 'FAIR';
+}
+
+/**
  * Main analysis function - analyzes team performance
  * Returns 5-tier Health vs. Heat Matrix analysis
+ * Uses PSxG for advanced finishing badge when available
  */
 export function analyzeTeamPerformance(teamStats: TeamStats): TeamAnalysis {
   const netXG = teamStats.xGFor - teamStats.xGAgainst;
@@ -179,6 +236,10 @@ export function analyzeTeamPerformance(teamStats: TeamStats): TeamAnalysis {
   const marketVerdict = deriveMarketVerdict(sustainabilityScore, efficiencyStatus);
   const chanceGrade = getChanceGrade(xGPer90);
   const insightNote = generateInsightNote(efficiencyStatus, marketVerdict);
+  
+  // Advanced PSxG analysis (if data available)
+  const hasPSxGData = teamStats.PSxG !== undefined;
+  const finishingBadge = calculateFinishingBadge(teamStats);
 
   return {
     teamId: teamStats.teamId,
@@ -191,6 +252,8 @@ export function analyzeTeamPerformance(teamStats: TeamStats): TeamAnalysis {
     marketVerdict,
     chanceGrade,
     insightNote,
+    finishingBadge,
+    hasPSxGData,
   };
 }
 
@@ -276,5 +339,53 @@ export function getVerdictConfig(verdict: MarketVerdict): {
     case 'FRAGILE':
     default:
       return { label: 'FRAGILE', icon: '', color: 'text-slate-500' };
+  }
+}
+
+/**
+ * Get finishing badge display config (PSxG-based)
+ */
+export function getFinishingBadgeConfig(badge: FinishingBadge): {
+  label: string;
+  description: string;
+  bgColor: string;
+  textColor: string;
+} {
+  switch (badge) {
+    case 'SIEGE':
+      return {
+        label: 'SIEGE',
+        description: 'Creating quality chances but can\'t convert. Goals are coming.',
+        bgColor: 'bg-purple-600',
+        textColor: 'text-white',
+      };
+    case 'SNIPER':
+      return {
+        label: 'SNIPER',
+        description: 'Elite finishing skill. Taking AND making great chances.',
+        bgColor: 'bg-emerald-600',
+        textColor: 'text-white',
+      };
+    case 'FAIR':
+      return {
+        label: 'FAIR',
+        description: 'Performing as expected. No significant edge.',
+        bgColor: 'bg-slate-600',
+        textColor: 'text-white',
+      };
+    case 'WASTEFUL':
+      return {
+        label: 'WASTEFUL',
+        description: 'Poor shot selection. Taking bad chances.',
+        bgColor: 'bg-amber-600',
+        textColor: 'text-white',
+      };
+    case 'GHOST':
+      return {
+        label: 'GHOST',
+        description: 'Scoring from nothing. Lucky goals - regression likely.',
+        bgColor: 'bg-rose-600',
+        textColor: 'text-white',
+      };
   }
 }

@@ -1,4 +1,5 @@
 import LeagueTable from '@/components/LeagueTable';
+import FinishingBadgeDemo from '@/components/FinishingBadgeDemo';
 import { DashboardData } from '@/lib/types';
 import fs from 'fs';
 import path from 'path';
@@ -252,6 +253,9 @@ export default async function HomePage() {
           </div>
         </div>
       </div>
+
+      {/* PSxG Finishing Badge Demo */}
+      <FinishingBadgeDemo />
 
       {/* League Table */}
       <LeagueTable teams={data.teams} />

@@ -17,6 +17,9 @@ export interface TeamData {
   Risk_Category: 'Critical' | 'High' | 'Moderate' | 'Low';
   Regression_Probability: number;
   Performance_Status: 'Overperforming' | 'Underperforming' | 'As Expected';
+  // Post-Shot xG metrics (optional - for advanced analysis)
+  PSxG?: number;        // Post-Shot Expected Goals (shot quality)
+  xGOT?: number;        // Expected Goals On Target
 }
 
 export interface DashboardData {
