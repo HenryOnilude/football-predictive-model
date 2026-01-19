@@ -5,9 +5,12 @@ import { X } from 'lucide-react';
 import {
   TeamAnalysis,
   ConversionStatus,
-  getConversionBadgeConfig,
-  getFundamentalScoreColor,
+  getFinishingBadgeConfig,
 } from '@/lib/TeamAnalysis';
+
+// Temporary stub functions until TeamAnalysis is updated
+const getConversionBadgeConfig = (status: ConversionStatus) => getFinishingBadgeConfig(status as unknown as 'FAIR');
+const getFundamentalScoreColor = (_score: number) => 'text-slate-400';
 
 interface TeamAnalysisTableProps {
   analyses: TeamAnalysis[];
