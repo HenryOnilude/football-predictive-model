@@ -5,6 +5,15 @@ import { TeamData } from '@/lib/types';
 import RiskBadge from './RiskBadge';
 import Link from 'next/link';
 
+// Normalize team name for URL slug (handle apostrophes, special chars)
+function normalizeForSlug(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/[''"]/g, '') // Remove apostrophes and quotes
+    .replace(/\s+/g, '-')   // Replace spaces with hyphens
+    .replace(/[^a-z0-9-]/g, ''); // Remove other special chars
+}
+
 interface LeagueTableProps {
   teams: TeamData[];
 }
@@ -162,7 +171,7 @@ export default function LeagueTable({ teams }: LeagueTableProps) {
                   </td>
                   <td className="px-6 py-5 whitespace-nowrap">
                     <Link
-                      href={`/team/${team.Team.toLowerCase().replace(/\s+/g, '-')}`}
+                      href={`/team/${normalizeForSlug(team.Team)}`}
                       className="text-sm font-semibold text-white hover:text-emerald-400 transition-colors"
                     >
                       {team.Team}
