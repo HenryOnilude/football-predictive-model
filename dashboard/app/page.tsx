@@ -3,47 +3,87 @@ import MarketMoversRow from '@/components/MarketMoversRow';
 import DeepDiveLinks from '@/components/DeepDiveLinks';
 import { DashboardData, TeamData } from '@/lib/types';
 import { getAllTeams } from '@/lib/fpl-api';
+import { StandingsResponse } from '@/app/api/standings/route';
 
 export const revalidate = 300; // Revalidate every 5 minutes
 
-// Map FPL team data to our TeamData format for LeagueTable
-function mapFPLToTeamData(fplTeams: Awaited<ReturnType<typeof getAllTeams>>): DashboardData {
-  const teams: TeamData[] = fplTeams.teams.map((team, index) => {
+// Normalize team names for matching between APIs
+function normalizeTeamName(name: string): string {
+  return name
+    .toLowerCase()
+    .replace(/\s*(fc|afc)\s*/gi, '')
+    .replace(/[''"]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
+// Fetch real Premier League standings
+async function getStandings(): Promise<StandingsResponse | null> {
+  try {
+    const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+    const res = await fetch(`${baseUrl}/api/standings`, { next: { revalidate: 300 } });
+    if (!res.ok) return null;
+    return res.json();
+  } catch {
+    return null;
+  }
+}
+
+// Map FPL team data + real standings to our TeamData format
+async function mapFPLToTeamData(fplTeams: Awaited<ReturnType<typeof getAllTeams>>): Promise<DashboardData> {
+  const standings = await getStandings();
+  const standingsTable = standings?.standings?.[0]?.table || [];
+  
+  // Create lookup map for standings by normalized team name
+  const standingsMap = new Map<string, typeof standingsTable[0]>();
+  standingsTable.forEach(team => {
+    standingsMap.set(normalizeTeamName(team.team.name), team);
+    standingsMap.set(normalizeTeamName(team.team.shortName), team);
+  });
+
+  const teams: TeamData[] = fplTeams.teams.map((team) => {
     const variance = Number(team.goalDelta.toFixed(1));
     const riskScore = Math.round(Math.min(100, Math.abs(variance) * 15));
     
-    const playerCount = team.players?.length || 1;
-    const totalMinutes = team.players?.reduce((sum, p) => sum + (p.minutes || 0), 0) || 0;
-    const totalPoints = team.players?.reduce((sum, p) => sum + (p.totalPoints || 0), 0) || 0;
+    // Find matching standings data
+    const standingsData = standingsMap.get(normalizeTeamName(team.name)) ||
+                          standingsMap.get(normalizeTeamName(team.shortName));
+    
+    // Use real standings data if available, otherwise estimate
+    const actualPoints = standingsData?.points || 0;
+    const matches = standingsData?.playedGames || 20;
+    const goalsFor = standingsData?.goalsFor || team.totalGoals;
+    const goalsAgainst = standingsData?.goalsAgainst || 0;
+    const position = standingsData?.position || 0;
+    
+    // Calculate xPTS based on xG differential (roughly 2.5 pts per xG advantage over average)
+    const xgDiff = team.totalXG - (team.totalXG * 0.9); // Simplified xG vs xGA
+    const xPTS = Math.round(matches * 1.3 + xgDiff * 2); // Base ~1.3 pts/game + xG bonus
     
     return {
       Team: team.name || team.shortName || 'Unknown',
-      Matches: Math.round(totalMinutes / 90 / playerCount) || 19,
-      Actual_Points: totalPoints,
-      Goals_For: team.totalGoals,
-      Goals_Against: 0, // FPL doesn't provide this at team level
+      Matches: matches,
+      Actual_Points: actualPoints,
+      Goals_For: goalsFor,
+      Goals_Against: goalsAgainst,
       xG_For: team.totalXG,
-      xG_Against: 0,
-      xPTS: team.totalXG * 2.5, // Rough estimate
-      Variance: Number(variance.toFixed(1)),
-      Position_Actual: index + 1,
-      Position_Expected: index + 1,
+      xG_Against: team.totalXG * 0.9, // Estimate
+      xPTS: xPTS,
+      Variance: Number((actualPoints - xPTS).toFixed(1)),
+      Position_Actual: position,
+      Position_Expected: position,
       Z_Score: Number((variance / 2).toFixed(2)),
       P_Value: 0.05,
-      Significant: Math.abs(variance) > 3,
+      Significant: Math.abs(actualPoints - xPTS) > 5,
       Risk_Score: riskScore,
       Risk_Category: riskScore >= 90 ? 'Critical' : riskScore >= 70 ? 'High' : riskScore >= 40 ? 'Moderate' : 'Low',
       Regression_Probability: Number(Math.min(0.95, Math.abs(variance) * 0.1).toFixed(2)),
-      Performance_Status: variance > 3 ? 'Overperforming' : variance < -3 ? 'Underperforming' : 'As Expected',
+      Performance_Status: (actualPoints - xPTS) > 5 ? 'Overperforming' : (actualPoints - xPTS) < -5 ? 'Underperforming' : 'As Expected',
     };
   });
 
-  // Sort by total goals (proxy for league position)
-  teams.sort((a, b) => b.Goals_For - a.Goals_For);
-  teams.forEach((team, i) => {
-    team.Position_Actual = i + 1;
-    team.Position_Expected = i + 1;
-  });
+  // Sort by actual position from standings
+  teams.sort((a, b) => a.Position_Actual - b.Position_Actual);
 
   return {
     teams,
@@ -58,7 +98,7 @@ export default async function HomePage() {
 
   try {
     const fplData = await getAllTeams();
-    data = mapFPLToTeamData(fplData);
+    data = await mapFPLToTeamData(fplData);
     currentGameweek = fplData.currentGameweek;
   } catch (e) {
     error = e instanceof Error ? e.message : 'Failed to load FPL data';
