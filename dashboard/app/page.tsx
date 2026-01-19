@@ -19,7 +19,7 @@ async function getData(): Promise<DashboardData> {
 
     const teams = lines.slice(1).map(line => {
       const values = line.split(',');
-      const team: any = {};
+      const team: Record<string, string | number | boolean> = {};
 
       headers.forEach((header, index) => {
         const value = values[index];
@@ -38,7 +38,7 @@ async function getData(): Promise<DashboardData> {
         }
       });
 
-      return team;
+      return team as unknown as import('@/lib/types').TeamData;
     });
 
     // Get file modification time for lastUpdated
