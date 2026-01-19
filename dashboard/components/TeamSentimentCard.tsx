@@ -49,12 +49,12 @@ export default function TeamSentimentCard({ team }: TeamSentimentCardProps) {
   const quadrantBadge = getQuadrantBadge();
 
   return (
-    <div className="bg-slate-900 rounded-xl border border-slate-800 overflow-hidden hover:border-slate-700 transition-colors">
+    <div className="bg-[var(--bg-card)] rounded-xl border border-[var(--border-subtle-color)] overflow-hidden hover:border-[var(--border-card-color)] transition-colors">
       {/* Header */}
-      <div className="p-4 border-b border-slate-800 flex items-center justify-between">
+      <div className="p-4 border-b border-[var(--border-subtle-color)] flex items-center justify-between">
         <div className="flex items-center gap-3">
           {team.logo ? (
-            <div className="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center overflow-hidden">
+            <div className="w-10 h-10 rounded-lg bg-[var(--bg-surface)] flex items-center justify-center overflow-hidden">
               <Image
                 src={team.logo}
                 alt={team.teamName}
@@ -65,13 +65,13 @@ export default function TeamSentimentCard({ team }: TeamSentimentCardProps) {
               />
             </div>
           ) : (
-            <div className="w-10 h-10 rounded-lg bg-slate-800 flex items-center justify-center">
-              <span className="text-xs font-bold text-slate-500">{team.teamShort}</span>
+            <div className="w-10 h-10 rounded-lg bg-[var(--bg-surface)] flex items-center justify-center">
+              <span className="text-xs font-bold text-[var(--text-muted-color)]">{team.teamShort}</span>
             </div>
           )}
           <div>
-            <h3 className="text-sm font-semibold text-white">{team.teamName}</h3>
-            <p className="text-xs text-slate-500">{team.matchesPlayed} matches</p>
+            <h3 className="text-sm font-semibold text-[var(--text-primary-color)]">{team.teamName}</h3>
+            <p className="text-xs text-[var(--text-muted-color)]">{team.matchesPlayed} matches</p>
           </div>
         </div>
         
@@ -82,7 +82,7 @@ export default function TeamSentimentCard({ team }: TeamSentimentCardProps) {
       </div>
 
       {/* Two Sections: Defense & Attack */}
-      <div className="grid grid-cols-2 divide-x divide-slate-800">
+      <div className="grid grid-cols-2 divide-x divide-[var(--border-subtle-color)]">
         {/* Section A: Defense */}
         <div className="p-4">
           <div className="flex items-center gap-2 mb-3">
@@ -91,7 +91,7 @@ export default function TeamSentimentCard({ team }: TeamSentimentCardProps) {
                 <path fillRule="evenodd" d="M10 1.944A11.954 11.954 0 012.166 5C2.056 5.649 2 6.319 2 7c0 5.225 3.34 9.67 8 11.317C14.66 16.67 18 12.225 18 7c0-.682-.057-1.35-.166-2A11.954 11.954 0 0110 1.944zM11 14a1 1 0 11-2 0 1 1 0 012 0zm0-7a1 1 0 10-2 0v3a1 1 0 102 0V7z" clipRule="evenodd" />
               </svg>
             </div>
-            <span className="text-xs font-medium text-slate-400 uppercase tracking-wide">Defensive Stability</span>
+            <span className="text-xs font-medium text-[var(--text-secondary-color)] uppercase tracking-wide">Defensive Stability</span>
           </div>
           
           {/* xGA Delta */}
@@ -102,9 +102,9 @@ export default function TeamSentimentCard({ team }: TeamSentimentCardProps) {
               }`}>
                 {team.defensiveLuck > 0 ? '+' : ''}{team.defensiveLuck.toFixed(1)}
               </span>
-              <span className="text-xs text-slate-500">xGA Δ</span>
+              <span className="text-xs text-[var(--text-muted-color)]">xGA Δ</span>
             </div>
-            <div className="flex items-center gap-2 text-xs text-slate-500 mt-1">
+            <div className="flex items-center gap-2 text-xs text-[var(--text-muted-color)] mt-1">
               <span>{team.goalsAgainst} GA</span>
               <span>•</span>
               <span>{team.xGAgainst.toFixed(1)} xGA</span>
@@ -116,7 +116,7 @@ export default function TeamSentimentCard({ team }: TeamSentimentCardProps) {
              {team.defenseLabel}
           </div>
           
-          <p className="text-xs text-slate-500 mt-2 leading-relaxed">
+          <p className="text-xs text-[var(--text-muted-color)] mt-2 leading-relaxed">
             {team.defenseDescription}
           </p>
         </div>
@@ -129,7 +129,7 @@ export default function TeamSentimentCard({ team }: TeamSentimentCardProps) {
                 <path d="M10 2a1 1 0 011 1v1.323l3.954 1.582 1.599-.8a1 1 0 01.894 1.79l-1.233.616 1.738 5.42a1 1 0 01-.285 1.05A3.989 3.989 0 0115 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.715-5.349L11 6.477V16h2a1 1 0 110 2H7a1 1 0 110-2h2V6.477L6.237 7.582l1.715 5.349a1 1 0 01-.285 1.05A3.989 3.989 0 015 15a3.989 3.989 0 01-2.667-1.019 1 1 0 01-.285-1.05l1.738-5.42-1.233-.617a1 1 0 01.894-1.788l1.599.799L9 4.323V3a1 1 0 011-1z" />
               </svg>
             </div>
-            <span className="text-xs font-medium text-slate-400 uppercase tracking-wide">Attacking Threat</span>
+            <span className="text-xs font-medium text-[var(--text-secondary-color)] uppercase tracking-wide">Attacking Threat</span>
           </div>
           
           {/* xG Delta */}
@@ -140,9 +140,9 @@ export default function TeamSentimentCard({ team }: TeamSentimentCardProps) {
               }`}>
                 {team.attackingLuck > 0 ? '+' : ''}{team.attackingLuck.toFixed(1)}
               </span>
-              <span className="text-xs text-slate-500">xG Δ</span>
+              <span className="text-xs text-[var(--text-muted-color)]">xG Δ</span>
             </div>
-            <div className="flex items-center gap-2 text-xs text-slate-500 mt-1">
+            <div className="flex items-center gap-2 text-xs text-[var(--text-muted-color)] mt-1">
               <span>{team.goalsFor} GF</span>
               <span>•</span>
               <span>{team.xGFor.toFixed(1)} xG</span>
@@ -154,7 +154,7 @@ export default function TeamSentimentCard({ team }: TeamSentimentCardProps) {
              {team.attackLabel}
           </div>
           
-          <p className="text-xs text-slate-500 mt-2 leading-relaxed">
+          <p className="text-xs text-[var(--text-muted-color)] mt-2 leading-relaxed">
             {team.attackDescription}
           </p>
         </div>

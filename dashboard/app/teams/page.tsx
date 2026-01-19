@@ -236,34 +236,34 @@ export default function TeamsPage() {
       {/* ========== PAGE HEADER ========== */}
       <div className="mb-8">
         <div className="flex items-center gap-3 mb-2">
-          <h1 className="text-3xl font-semibold text-white tracking-tight">
+          <h1 className="text-3xl font-semibold text-[var(--text-primary-color)] tracking-tight">
             Market Intelligence
           </h1>
           <span className="px-3 py-1 bg-emerald-600/20 border border-emerald-600/40 text-emerald-400 text-sm font-medium rounded-full">
             GW{gameweek}
           </span>
         </div>
-        <p className="text-slate-400">
+        <p className="text-[var(--text-secondary-color)]">
           Live Premier League standings with actionable Buy/Sell signals • Official FPL API
         </p>
       </div>
 
       {/* ========== SECTION A: MARKET SENTIMENT (THE DASHBOARD) ========== */}
       <div className="mb-6">
-        <h2 className="text-xl font-semibold text-white tracking-tight mb-2">
+        <h2 className="text-xl font-semibold text-[var(--text-primary-color)] tracking-tight mb-2">
           Market Sentiment Dashboard
         </h2>
-        <p className="text-slate-400 text-sm">
+        <p className="text-[var(--text-secondary-color)] text-sm">
           Actionable Buy/Sell signals based on xG variance • Click a card for details
         </p>
       </div>
 
       {/* ========== CARD LEGEND (Always Visible) ========== */}
-      <div className="mb-6 p-4 bg-slate-900/50 border border-slate-800 rounded-xl">
+      <div className="mb-6 p-4 bg-[var(--bg-card)] border border-[var(--border-subtle-color)] rounded-xl">
         <div className="grid md:grid-cols-2 gap-6">
           {/* Quadrant Badges */}
           <div>
-            <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Team Categories</h4>
+            <h4 className="text-xs font-semibold text-[var(--text-secondary-color)] uppercase tracking-wider mb-3">Team Categories</h4>
             <div className="space-y-2 text-xs">
               <div className="flex items-start gap-2">
                 <span className="text-emerald-400 font-semibold whitespace-nowrap">DOUBLE VALUE</span>
@@ -286,7 +286,7 @@ export default function TeamsPage() {
           
           {/* Action Labels */}
           <div>
-            <h4 className="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Card Signals</h4>
+            <h4 className="text-xs font-semibold text-[var(--text-secondary-color)] uppercase tracking-wider mb-3">Card Signals</h4>
             <div className="space-y-2 text-xs">
               <div className="flex items-start gap-2">
                 <span className="px-1.5 py-0.5 rounded bg-emerald-600 text-white font-semibold whitespace-nowrap">BUY DIP</span>

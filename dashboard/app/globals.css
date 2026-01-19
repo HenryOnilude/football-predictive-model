@@ -2,70 +2,77 @@
 
 /* stylelint-disable at-rule-no-unknown */
 @theme {
-  /* Semantic Color Tokens */
-  --color-background: rgb(var(--background) / <alpha-value>);
-  --color-surface: rgb(var(--surface) / <alpha-value>);
-  --color-surface-highlight: rgb(var(--surface-highlight) / <alpha-value>);
-  --color-text-primary: rgb(var(--text-primary) / <alpha-value>);
-  --color-text-secondary: rgb(var(--text-secondary) / <alpha-value>);
-  --color-text-muted: rgb(var(--text-muted) / <alpha-value>);
+  /* ===== CORE SEMANTIC TOKENS (Flip with theme) ===== */
   
-  /* Semantic Signal Colors */
-  --color-elite: rgb(var(--signal-elite) / <alpha-value>);
-  --color-warning: rgb(var(--signal-warning) / <alpha-value>);
-  --color-critical: rgb(var(--signal-critical) / <alpha-value>);
-  --color-cold: rgb(var(--signal-cold) / <alpha-value>);
-  --color-purple: rgb(var(--signal-purple) / <alpha-value>);
+  /* Backgrounds */
+  --color-bg-app: var(--bg-app);
+  --color-bg-card: var(--bg-card);
+  --color-bg-surface: var(--bg-surface);
   
-  /* Card & Border */
-  --color-card-bg: rgb(var(--card-bg) / <alpha-value>);
-  --color-card-border: rgb(var(--card-border) / <alpha-value>);
-  --color-border-subtle: rgb(var(--border-subtle) / <alpha-value>);
+  /* Text */
+  --color-text-primary: var(--text-primary-color);
+  --color-text-secondary: var(--text-secondary-color);
+  --color-text-muted: var(--text-muted-color);
+  
+  /* Borders */
+  --color-border-subtle: var(--border-subtle-color);
+  --color-border-card: var(--border-card-color);
+  
+  /* ===== SIGNAL COLORS (Theme-aware for contrast) ===== */
+  --color-signal-success: var(--signal-success);
+  --color-signal-warning: var(--signal-warning);
+  --color-signal-danger: var(--signal-danger);
+  --color-signal-info: var(--signal-info);
+  --color-signal-purple: var(--signal-purple);
 }
 
 @layer base {
   :root {
-    /* LIGHT MODE (Positive Polarity - High Acuity for Astigmatism) */
-    --background: 255 255 255;        /* Pure White */
-    --surface: 248 250 252;           /* Slate-50 */
-    --surface-highlight: 241 245 249; /* Slate-100 */
-    --text-primary: 15 23 42;         /* Slate-900 */
-    --text-secondary: 100 116 139;    /* Slate-500 */
-    --text-muted: 148 163 184;        /* Slate-400 */
+    /* ===== LIGHT MODE ===== */
+    /* Core Backgrounds */
+    --bg-app: #ffffff;                /* Pure White */
+    --bg-card: #f8fafc;               /* Slate-50 */
+    --bg-surface: #f1f5f9;            /* Slate-100 */
     
-    /* Signals (Darker for Contrast against White) */
-    --signal-elite: 5 150 105;        /* Emerald-600 */
-    --signal-warning: 217 119 6;      /* Amber-600 */
-    --signal-critical: 220 38 38;     /* Red-600 */
-    --signal-cold: 37 99 235;         /* Blue-600 */
-    --signal-purple: 147 51 234;      /* Purple-600 */
+    /* Text Colors */
+    --text-primary-color: #0f172a;    /* Slate-900 */
+    --text-secondary-color: #64748b;  /* Slate-500 */
+    --text-muted-color: #94a3b8;      /* Slate-400 */
     
-    /* Card & Border */
-    --card-bg: 248 250 252;           /* Slate-50 */
-    --card-border: 226 232 240;       /* Slate-200 */
-    --border-subtle: 203 213 225;     /* Slate-300 */
+    /* Border Colors */
+    --border-subtle-color: #e2e8f0;   /* Slate-200 */
+    --border-card-color: #cbd5e1;     /* Slate-300 */
+    
+    /* Signal Colors (Darker for white bg contrast) */
+    --signal-success: #059669;        /* Emerald-600 */
+    --signal-warning: #d97706;        /* Amber-600 */
+    --signal-danger: #dc2626;         /* Red-600 */
+    --signal-info: #2563eb;           /* Blue-600 */
+    --signal-purple: #9333ea;         /* Purple-600 */
   }
 
   .dark {
-    /* DARK MODE (Negative Polarity - Low Glare) */
-    --background: 15 23 42;           /* Slate-900 (Not Pure Black!) */
-    --surface: 30 41 59;              /* Slate-800 */
-    --surface-highlight: 51 65 85;    /* Slate-700 */
-    --text-primary: 248 250 252;      /* Slate-50 */
-    --text-secondary: 148 163 184;    /* Slate-400 */
-    --text-muted: 100 116 139;        /* Slate-500 */
+    /* ===== DARK MODE ===== */
+    /* Core Backgrounds */
+    --bg-app: #0f172a;                /* Slate-900 */
+    --bg-card: #1e293b;               /* Slate-800 */
+    --bg-surface: #334155;            /* Slate-700 */
     
-    /* Signals (Brighter/Pastel to "Pop" against Dark) */
-    --signal-elite: 52 211 153;       /* Emerald-400 */
-    --signal-warning: 251 191 36;     /* Amber-400 */
-    --signal-critical: 248 113 113;   /* Red-400 */
-    --signal-cold: 96 165 250;        /* Blue-400 */
-    --signal-purple: 192 132 252;     /* Purple-400 */
+    /* Text Colors */
+    --text-primary-color: #f8fafc;    /* Slate-50 */
+    --text-secondary-color: #94a3b8;  /* Slate-400 */
+    --text-muted-color: #64748b;      /* Slate-500 */
     
-    /* Card & Border */
-    --card-bg: 30 41 59;              /* Slate-800 */
-    --card-border: 51 65 85;          /* Slate-700 */
-    --border-subtle: 71 85 105;       /* Slate-600 */
+    /* Border Colors */
+    --border-subtle-color: #334155;   /* Slate-700 */
+    --border-card-color: #475569;     /* Slate-600 */
+    
+    /* Signal Colors (Brighter to pop on dark bg) */
+    --signal-success: #34d399;        /* Emerald-400 */
+    --signal-warning: #fbbf24;        /* Amber-400 */
+    --signal-danger: #f87171;         /* Red-400 */
+    --signal-info: #60a5fa;           /* Blue-400 */
+    --signal-purple: #c084fc;         /* Purple-400 */
   }
 }
 
@@ -77,8 +84,8 @@ html {
 }
 
 body {
-  color: rgb(var(--text-primary));
-  background-color: rgb(var(--background));
+  color: var(--text-primary-color);
+  background-color: var(--bg-app);
   font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
   letter-spacing: -0.011em;
 }
@@ -132,15 +139,15 @@ h3 {
 
 /* Modern card style (theme-aware) */
 .card {
-  background-color: rgb(var(--card-bg));
+  background-color: var(--bg-card);
   border-radius: 0.75rem;
-  border: 1px solid rgb(var(--card-border) / 0.6);
+  border: 1px solid var(--border-subtle-color);
   box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.1);
   transition: all 200ms;
 }
 
 .card:hover {
-  border-color: rgb(var(--border-subtle) / 0.8);
+  border-color: var(--border-card-color);
   box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
 }
 
@@ -167,20 +174,20 @@ h3 {
   text-align: left;
   font-size: 0.875rem;
   font-weight: 600;
-  color: rgb(var(--text-secondary));
+  color: var(--text-secondary-color);
   padding-bottom: 0.75rem;
-  border-bottom: 1px solid rgb(var(--card-border));
+  border-bottom: 1px solid var(--border-subtle-color);
 }
 
 .table-minimal td {
   padding-top: 1rem;
   padding-bottom: 1rem;
-  border-bottom: 1px solid rgb(var(--surface));
+  border-bottom: 1px solid var(--border-subtle-color);
 }
 
 /* Glassmorphism effect (theme-aware) */
 .glass {
-  background: rgb(var(--background) / 0.9);
+  background: var(--bg-app);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
 }
