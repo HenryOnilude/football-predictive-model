@@ -43,6 +43,12 @@ export default function RootLayout({
               </Link>
               <div className="flex items-center gap-4">
                 <Link 
+                  href="/" 
+                  className="text-sm font-medium text-slate-400 hover:text-white transition-colors"
+                >
+                  Home
+                </Link>
+                <Link 
                   href="/luck" 
                   className="text-sm font-medium text-slate-400 hover:text-emerald-400 transition-colors"
                 >
