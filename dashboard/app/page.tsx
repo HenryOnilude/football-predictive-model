@@ -9,8 +9,8 @@ export const revalidate = 300; // Revalidate every 5 minutes
 // Map FPL team data to our TeamData format for LeagueTable
 function mapFPLToTeamData(fplTeams: Awaited<ReturnType<typeof getAllTeams>>): DashboardData {
   const teams: TeamData[] = fplTeams.teams.map((team, index) => {
-    const variance = team.goalDelta;
-    const riskScore = Math.min(100, Math.abs(variance) * 15);
+    const variance = Number(team.goalDelta.toFixed(1));
+    const riskScore = Math.round(Math.min(100, Math.abs(variance) * 15));
     
     return {
       Team: team.name,
@@ -21,15 +21,15 @@ function mapFPLToTeamData(fplTeams: Awaited<ReturnType<typeof getAllTeams>>): Da
       xG_For: team.totalXG,
       xG_Against: 0,
       xPTS: team.totalXG * 2.5, // Rough estimate
-      Variance: variance,
+      Variance: Number(variance.toFixed(1)),
       Position_Actual: index + 1,
       Position_Expected: index + 1,
-      Z_Score: variance / 2,
+      Z_Score: Number((variance / 2).toFixed(2)),
       P_Value: 0.05,
       Significant: Math.abs(variance) > 3,
       Risk_Score: riskScore,
       Risk_Category: riskScore >= 90 ? 'Critical' : riskScore >= 70 ? 'High' : riskScore >= 40 ? 'Moderate' : 'Low',
-      Regression_Probability: Math.min(0.95, Math.abs(variance) * 0.1),
+      Regression_Probability: Number(Math.min(0.95, Math.abs(variance) * 0.1).toFixed(2)),
       Performance_Status: variance > 3 ? 'Overperforming' : variance < -3 ? 'Underperforming' : 'As Expected',
     };
   });

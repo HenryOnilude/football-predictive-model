@@ -43,7 +43,7 @@ export default function RiskBadge({ riskCategory, riskScore }: RiskBadgeProps) {
           {riskCategory} Risk
         </span>
         <span className={`text-xs font-bold ${style.text} opacity-75`}>
-          {riskScore}
+          {Math.round(riskScore)}
         </span>
       </div>
     </div>

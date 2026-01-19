@@ -180,7 +180,7 @@ export default function LeagueTable({ teams }: LeagueTableProps) {
                   </td>
                   <td className="px-6 py-5 whitespace-nowrap text-center">
                     <span className="text-sm font-bold text-white">
-                      {team.Risk_Score}
+                      {Math.round(team.Risk_Score)}
                     </span>
                   </td>
                   <td className="px-6 py-5 whitespace-nowrap">
