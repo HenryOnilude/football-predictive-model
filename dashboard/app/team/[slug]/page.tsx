@@ -4,6 +4,7 @@ import path from 'path';
 import Link from 'next/link';
 import RiskBadge from '@/components/RiskBadge';
 import TeamChart from '@/components/TeamChart';
+import LuckWaterfallChart from '@/components/LuckWaterfallChart';
 
 async function getData(): Promise<DashboardData> {
   const dataPath = path.join(process.cwd(), '..', 'data', 'risk_analysis.csv');
@@ -188,6 +189,14 @@ export default async function TeamPage({ params }: { params: Promise<{ slug: str
           <div className="text-xs text-slate-400">xGA: <span className="font-semibold text-white">{team.xG_Against.toFixed(1)}</span></div>
         </div>
       </div>
+
+      {/* Finishing Flow Chart (PSxG Analysis) */}
+      <LuckWaterfallChart 
+        teamName={team.Team}
+        xG={team.xG_For}
+        PSxG={team.PSxG}
+        goals={team.Goals_For}
+      />
 
       {/* Charts */}
       <TeamChart team={team} />
