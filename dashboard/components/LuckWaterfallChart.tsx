@@ -38,26 +38,26 @@ function CustomTooltip({ active, payload, xG, PSxG, goals }: CustomTooltipProps)
   let gapValue = 0;
   let gapColor = 'text-slate-400';
 
-  if (data.name === 'Shot Quality' && PSxG !== undefined) {
+  if (data.name === 'Execution' && PSxG !== undefined) {
     gapValue = PSxG - xG;
-    if (gapValue >= 3) {
+    if (gapValue >= 2) {
       gapAnalysis = 'Elite Shot Selection';
       gapColor = 'text-emerald-400';
-    } else if (gapValue <= -3) {
-      gapAnalysis = 'Poor Shot Selection';
+    } else if (gapValue <= -2) {
+      gapAnalysis = 'Poor Shooting';
       gapColor = 'text-amber-400';
     } else {
       gapAnalysis = 'Normal Shot Quality';
       gapColor = 'text-slate-400';
     }
-  } else if (data.name === 'Actual Goals') {
+  } else if (data.name === 'Result') {
     const reference = PSxG !== undefined ? PSxG : xG;
     gapValue = goals - reference;
     if (gapValue >= 3) {
       gapAnalysis = 'Clinical Finishing';
       gapColor = 'text-emerald-400';
     } else if (gapValue <= -3) {
-      gapAnalysis = 'Keeper Saves / Bad Luck';
+      gapAnalysis = 'Keeper Saves';
       gapColor = 'text-rose-400';
     } else if (gapValue >= 1) {
       gapAnalysis = 'Slightly Lucky';
@@ -69,9 +69,9 @@ function CustomTooltip({ active, payload, xG, PSxG, goals }: CustomTooltipProps)
       gapAnalysis = 'As Expected';
       gapColor = 'text-slate-400';
     }
-  } else if (data.name === 'Chances Created') {
-    gapAnalysis = 'Base Chance Quality';
-    gapColor = 'text-blue-400';
+  } else if (data.name === 'Creation') {
+    gapAnalysis = 'Chance Quality Created';
+    gapColor = 'text-slate-400';
   }
 
   return (
@@ -81,7 +81,7 @@ function CustomTooltip({ active, payload, xG, PSxG, goals }: CustomTooltipProps)
       {gapAnalysis && (
         <div className="mt-2 pt-2 border-t border-slate-700">
           <p className={`text-xs font-semibold ${gapColor}`}>
-            {gapAnalysis} {gapValue !== 0 && data.name !== 'Chances Created' && (
+            {gapAnalysis} {gapValue !== 0 && data.name !== 'Creation' && (
               <span>({gapValue > 0 ? '+' : ''}{gapValue.toFixed(1)})</span>
             )}
           </p>
@@ -150,40 +150,42 @@ function getAnalysisText(teamName: string, xG: number, PSxG: number | undefined,
 }
 
 export default function LuckWaterfallChart({ teamName, xG, PSxG, goals }: LuckWaterfallChartProps) {
-  const hasPSxG = PSxG !== undefined;
+  // If PSxG not provided, estimate it based on xG and goals relationship
+  // PSxG typically falls between xG and Goals, weighted toward xG
+  const estimatedPSxG = PSxG !== undefined 
+    ? PSxG 
+    : xG + (goals - xG) * 0.4; // Estimate: 40% of the way from xG to Goals
   
-  // Build chart data
+  const isEstimated = PSxG === undefined;
+  
+  // Build chart data - ALWAYS show 3 bars
   const chartData: ChartDataItem[] = [
     {
-      name: 'Chances Created',
+      name: 'Creation',
       value: xG,
-      fill: '#64748b', // Slate
+      fill: '#64748b', // Slate-400
       label: 'xG (Expected Goals)',
     },
+    {
+      name: 'Execution',
+      value: estimatedPSxG,
+      fill: '#a855f7', // Purple-500
+      label: isEstimated ? 'PSxG (Estimated)' : 'PSxG (Post-Shot xG)',
+    },
+    {
+      name: 'Result',
+      value: goals,
+      fill: '#10b981', // Emerald-500
+      label: 'Goals Scored',
+    },
   ];
-
-  if (hasPSxG) {
-    chartData.push({
-      name: 'Shot Quality',
-      value: PSxG,
-      fill: '#8b5cf6', // Purple
-      label: 'PSxG (Post-Shot xG)',
-    });
-  }
-
-  chartData.push({
-    name: 'Actual Goals',
-    value: goals,
-    fill: '#10b981', // Emerald
-    label: 'Goals Scored',
-  });
 
   // Get analysis
   const { badge, analysis } = getAnalysisText(teamName, xG, PSxG, goals);
   const badgeConfig = getFinishingBadgeConfig(badge);
 
   // Calculate max for chart domain
-  const maxValue = Math.max(xG, PSxG || 0, goals) * 1.2;
+  const maxValue = Math.max(xG, estimatedPSxG, goals) * 1.2;
 
   return (
     <div className="card p-6 mb-8">
@@ -193,7 +195,7 @@ export default function LuckWaterfallChart({ teamName, xG, PSxG, goals }: LuckWa
             Finishing Flow Analysis
           </h3>
           <p className="text-sm text-[var(--text-secondary-color)]">
-            xG → {hasPSxG ? 'PSxG → ' : ''}Goals Conversion
+            Creation → Execution → Result
           </p>
         </div>
         <span className={`px-3 py-1.5 rounded-lg text-sm font-bold ${badgeConfig.bgColor} ${badgeConfig.textColor}`}>
@@ -223,7 +225,7 @@ export default function LuckWaterfallChart({ teamName, xG, PSxG, goals }: LuckWa
               width={90}
             />
             <Tooltip 
-              content={<CustomTooltip xG={xG} PSxG={PSxG} goals={goals} />}
+              content={<CustomTooltip xG={xG} PSxG={estimatedPSxG} goals={goals} />}
               cursor={{ fill: 'rgba(255,255,255,0.05)' }}
             />
             <ReferenceLine x={xG} stroke="#64748b" strokeDasharray="3 3" />
@@ -243,18 +245,18 @@ export default function LuckWaterfallChart({ teamName, xG, PSxG, goals }: LuckWa
       {/* Legend */}
       <div className="flex flex-wrap gap-4 mb-6 pb-6 border-b border-[var(--border-subtle-color)]">
         <div className="flex items-center gap-2">
-          <div className="w-3 h-3 rounded bg-slate-500" />
-          <span className="text-xs text-[var(--text-secondary-color)]">xG (Chance Quality)</span>
+          <div className="w-3 h-3 rounded bg-slate-400" />
+          <span className="text-xs text-[var(--text-secondary-color)]">Creation (xG)</span>
         </div>
-        {hasPSxG && (
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded bg-purple-500" />
-            <span className="text-xs text-[var(--text-secondary-color)]">PSxG (Shot Quality)</span>
-          </div>
-        )}
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 rounded bg-purple-500" />
+          <span className="text-xs text-[var(--text-secondary-color)]">
+            Execution (PSxG){isEstimated && <span className="text-[var(--text-muted-color)]"> est.</span>}
+          </span>
+        </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded bg-emerald-500" />
-          <span className="text-xs text-[var(--text-secondary-color)]">Goals (Actual)</span>
+          <span className="text-xs text-[var(--text-secondary-color)]">Result (Goals)</span>
         </div>
       </div>
 
@@ -266,31 +268,33 @@ export default function LuckWaterfallChart({ teamName, xG, PSxG, goals }: LuckWa
         </p>
       </div>
 
-      {/* Gap Breakdown (if PSxG available) */}
-      {hasPSxG && (
-        <div className="grid grid-cols-2 gap-4 mt-4">
-          <div className="bg-[var(--bg-surface)] rounded-lg p-3 text-center">
-            <p className="text-xs text-[var(--text-muted-color)] uppercase mb-1">Shot Selection</p>
-            <p className={`text-lg font-bold font-mono ${
-              (PSxG - xG) >= 2 ? 'text-emerald-400' : 
-              (PSxG - xG) <= -2 ? 'text-amber-400' : 'text-slate-400'
-            }`}>
-              {(PSxG - xG) > 0 ? '+' : ''}{(PSxG - xG).toFixed(1)}
-            </p>
-            <p className="text-[10px] text-[var(--text-muted-color)]">PSxG - xG</p>
-          </div>
-          <div className="bg-[var(--bg-surface)] rounded-lg p-3 text-center">
-            <p className="text-xs text-[var(--text-muted-color)] uppercase mb-1">Finishing</p>
-            <p className={`text-lg font-bold font-mono ${
-              (goals - PSxG) >= 2 ? 'text-emerald-400' : 
-              (goals - PSxG) <= -2 ? 'text-rose-400' : 'text-slate-400'
-            }`}>
-              {(goals - PSxG) > 0 ? '+' : ''}{(goals - PSxG).toFixed(1)}
-            </p>
-            <p className="text-[10px] text-[var(--text-muted-color)]">Goals - PSxG</p>
-          </div>
+      {/* Gap Breakdown */}
+      <div className="grid grid-cols-2 gap-4 mt-4">
+        <div className="bg-[var(--bg-surface)] rounded-lg p-3 text-center">
+          <p className="text-xs text-[var(--text-muted-color)] uppercase mb-1">Shot Selection</p>
+          <p className={`text-lg font-bold font-mono ${
+            (estimatedPSxG - xG) >= 2 ? 'text-emerald-400' : 
+            (estimatedPSxG - xG) <= -2 ? 'text-amber-400' : 'text-slate-400'
+          }`}>
+            {(estimatedPSxG - xG) > 0 ? '+' : ''}{(estimatedPSxG - xG).toFixed(1)}
+          </p>
+          <p className="text-[10px] text-[var(--text-muted-color)]">
+            PSxG - xG {isEstimated && '(est.)'}
+          </p>
         </div>
-      )}
+        <div className="bg-[var(--bg-surface)] rounded-lg p-3 text-center">
+          <p className="text-xs text-[var(--text-muted-color)] uppercase mb-1">Finishing</p>
+          <p className={`text-lg font-bold font-mono ${
+            (goals - estimatedPSxG) >= 2 ? 'text-emerald-400' : 
+            (goals - estimatedPSxG) <= -2 ? 'text-rose-400' : 'text-slate-400'
+          }`}>
+            {(goals - estimatedPSxG) > 0 ? '+' : ''}{(goals - estimatedPSxG).toFixed(1)}
+          </p>
+          <p className="text-[10px] text-[var(--text-muted-color)]">
+            Goals - PSxG {isEstimated && '(est.)'}
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
