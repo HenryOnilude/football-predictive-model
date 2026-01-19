@@ -49,8 +49,14 @@ export default function RootLayout({
                   Home
                 </Link>
                 <Link 
-                  href="/luck" 
+                  href="/fpl" 
                   className="text-sm font-medium text-slate-400 hover:text-emerald-400 transition-colors"
+                >
+                  Live FPL
+                </Link>
+                <Link 
+                  href="/luck" 
+                  className="text-sm font-medium text-slate-400 hover:text-amber-400 transition-colors"
                 >
                   Luck Cards
                 </Link>
