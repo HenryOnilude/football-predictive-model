@@ -7,13 +7,29 @@ import { StandingsResponse } from '@/app/api/standings/route';
 
 export const revalidate = 300; // Revalidate every 5 minutes
 
-// Explicit mapping from FPL team names to standings team names
+// Explicit mapping from FPL team names to standings team shortNames
 const FPL_TO_STANDINGS_MAP: Record<string, string> = {
-  'Man Utd': 'Man United',
-  'Spurs': 'Tottenham',
-  'Nott\'m Forest': 'Nott\'m Forest',
-  'Wolves': 'Wolves',
-  // Add more if needed
+  // FPL name -> Standings shortName
+  'Man Utd': 'man united',
+  'Spurs': 'tottenham',
+  'Nott\'m Forest': 'nott\'m forest',
+  'Wolves': 'wolves',
+  'Man City': 'man city',
+  'Arsenal': 'arsenal',
+  'Liverpool': 'liverpool',
+  'Chelsea': 'chelsea',
+  'Newcastle': 'newcastle',
+  'Brighton': 'brighton',
+  'Aston Villa': 'aston villa',
+  'Fulham': 'fulham',
+  'Brentford': 'brentford',
+  'Crystal Palace': 'crystal palace',
+  'West Ham': 'west ham',
+  'Bournemouth': 'bournemouth',
+  'Everton': 'everton',
+  'Leicester': 'leicester',
+  'Ipswich': 'ipswich',
+  'Southampton': 'southampton',
 };
 
 // Normalize team names for matching between APIs
