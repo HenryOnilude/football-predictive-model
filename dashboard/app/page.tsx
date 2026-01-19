@@ -1,5 +1,6 @@
 import LeagueTable from '@/components/LeagueTable';
-import FinishingBadgeDemo from '@/components/FinishingBadgeDemo';
+import MarketMoversRow from '@/components/MarketMoversRow';
+import DeepDiveLinks from '@/components/DeepDiveLinks';
 import { DashboardData } from '@/lib/types';
 import fs from 'fs';
 import path from 'path';
@@ -254,11 +255,24 @@ export default async function HomePage() {
         </div>
       </div>
 
-      {/* PSxG Finishing Badge Demo */}
-      <FinishingBadgeDemo />
+      {/* Section 1: Market Movers (Top Teaser) */}
+      <MarketMoversRow />
 
-      {/* League Table */}
-      <LeagueTable teams={data.teams} />
+      {/* Section 3: Anchor Table (Main Workspace) */}
+      <div className="mb-8">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-[var(--text-primary-color)]">
+            League Performance Table
+          </h3>
+          <span className="text-xs text-[var(--text-muted-color)]">
+            {data.teams.length} teams
+          </span>
+        </div>
+        <LeagueTable teams={data.teams} />
+      </div>
+
+      {/* Section 4: Deep Dive Links (Bottom) */}
+      <DeepDiveLinks />
     </div>
   );
 }
