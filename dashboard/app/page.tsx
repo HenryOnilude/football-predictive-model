@@ -7,8 +7,21 @@ import { StandingsResponse } from '@/app/api/standings/route';
 
 export const revalidate = 300; // Revalidate every 5 minutes
 
+// Explicit mapping from FPL team names to standings team names
+const FPL_TO_STANDINGS_MAP: Record<string, string> = {
+  'Man Utd': 'Man United',
+  'Spurs': 'Tottenham',
+  'Nott\'m Forest': 'Nott\'m Forest',
+  'Wolves': 'Wolves',
+  // Add more if needed
+};
+
 // Normalize team names for matching between APIs
 function normalizeTeamName(name: string): string {
+  // First check explicit mapping
+  if (FPL_TO_STANDINGS_MAP[name]) {
+    name = FPL_TO_STANDINGS_MAP[name];
+  }
   return name
     .toLowerCase()
     .replace(/\s*(fc|afc)\s*/gi, '')
@@ -41,46 +54,53 @@ async function mapFPLToTeamData(fplTeams: Awaited<ReturnType<typeof getAllTeams>
     standingsMap.set(normalizeTeamName(team.team.shortName), team);
   });
 
-  const teams: TeamData[] = fplTeams.teams.map((team) => {
-    const variance = Number(team.goalDelta.toFixed(1));
-    const riskScore = Math.round(Math.min(100, Math.abs(variance) * 15));
-    
-    // Find matching standings data
-    const standingsData = standingsMap.get(normalizeTeamName(team.name)) ||
-                          standingsMap.get(normalizeTeamName(team.shortName));
-    
-    // Use real standings data if available, otherwise estimate
-    const actualPoints = standingsData?.points || 0;
-    const matches = standingsData?.playedGames || 20;
-    const goalsFor = standingsData?.goalsFor || team.totalGoals;
-    const goalsAgainst = standingsData?.goalsAgainst || 0;
-    const position = standingsData?.position || 0;
-    
-    // Calculate xPTS based on xG differential (roughly 2.5 pts per xG advantage over average)
-    const xgDiff = team.totalXG - (team.totalXG * 0.9); // Simplified xG vs xGA
-    const xPTS = Math.round(matches * 1.3 + xgDiff * 2); // Base ~1.3 pts/game + xG bonus
-    
-    return {
-      Team: team.name || team.shortName || 'Unknown',
-      Matches: matches,
-      Actual_Points: actualPoints,
-      Goals_For: goalsFor,
-      Goals_Against: goalsAgainst,
-      xG_For: team.totalXG,
-      xG_Against: team.totalXG * 0.9, // Estimate
-      xPTS: xPTS,
-      Variance: Number((actualPoints - xPTS).toFixed(1)),
-      Position_Actual: position,
-      Position_Expected: position,
-      Z_Score: Number((variance / 2).toFixed(2)),
-      P_Value: 0.05,
-      Significant: Math.abs(actualPoints - xPTS) > 5,
-      Risk_Score: riskScore,
-      Risk_Category: riskScore >= 90 ? 'Critical' : riskScore >= 70 ? 'High' : riskScore >= 40 ? 'Moderate' : 'Low',
-      Regression_Probability: Number(Math.min(0.95, Math.abs(variance) * 0.1).toFixed(2)),
-      Performance_Status: (actualPoints - xPTS) > 5 ? 'Overperforming' : (actualPoints - xPTS) < -5 ? 'Underperforming' : 'As Expected',
-    };
-  });
+  // Only include teams that exist in standings (current Premier League teams)
+  const teams: TeamData[] = fplTeams.teams
+    .map((team) => {
+      const variance = Number(team.goalDelta.toFixed(1));
+      const riskScore = Math.round(Math.min(100, Math.abs(variance) * 15));
+      
+      // Find matching standings data
+      const standingsData = standingsMap.get(normalizeTeamName(team.name)) ||
+                            standingsMap.get(normalizeTeamName(team.shortName));
+      
+      // Skip teams not in current Premier League
+      if (!standingsData) {
+        return null;
+      }
+      
+      const actualPoints = standingsData.points;
+      const matches = standingsData.playedGames;
+      const goalsFor = standingsData.goalsFor;
+      const goalsAgainst = standingsData.goalsAgainst;
+      const position = standingsData.position;
+      
+      // Calculate xPTS based on xG differential
+      const xgDiff = team.totalXG - (team.totalXG * 0.9);
+      const xPTS = Math.round(matches * 1.3 + xgDiff * 2);
+      
+      return {
+        Team: standingsData.team.shortName, // Use standings team name for consistency
+        Matches: matches,
+        Actual_Points: actualPoints,
+        Goals_For: goalsFor,
+        Goals_Against: goalsAgainst,
+        xG_For: team.totalXG,
+        xG_Against: team.totalXG * 0.9,
+        xPTS: xPTS,
+        Variance: Number((actualPoints - xPTS).toFixed(1)),
+        Position_Actual: position,
+        Position_Expected: position,
+        Z_Score: Number((variance / 2).toFixed(2)),
+        P_Value: 0.05,
+        Significant: Math.abs(actualPoints - xPTS) > 5,
+        Risk_Score: riskScore,
+        Risk_Category: riskScore >= 90 ? 'Critical' : riskScore >= 70 ? 'High' : riskScore >= 40 ? 'Moderate' : 'Low',
+        Regression_Probability: Number(Math.min(0.95, Math.abs(variance) * 0.1).toFixed(2)),
+        Performance_Status: (actualPoints - xPTS) > 5 ? 'Overperforming' : (actualPoints - xPTS) < -5 ? 'Underperforming' : 'As Expected',
+      };
+    })
+    .filter((team): team is TeamData => team !== null);
 
   // Sort by actual position from standings
   teams.sort((a, b) => a.Position_Actual - b.Position_Actual);
