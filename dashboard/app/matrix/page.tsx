@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import TeamMatrix from '@/components/TeamMatrix';
+import MagicQuadrant from '@/components/MagicQuadrant';
 import { TeamAnalysis } from '@/lib/TeamAnalysis';
 import { 
   fetchFPLData, 
@@ -202,6 +203,21 @@ export default function MatrixPage() {
             </div>
           </div>
         </div>
+      </div>
+
+      {/* Magic Quadrant Visualization */}
+      <div className="mb-8">
+        <MagicQuadrant 
+          teams={analyzedTeams.map(t => ({
+            teamId: t.teamId,
+            teamName: t.teamName,
+            teamLogo: t.teamLogo,
+            avgXGPer90: t.avgXGPer90 || 0,
+            avgXGCPer90: t.avgXGCPer90 || 0,
+            sustainabilityScore: t.sustainabilityScore,
+            marketVerdict: t.marketVerdict,
+          }))}
+        />
       </div>
 
       {/* Matrix Table */}

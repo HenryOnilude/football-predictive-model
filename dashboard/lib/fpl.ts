@@ -214,12 +214,35 @@ function parseFloatSafe(value: string | number): number {
 // Based on net xG per 90 (xGPer90 - xGCPer90)
 // -----------------------------------------------------------------------------
 
-function calculateSustainabilityScore(netXGPer90: number): number {
+function calculateRawSustainabilityScore(netXGPer90: number): number {
   // Scale: -1.5 (terrible) to +1.5 (elite) -> 0-100
   // Midpoint (0) = 50
   const normalized = (netXGPer90 + 1.5) / 3.0; // Maps -1.5..+1.5 to 0..1
   const score = Math.round(normalized * 100);
   return Math.max(0, Math.min(100, score));
+}
+
+// Apply league position boost for top 4 teams
+function applyLeaguePositionBoost(score: number, leagueRank: number): number {
+  if (leagueRank <= 4) {
+    return score + 15; // Boost top 4 teams
+  }
+  return score;
+}
+
+// Min-Max Normalization to spread scores 0-99
+function normalizeScores(teams: { id: number; rawScore: number }[]): Map<number, number> {
+  const scores = teams.map(t => t.rawScore);
+  const minScore = Math.min(...scores);
+  const maxScore = Math.max(...scores);
+  const range = maxScore - minScore || 1; // Avoid division by zero
+  
+  const normalized = new Map<number, number>();
+  for (const team of teams) {
+    const normalizedScore = Math.round(((team.rawScore - minScore) / range) * 99);
+    normalized.set(team.id, Math.max(1, Math.min(99, normalizedScore)));
+  }
+  return normalized;
 }
 
 // -----------------------------------------------------------------------------
@@ -236,28 +259,59 @@ function determineEfficiencyStatus(goalDelta: number): EfficiencyStatus {
 }
 
 // -----------------------------------------------------------------------------
-// Market Verdict (6 archetypes)
-// Combines sustainability + efficiency
+// Market Verdict (Rank-based for bell curve distribution)
+// Top 3 = PRIME BUY, Next 5 = STABLE, Bottom 5 = AVOID/CRITICAL
 // -----------------------------------------------------------------------------
 
-function deriveMarketVerdict(
+function deriveMarketVerdictByRank(
+  rank: number,
+  sustainabilityScore: number,
+  efficiencyStatus: EfficiencyStatus
+): MarketVerdict {
+  const isHot = efficiencyStatus === 'CRITICAL_OVER' || efficiencyStatus === 'RUNNING_HOT';
+  
+  // Top 3 teams (score > 85 typically)
+  if (rank <= 3) {
+    return isHot ? 'DOMINANT' : 'PRIME_BUY';
+  }
+  
+  // Next 5 teams (ranks 4-8)
+  if (rank <= 8) {
+    if (isHot) return 'DOMINANT';
+    if (sustainabilityScore >= 60) return 'STABLE';
+    return 'STABLE';
+  }
+  
+  // Middle teams (ranks 9-15)
+  if (rank <= 15) {
+    if (sustainabilityScore >= 50) return 'STABLE';
+    return 'FRAGILE';
+  }
+  
+  // Bottom 5 teams (ranks 16-20)
+  if (rank >= 18) {
+    return 'CRITICAL'; // Only bottom 3 get CRITICAL
+  }
+  
+  return 'FRAGILE'; // ranks 16-17
+}
+
+// Simple verdict for individual players (not rank-based)
+function derivePlayerVerdict(
   sustainabilityScore: number,
   efficiencyStatus: EfficiencyStatus
 ): MarketVerdict {
   const isHighSustainability = sustainabilityScore >= 60;
   const isLowSustainability = sustainabilityScore < 40;
   
-  // Hot performers
   if (efficiencyStatus === 'CRITICAL_OVER' || efficiencyStatus === 'RUNNING_HOT') {
     return isHighSustainability ? 'DOMINANT' : 'OVERHEATED';
   }
   
-  // Cold performers
   if (efficiencyStatus === 'CRITICAL_VALUE' || efficiencyStatus === 'COLD') {
     return isHighSustainability ? 'PRIME_BUY' : 'CRITICAL';
   }
   
-  // Sustainable
   return isLowSustainability ? 'FRAGILE' : 'STABLE';
 }
 
@@ -315,9 +369,10 @@ export function transformPlayers(
         ? -xGCPer90 // Lower xGC is better for defenders
         : xGPer90 - xAPer90 * 0.5; // Weighted for attacking contribution
       
-      const sustainabilityScore = calculateSustainabilityScore(netXGPer90);
+      const sustainabilityScore = calculateRawSustainabilityScore(netXGPer90);
       const efficiencyStatus = determineEfficiencyStatus(goalDelta);
-      const marketVerdict = deriveMarketVerdict(sustainabilityScore, efficiencyStatus);
+      // Simple verdict for players (not rank-based)
+      const marketVerdict = derivePlayerVerdict(sustainabilityScore, efficiencyStatus);
       
       // Clean sheet luck for GK/DEF
       const cleanSheetLuck = (position === 'GK' || position === 'DEF')
@@ -380,17 +435,18 @@ export function transformTeams(
     teamPlayers.set(player.teamId, existing);
   }
   
-  return data.teams.map(team => {
-    const players = teamPlayers.get(team.id) || [];
+  // STEP 1: Calculate raw scores for all teams
+  const rawTeamData = data.teams.map(team => {
+    const teamPlayersList = teamPlayers.get(team.id) || [];
     
     // Aggregate stats
-    const totalGoals = players.reduce((sum, p) => sum + p.goals, 0);
-    const totalXG = players.reduce((sum, p) => sum + p.xG, 0);
-    const totalXGC = players.reduce((sum, p) => sum + p.xGC, 0) / 11; // Normalize
-    const cleanSheets = Math.max(...players.filter(p => p.position === 'GK' || p.position === 'DEF').map(p => p.cleanSheets), 0);
+    const totalGoals = teamPlayersList.reduce((sum, p) => sum + p.goals, 0);
+    const totalXG = teamPlayersList.reduce((sum, p) => sum + p.xG, 0);
+    const totalXGC = teamPlayersList.reduce((sum, p) => sum + p.xGC, 0) / 11; // Normalize
+    const cleanSheets = Math.max(...teamPlayersList.filter(p => p.position === 'GK' || p.position === 'DEF').map(p => p.cleanSheets), 0);
     
     // Average per 90 metrics from starting players
-    const starters = players.filter(p => p.minutes > 450).slice(0, 11);
+    const starters = teamPlayersList.filter(p => p.minutes > 450).slice(0, 11);
     const avgXGPer90 = starters.length > 0
       ? starters.reduce((sum, p) => sum + p.xGPer90, 0) / starters.length
       : 0;
@@ -401,37 +457,77 @@ export function transformTeams(
     
     const goalDelta = totalGoals - totalXG;
     const netXGPer90 = avgXGPer90 - avgXGCPer90;
-    const sustainabilityScore = calculateSustainabilityScore(netXGPer90);
+    const rawScore = calculateRawSustainabilityScore(netXGPer90);
     const efficiencyStatus = determineEfficiencyStatus(goalDelta);
-    const marketVerdict = deriveMarketVerdict(sustainabilityScore, efficiencyStatus);
     
     // Estimate matches from GK minutes
-    const gk = players.find(p => p.position === 'GK' && p.minutes > 450);
+    const gk = teamPlayersList.find(p => p.position === 'GK' && p.minutes > 450);
     const matches = gk ? Math.floor(gk.minutes / 90) : 10;
     const cleanSheetLuck = calculateCleanSheetLuck(cleanSheets, totalXGC * matches, matches);
     
     return {
-      id: team.id,
-      code: team.code,
-      name: team.name,
-      shortName: team.short_name,
-      logo: getTeamLogo(team.code),
-      
+      team,
       totalGoals,
-      totalXG: Number(totalXG.toFixed(2)),
-      totalXGC: Number(totalXGC.toFixed(2)),
-      avgXGPer90: Number(avgXGPer90.toFixed(3)),
-      avgXGCPer90: Number(avgXGCPer90.toFixed(3)),
-      
-      goalDelta: Number(goalDelta.toFixed(2)),
-      sustainabilityScore,
+      totalXG,
+      totalXGC,
+      avgXGPer90,
+      avgXGCPer90,
+      goalDelta,
+      netXGPer90,
+      rawScore,
       efficiencyStatus,
-      marketVerdict,
-      
       cleanSheets,
       cleanSheetLuck,
     };
-  }).sort((a, b) => b.sustainabilityScore - a.sustainabilityScore);
+  });
+  
+  // STEP 2: Sort by raw score to get league ranks
+  const sortedByScore = [...rawTeamData].sort((a, b) => b.rawScore - a.rawScore);
+  const rankMap = new Map<number, number>();
+  sortedByScore.forEach((t, index) => {
+    rankMap.set(t.team.id, index + 1);
+  });
+  
+  // STEP 3: Apply league position boost for top 4 teams
+  const boostedScores = rawTeamData.map(t => ({
+    id: t.team.id,
+    rawScore: applyLeaguePositionBoost(t.rawScore, rankMap.get(t.team.id) || 20),
+  }));
+  
+  // STEP 4: Apply Min-Max Normalization (spread 0-99)
+  const normalizedScoreMap = normalizeScores(boostedScores);
+  
+  // STEP 5: Build final team objects with normalized scores and rank-based verdicts
+  const finalTeams = rawTeamData.map(t => {
+    const rank = rankMap.get(t.team.id) || 20;
+    const sustainabilityScore = normalizedScoreMap.get(t.team.id) || 50;
+    const marketVerdict = deriveMarketVerdictByRank(rank, sustainabilityScore, t.efficiencyStatus);
+    
+    return {
+      id: t.team.id,
+      code: t.team.code,
+      name: t.team.name,
+      shortName: t.team.short_name,
+      logo: getTeamLogo(t.team.code),
+      
+      totalGoals: t.totalGoals,
+      totalXG: Number(t.totalXG.toFixed(2)),
+      totalXGC: Number(t.totalXGC.toFixed(2)),
+      avgXGPer90: Number(t.avgXGPer90.toFixed(3)),
+      avgXGCPer90: Number(t.avgXGCPer90.toFixed(3)),
+      
+      goalDelta: Number(t.goalDelta.toFixed(2)),
+      sustainabilityScore,
+      efficiencyStatus: t.efficiencyStatus,
+      marketVerdict,
+      
+      cleanSheets: t.cleanSheets,
+      cleanSheetLuck: t.cleanSheetLuck,
+    };
+  });
+  
+  // Sort by sustainability score (highest first)
+  return finalTeams.sort((a, b) => b.sustainabilityScore - a.sustainabilityScore);
 }
 
 // -----------------------------------------------------------------------------
@@ -516,5 +612,8 @@ export function convertToTeamAnalysis(teams: TeamHealthHeat[]): TeamAnalysis[] {
     marketVerdict: team.marketVerdict,
     chanceGrade: getChanceGrade(team.sustainabilityScore),
     insightNote: generateInsightNote(team),
+    // For Magic Quadrant visualization
+    avgXGPer90: team.avgXGPer90,
+    avgXGCPer90: team.avgXGCPer90,
   }));
 }

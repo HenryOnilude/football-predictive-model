@@ -54,6 +54,9 @@ export interface TeamAnalysis {
   marketVerdict: MarketVerdict;
   chanceGrade: 'Elite' | 'Good' | 'Average' | 'Poor' | 'Broken';
   insightNote: string;
+  // For Magic Quadrant visualization
+  avgXGPer90?: number;
+  avgXGCPer90?: number;
   // PSxG-based advanced analysis (optional)
   finishingBadge?: FinishingBadge;
   hasPSxGData?: boolean;
