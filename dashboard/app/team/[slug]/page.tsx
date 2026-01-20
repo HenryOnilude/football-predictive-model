@@ -7,6 +7,21 @@ import { getAllTeams } from '@/lib/fpl-api';
 
 export const revalidate = 300; // Revalidate every 5 minutes
 
+// Team name aliases (FPL API names -> common names people search for)
+const TEAM_ALIASES: Record<string, string[]> = {
+  'Spurs': ['tottenham', 'tottenham-hotspur', 'thfc'],
+  'Man City': ['manchester-city', 'mcfc', 'city'],
+  'Man Utd': ['manchester-united', 'mufc', 'united'],
+  'Nott\'m Forest': ['nottingham-forest', 'forest', 'nffc'],
+  'Wolves': ['wolverhampton', 'wolverhampton-wanderers'],
+  'Brighton': ['brighton-hove-albion', 'brighton-and-hove-albion', 'bhafc'],
+  'West Ham': ['west-ham-united', 'whufc'],
+  'Newcastle': ['newcastle-united', 'nufc'],
+  'Crystal Palace': ['cpfc'],
+  'Aston Villa': ['avfc', 'villa'],
+  'Leeds': ['leeds-united', 'lufc'],
+};
+
 // Normalize team name for slug matching (handle apostrophes, special chars)
 function normalizeForSlug(name: string): string {
   return name
@@ -14,6 +29,27 @@ function normalizeForSlug(name: string): string {
     .replace(/[''"]/g, '') // Remove apostrophes and quotes
     .replace(/\s+/g, '-')   // Replace spaces with hyphens
     .replace(/[^a-z0-9-]/g, ''); // Remove other special chars
+}
+
+// Find team by slug with alias support
+function findTeamBySlug(teams: TeamData[], slug: string): TeamData | undefined {
+  // Direct match first
+  let team = teams.find(t => normalizeForSlug(t.Team) === slug);
+  if (team) return team;
+  
+  // Check aliases
+  for (const [apiName, aliases] of Object.entries(TEAM_ALIASES)) {
+    if (aliases.includes(slug)) {
+      team = teams.find(t => t.Team === apiName);
+      if (team) return team;
+    }
+  }
+  
+  // Partial match fallback
+  return teams.find(t => 
+    normalizeForSlug(t.Team).includes(slug) || 
+    slug.includes(normalizeForSlug(t.Team))
+  );
 }
 
 async function getData(): Promise<DashboardData> {
@@ -66,10 +102,10 @@ export default async function TeamPage({ params }: { params: Promise<{ slug: str
   const data = await getData();
   const { slug } = await params;
 
-  // Find team by slug (handle special characters like apostrophes)
-  const team = data.teams.find(t => normalizeForSlug(t.Team) === slug);
+  // Find team by slug with alias support (handles Tottenham/Spurs, etc.)
+  const team = findTeamBySlug(data.teams, slug);
   
-  // Fallback: try original slug matching
+  // Display name for error message
   const teamName = slug
     .split('-')
     .map(word => word.charAt(0).toUpperCase() + word.slice(1))

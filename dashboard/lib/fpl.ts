@@ -288,11 +288,18 @@ function deriveMarketVerdictByRank(
   sustainabilityScore: number,
   efficiencyStatus: EfficiencyStatus,
   defenseZScore: number, // Z-score: negative = below average defense
-  attackZScore: number   // Z-score: positive = above average attack
+  attackZScore: number,  // Z-score: positive = above average attack
+  totalGoals: number,    // Actual goal output (performance reality check)
+  goalDelta: number      // Goals - xG (overperformance indicator)
 ): MarketVerdict {
   const isHot = efficiencyStatus === 'CRITICAL_OVER' || efficiencyStatus === 'RUNNING_HOT';
   const hasGoodDefense = defenseZScore >= 0; // At or above average
   const hasHighAttack = attackZScore > 0.5;  // Above average attack
+  
+  // REALITY CHECK: Teams with very low goal output can't be DOMINANT
+  // This prevents relegation-tier teams from being mislabeled
+  const isLowPerformer = totalGoals < 25; // Bottom-tier actual output
+  const isMassiveOverperformer = goalDelta > 5; // Significantly outperforming xG
   
   // DEFENSE-GATE: High attack + poor defense = ENTERTAINERS (Glass Cannon)
   // This prevents teams like Spurs from being labeled DOMINANT
@@ -300,17 +307,30 @@ function deriveMarketVerdictByRank(
     return 'ENTERTAINERS';
   }
   
-  // Top 3 teams (score > 85 typically)
+  // OVERPERFORMANCE GATE: Hot teams with poor defense are ENTERTAINERS
+  if (isHot && !hasGoodDefense) {
+    return 'ENTERTAINERS';
+  }
+  
+  // LOW PERFORMER GATE: Teams with very few goals can't be DOMINANT
+  // Even if their xG metrics look good, actual results matter
+  if (isLowPerformer && isMassiveOverperformer) {
+    return 'OVERHEATED'; // Unsustainable - results don't match quality
+  }
+  if (isLowPerformer) {
+    if (defenseZScore < -0.5) return 'CRITICAL';
+    return 'FRAGILE';
+  }
+  
+  // Top 3 teams by sustainability (with defense gate passed)
   if (rank <= 3) {
     if (isHot && hasGoodDefense) return 'DOMINANT';
-    if (isHot) return 'ENTERTAINERS'; // Hot but leaky defense
     return 'PRIME_BUY';
   }
   
   // Next 5 teams (ranks 4-8)
   if (rank <= 8) {
     if (isHot && hasGoodDefense) return 'DOMINANT';
-    if (isHot) return 'ENTERTAINERS'; // Hot but leaky defense
     if (sustainabilityScore >= 60) return 'STABLE';
     return 'STABLE';
   }
@@ -559,7 +579,9 @@ export function transformTeams(
       sustainabilityScore, 
       t.efficiencyStatus,
       zScores.defenseZ,
-      zScores.attackZ
+      zScores.attackZ,
+      t.totalGoals,
+      t.goalDelta
     );
     
     return {
