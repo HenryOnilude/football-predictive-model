@@ -50,7 +50,7 @@ export default function RootLayout({
                   href="/fpl" 
                   className="text-sm font-medium text-slate-400 hover:text-emerald-400 transition-colors"
                 >
-                  Live FPL
+                  Terminal
                 </Link>
                 <Link 
                   href="/luck" 
