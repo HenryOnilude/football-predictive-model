@@ -118,8 +118,8 @@ export default function FinishingBadgeDemo() {
             <span className="text-[var(--text-muted-color)]">Bad shots</span>
           </div>
           <div className="flex items-center gap-2">
-            <span className="px-2 py-1 rounded bg-rose-600 text-white font-bold">GHOST</span>
-            <span className="text-[var(--text-muted-color)]">Lucky</span>
+            <span className="px-2 py-1 rounded bg-rose-600 text-white font-bold">MIRAGE</span>
+            <span className="text-[var(--text-muted-color)]">Illusion</span>
           </div>
         </div>
       </div>

@@ -143,7 +143,7 @@ export interface MappedPlayer {
   status: 'available' | 'injured' | 'doubtful' | 'unavailable';
   news: string;
   // Calculated fields
-  finishingBadge: 'SIEGE' | 'SNIPER' | 'FAIR' | 'WASTEFUL' | 'GHOST';
+  finishingBadge: 'SIEGE' | 'SNIPER' | 'FAIR' | 'WASTEFUL' | 'MIRAGE';
   riskLevel: 'Critical' | 'High' | 'Moderate' | 'Low';
 }
 
@@ -222,9 +222,9 @@ function calculateFinishingBadge(goals: number, xG: number, minutes: number): Ma
     return 'SNIPER';
   }
 
-  // GHOST: Scoring from nothing (very lucky, unsustainable)
+  // MIRAGE: Results are an illusion (very lucky, unsustainable)
   if (goals >= 3 && xG < 1) {
-    return 'GHOST';
+    return 'MIRAGE';
   }
 
   // WASTEFUL: Poor shot selection (xG low relative to opportunities)
@@ -397,8 +397,8 @@ export async function getTopPerformers(limit: number = 10) {
     byValue: [...data.players].filter(p => p.minutes >= 270).sort((a, b) => (b.totalPoints / b.price) - (a.totalPoints / a.price)).slice(0, limit),
     // Underperformers (SIEGE badge - unlucky, due a haul)
     unlucky: [...data.players].filter(p => p.finishingBadge === 'SIEGE').sort((a, b) => a.goalDelta - b.goalDelta).slice(0, limit),
-    // Overperformers (SNIPER/GHOST - regression risk)
-    lucky: [...data.players].filter(p => p.finishingBadge === 'SNIPER' || p.finishingBadge === 'GHOST').sort((a, b) => b.goalDelta - a.goalDelta).slice(0, limit),
+    // Overperformers (SNIPER/MIRAGE - regression risk)
+    lucky: [...data.players].filter(p => p.finishingBadge === 'SNIPER' || p.finishingBadge === 'MIRAGE').sort((a, b) => b.goalDelta - a.goalDelta).slice(0, limit),
     lastUpdated: data.lastUpdated,
     currentGameweek: data.currentGameweek,
   };

@@ -9,7 +9,7 @@
  * - SNIPER: High xG + Very High PSxG + High Goals = Elite Finishing Skill
  * - FAIR: xG ≈ PSxG ≈ Goals = Sustainable, no edge
  * - WASTEFUL: High xG + Low PSxG + Low Goals = Bad shot selection/technique
- * - GHOST: Low xG + Low PSxG + High Goals = Lucky (scrappy goals, deflections)
+ * - MIRAGE: Low xG + Low PSxG + High Goals = Results are an illusion (sell)
  */
 
 import { TeamStats } from './TeamAnalysis';
@@ -19,7 +19,7 @@ export type FinishingBadge =
   | 'SNIPER'     // Elite skill - clinical finishing
   | 'FAIR'       // Sustainable - performing as expected
   | 'WASTEFUL'   // Bad finishing - poor shot quality
-  | 'GHOST';     // Lucky - scoring from nothing
+  | 'MIRAGE';    // Results are an illusion - sell
 
 export interface DemoTeam extends TeamStats {
   expectedBadge: FinishingBadge;
@@ -62,10 +62,10 @@ export function calculateFinishingBadge(team: TeamStats): FinishingBadge {
     return 'WASTEFUL';
   }
 
-  // GHOST: Low xG, low PSxG, but high goals
-  // Scoring from nothing - scrappy goals, deflections, penalties
+  // MIRAGE: Low xG, low PSxG, but high goals
+  // Results are an illusion - scrappy goals, deflections, penalties
   if (team.xGFor <= 15 && goalDelta >= 5) {
-    return 'GHOST';
+    return 'MIRAGE';
   }
 
   // FAIR: Everything roughly aligned
@@ -110,10 +110,10 @@ export function getFinishingBadgeConfig(badge: FinishingBadge): {
         bgColor: 'bg-amber-600',
         textColor: 'text-white',
       };
-    case 'GHOST':
+    case 'MIRAGE':
       return {
-        label: 'GHOST',
-        description: 'Scoring from nothing. Lucky goals - regression likely.',
+        label: 'MIRAGE',
+        description: 'Results are an illusion. High goals vs Low xG. Sell.',
         bgColor: 'bg-rose-600',
         textColor: 'text-white',
       };
@@ -198,9 +198,9 @@ export const demoTeams: DemoTeam[] = [
     badgeReason: 'Creating chances (xG=25) but taking poor shots (PSxG=15). Need better finishing positions.',
   },
   {
-    // GHOST: Luton - "The Lucky"
+    // MIRAGE: Luton - "The Illusion"
     // Low xG (10.0), Low PSxG (11.0), High Goals (20)
-    // Scoring from nothing - scrappy goals, deflections
+    // Results are an illusion - scrappy goals, deflections
     teamId: 5,
     teamName: 'Luton Town',
     teamLogo: 'https://resources.premierleague.com/premierleague/badges/t163.png',
@@ -212,8 +212,8 @@ export const demoTeams: DemoTeam[] = [
     points: 18,
     PSxG: 11.0,     // Shot quality roughly matches low xG
     xGOT: 10.0,     // Low accuracy
-    expectedBadge: 'GHOST',
-    badgeReason: 'Scoring from nothing (Goals=20 vs xG=10). Lucky goals - major regression incoming.',
+    expectedBadge: 'MIRAGE',
+    badgeReason: 'Results are an illusion (Goals=20 vs xG=10). Sell before regression.',
   },
 ];
 

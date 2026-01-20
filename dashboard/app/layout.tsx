@@ -10,8 +10,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "FPL Luck Finder | Spot Undervalued Players",
-  description: "Find undervalued Fantasy Premier League players using xG analysis. Identify who's due a haul and who's a trap.",
+  title: "FPL Axiom | Professional Grade Analytics",
+  description: "Separate the signal from the noise. Advanced regression analysis and xG intelligence for Fantasy Premier League.",
 };
 
 export default function RootLayout({
@@ -28,16 +28,14 @@ export default function RootLayout({
             <div className="flex justify-between items-center h-16">
               <Link href="/luck" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
                 <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                  <svg className="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clipRule="evenodd" />
-                  </svg>
+                  <span className="text-xl font-bold text-white">Δ</span>
                 </div>
                 <div>
                   <h1 className="text-lg font-bold text-white tracking-tight">
-                    FPL Luck Finder
+                    FPL Axiom
                   </h1>
                   <p className="text-[10px] text-slate-500 uppercase tracking-wider">
-                    xG-Powered Insights
+                    Establish the Truth
                   </p>
                 </div>
               </Link>
@@ -91,10 +89,10 @@ export default function RootLayout({
                 <span>Powered by API-Football</span>
               </div>
               <p className="text-xs text-slate-600">
-                Statistical analysis using Expected Goals (xG) • Not affiliated with FPL
+                FPL Axiom • Advanced xG Analytics • Not affiliated with FPL
               </p>
               <p className="text-xs text-slate-700">
-                Find undervalued assets before the casuals
+                Establish the Truth
               </p>
             </div>
           </div>

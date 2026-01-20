@@ -66,7 +66,7 @@ export default async function FPLPage() {
           <div className="text-xs text-purple-400/70 mt-2">Due a haul</div>
         </div>
         <div className="card p-6 bg-amber-500/10 border-amber-500/30">
-          <div className="text-xs font-semibold text-amber-400 uppercase tracking-wide mb-2">Ghost (Lucky)</div>
+          <div className="text-xs font-semibold text-amber-400 uppercase tracking-wide mb-2">Mirage (Illusion)</div>
           <div className="text-4xl font-semibold text-amber-400">{data.lucky.length}</div>
           <div className="text-xs text-amber-400/70 mt-2">Regression risk</div>
         </div>

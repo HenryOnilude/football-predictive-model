@@ -123,8 +123,8 @@ function getAnalysisText(teamName: string, xG: number, PSxG: number | undefined,
     }
     if (xG <= 15 && goalDelta >= 5) {
       return {
-        badge: 'GHOST',
-        analysis: `${teamName} is scoring (Goals: ${goals}) despite poor chance creation (xG: ${xG.toFixed(1)}). These are lucky, scrappy goals - expect negative regression.`,
+        badge: 'MIRAGE',
+        analysis: `${teamName} is scoring (Goals: ${goals}) despite poor chance creation (xG: ${xG.toFixed(1)}). Results are an illusion - expect negative regression.`,
       };
     }
   } else {
@@ -137,8 +137,8 @@ function getAnalysisText(teamName: string, xG: number, PSxG: number | undefined,
     }
     if (goalDelta >= 5) {
       return {
-        badge: 'GHOST',
-        analysis: `${teamName} is scoring (Goals: ${goals}) beyond expected (xG: ${xG.toFixed(1)}). Lucky finishing - expect negative regression.`,
+        badge: 'MIRAGE',
+        analysis: `${teamName} is scoring (Goals: ${goals}) beyond expected (xG: ${xG.toFixed(1)}). Results are an illusion - sell before regression.`,
       };
     }
   }

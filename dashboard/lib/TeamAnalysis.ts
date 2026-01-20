@@ -41,7 +41,7 @@ export type FinishingBadge =
   | 'SNIPER'     // Elite skill - clinical finishing
   | 'FAIR'       // Sustainable - performing as expected
   | 'WASTEFUL'   // Bad finishing - poor shot quality
-  | 'GHOST';     // Lucky - scoring from nothing
+  | 'MIRAGE';    // Results are an illusion - sell
 
 export interface TeamAnalysis {
   teamId: number;
@@ -210,10 +210,10 @@ function calculateFinishingBadge(teamStats: TeamStats): FinishingBadge {
     return 'WASTEFUL';
   }
 
-  // GHOST: Low xG, low PSxG, but high goals
-  // Scoring from nothing - scrappy goals, deflections
+  // MIRAGE: Low xG, low PSxG, but high goals
+  // Results are an illusion - scrappy goals, deflections
   if (teamStats.xGFor <= 15 && goalDelta >= 5) {
-    return 'GHOST';
+    return 'MIRAGE';
   }
 
   // FAIR: Everything roughly aligned
@@ -380,10 +380,10 @@ export function getFinishingBadgeConfig(badge: FinishingBadge): {
         bgColor: 'bg-amber-600',
         textColor: 'text-white',
       };
-    case 'GHOST':
+    case 'MIRAGE':
       return {
-        label: 'GHOST',
-        description: 'Scoring from nothing. Lucky goals - regression likely.',
+        label: 'MIRAGE',
+        description: 'Results are an illusion. High goals vs Low xG. Sell.',
         bgColor: 'bg-rose-600',
         textColor: 'text-white',
       };

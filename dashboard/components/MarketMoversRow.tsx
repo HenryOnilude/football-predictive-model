@@ -12,12 +12,12 @@ export default function MarketMoversRow() {
     analysis: analyzeTeamPerformance(team),
   }));
 
-  // Get diverse selection: SIEGE (unlucky), SNIPER (elite), GHOST (lucky)
+  // Get diverse selection: SIEGE (unlucky), SNIPER (elite), MIRAGE (illusion)
   const siege = analyzedTeams.find(t => t.analysis.finishingBadge === 'SIEGE');
   const sniper = analyzedTeams.find(t => t.analysis.finishingBadge === 'SNIPER');
-  const ghost = analyzedTeams.find(t => t.analysis.finishingBadge === 'GHOST');
+  const mirage = analyzedTeams.find(t => t.analysis.finishingBadge === 'MIRAGE');
 
-  const topMovers = [siege, sniper, ghost].filter((t): t is { team: typeof demoTeams[0]; analysis: ReturnType<typeof analyzeTeamPerformance> } => t !== undefined).slice(0, 3);
+  const topMovers = [siege, sniper, mirage].filter((t): t is { team: typeof demoTeams[0]; analysis: ReturnType<typeof analyzeTeamPerformance> } => t !== undefined).slice(0, 3);
 
   return (
     <div className="mb-8">

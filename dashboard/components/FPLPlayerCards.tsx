@@ -16,8 +16,8 @@ function getBadgeConfig(badge: MappedPlayer['finishingBadge']) {
       return { label: 'SIEGE', bgColor: 'bg-purple-500/20', textColor: 'text-purple-400', description: 'Unlucky - due a haul' };
     case 'SNIPER':
       return { label: 'SNIPER', bgColor: 'bg-emerald-500/20', textColor: 'text-emerald-400', description: 'Elite finisher' };
-    case 'GHOST':
-      return { label: 'GHOST', bgColor: 'bg-amber-500/20', textColor: 'text-amber-400', description: 'Lucky - regression risk' };
+    case 'MIRAGE':
+      return { label: 'MIRAGE', bgColor: 'bg-amber-500/20', textColor: 'text-amber-400', description: 'Illusion - sell before regression' };
     case 'WASTEFUL':
       return { label: 'WASTEFUL', bgColor: 'bg-rose-500/20', textColor: 'text-rose-400', description: 'Poor shot selection' };
     default:
