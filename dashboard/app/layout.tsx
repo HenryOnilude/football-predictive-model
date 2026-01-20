@@ -56,7 +56,7 @@ export default function RootLayout({
                   href="/luck" 
                   className="text-sm font-medium text-slate-400 hover:text-amber-400 transition-colors"
                 >
-                  Luck Cards
+                  Delta Deck
                 </Link>
                 <Link 
                   href="/teams" 

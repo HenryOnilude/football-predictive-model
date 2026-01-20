@@ -324,9 +324,11 @@ async function fetchPlayersFromFPLAPI(): Promise<PlayerLuckData[]> {
     4: 'Attacker',
   };
   
-  // Filter players with goals or significant xG, sort by goals
+  // Filter players with goals or significant xG, excluding unavailable/departed
   const relevantPlayers = data.elements
     .filter((el: FPLElement) => {
+      // Exclude unavailable (u) and departed (d) players
+      if (el.status === 'u' || el.status === 'd') return false;
       const xG = parseFloat(el.expected_goals) || 0;
       return el.goals_scored > 0 || xG > 1.0;
     })
