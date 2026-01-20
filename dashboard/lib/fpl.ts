@@ -211,8 +211,40 @@ function parseFloatSafe(value: string | number): number {
 
 // -----------------------------------------------------------------------------
 // Sustainability Score (0-100)
-// Based on net xG per 90 (xGPer90 - xGCPer90)
+// Based on net xG per 90 (xGPer90 - xGCPer90) WITH absolute volume penalties
 // -----------------------------------------------------------------------------
+
+// FORENSIC FIX: Apply penalties based on absolute xG/xGA totals
+// This prevents teams like Burnley (low volume) from gaming the per-90 ratio
+function applyAbsoluteVolumePenalty(
+  baseScore: number,
+  totalXG: number,
+  totalXGA: number
+): number {
+  let penalty = 0;
+  
+  // FIX 1: Minimum xG threshold - teams creating few chances can't be "Elite"
+  // Burnley has 18.7 xG (lowest) - should be heavily penalized
+  if (totalXG < 20) {
+    penalty += 40; // Severe penalty for bottom-tier attack
+  } else if (totalXG < 25) {
+    penalty += 25; // Significant penalty for weak attack
+  } else if (totalXG < 30) {
+    penalty += 10; // Moderate penalty for below-average attack
+  }
+  
+  // FIX 2: Maximum xGA threshold - teams conceding lots can't be "Elite"
+  // Burnley has 45.4 xGA (worst) - should be heavily penalized
+  if (totalXGA > 40) {
+    penalty += 40; // Severe penalty for terrible defense
+  } else if (totalXGA > 35) {
+    penalty += 25; // Significant penalty for poor defense
+  } else if (totalXGA > 30) {
+    penalty += 15; // Moderate penalty for leaky defense
+  }
+  
+  return Math.max(0, baseScore - penalty);
+}
 
 function calculateRawSustainabilityScore(netXGPer90: number): number {
   // Scale: -1.5 (terrible) to +1.5 (elite) -> 0-100
@@ -510,7 +542,14 @@ export function transformTeams(
     
     const goalDelta = totalGoals - totalXG;
     const netXGPer90 = avgXGPer90 - avgXGCPer90;
-    const rawScore = calculateRawSustainabilityScore(netXGPer90);
+    
+    // Calculate base score from per-90 metrics
+    const baseScore = calculateRawSustainabilityScore(netXGPer90);
+    
+    // FORENSIC FIX: Apply absolute volume penalties
+    // This prevents low-volume teams (Burnley) from gaming per-90 ratios
+    const rawScore = applyAbsoluteVolumePenalty(baseScore, totalXG, totalXGC * 11);
+    
     const efficiencyStatus = determineEfficiencyStatus(goalDelta);
     
     // Estimate matches from GK minutes
