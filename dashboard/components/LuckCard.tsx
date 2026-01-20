@@ -269,14 +269,10 @@ export default function LuckCard({ player }: LuckCardProps) {
               </div>
             </div>
 
-            {/* Bottom - Price & GW */}
+            {/* Bottom - GW Indicator */}
             <div className="flex-shrink-0 px-5 pb-6 pt-2">
-              <div className="flex items-center justify-between text-sm">
-                <span className="text-slate-500">Price</span>
-                <span className="font-bold text-emerald-400">£{player.price.toFixed(1)}m</span>
-              </div>
-              <div className="flex items-center justify-between text-sm mt-1">
-                <span className="text-slate-500">Gameweek</span>
+              <div className="flex items-center justify-center text-sm gap-2">
+                <span className="text-slate-500">GW</span>
                 <span className="font-bold text-white">{player.gameweek}</span>
               </div>
             </div>
