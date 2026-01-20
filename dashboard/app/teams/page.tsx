@@ -144,7 +144,7 @@ export default function TeamsPage() {
           const standingName = s.team.name.toLowerCase();
           const standingShort = s.team.shortName.toLowerCase();
           
-          const analysis = analyzed.find(a => {
+          let analysis = analyzed.find(a => {
             const analysisName = a.teamName.toLowerCase();
             
             // Direct match
@@ -163,6 +163,22 @@ export default function TeamsPage() {
             
             return false;
           }) || null;
+          
+          // LEAGUE POSITION GATE: Override verdict based on actual league standings
+          // Teams in relegation zone (bottom 3) cannot be DOMINANT
+          // Teams in bottom half with hot efficiency are ENTERTAINERS, not DOMINANT
+          if (analysis) {
+            const isRelegationZone = s.position >= 18;
+            const isBottomHalf = s.position >= 11;
+            const isHot = analysis.efficiencyStatus === 'CRITICAL_OVER' || analysis.efficiencyStatus === 'RUNNING_HOT';
+            
+            if (isRelegationZone && analysis.marketVerdict === 'DOMINANT') {
+              analysis = { ...analysis, marketVerdict: 'CRITICAL' };
+            } else if (isBottomHalf && analysis.marketVerdict === 'DOMINANT') {
+              // Bottom half teams with hot efficiency = ENTERTAINERS (unsustainable overperformance)
+              analysis = { ...analysis, marketVerdict: isHot ? 'ENTERTAINERS' : 'FRAGILE' };
+            }
+          }
           
           return { position: s.position, team: s.team, points: s.points, analysis };
         });

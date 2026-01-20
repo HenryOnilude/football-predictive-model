@@ -65,6 +65,7 @@ function ActionBadge({ verdict }: { verdict: string }) {
   
   const styleMap: Record<string, string> = {
     DOMINANT: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+    ENTERTAINERS: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
     PRIME_BUY: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
     STABLE: 'bg-slate-700/50 text-slate-400 border-slate-600',
     OVERHEATED: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
