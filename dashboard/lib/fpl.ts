@@ -75,7 +75,7 @@ export interface FPLBootstrapResponse {
 
 export type PositionType = 'GK' | 'DEF' | 'MID' | 'FWD';
 export type EfficiencyStatus = 'CRITICAL_OVER' | 'RUNNING_HOT' | 'SUSTAINABLE' | 'COLD' | 'CRITICAL_VALUE';
-export type MarketVerdict = 'DOMINANT' | 'OVERHEATED' | 'PRIME_BUY' | 'CRITICAL' | 'STABLE' | 'FRAGILE';
+export type MarketVerdict = 'DOMINANT' | 'ENTERTAINERS' | 'OVERHEATED' | 'PRIME_BUY' | 'CRITICAL' | 'STABLE' | 'FRAGILE';
 
 export interface PlayerHealthHeat {
   id: number;
@@ -259,6 +259,26 @@ function determineEfficiencyStatus(goalDelta: number): EfficiencyStatus {
 }
 
 // -----------------------------------------------------------------------------
+// Game State Penalty (Desperation Fix)
+// When trailing, teams generate inflated xG from "desperation shots"
+// Apply 0.85 multiplier to discount low-quality volume
+// -----------------------------------------------------------------------------
+
+export type GameState = 'WINNING' | 'DRAWING' | 'TRAILING';
+
+export function applyGameStatePenalty(
+  xG: number,
+  gameState: GameState
+): number {
+  // Desperation Penalty: trailing teams take more low-quality shots
+  // Discount their xG by 15% to reflect true system health
+  if (gameState === 'TRAILING') {
+    return xG * 0.85;
+  }
+  return xG;
+}
+
+// -----------------------------------------------------------------------------
 // Market Verdict (Rank-based for bell curve distribution)
 // Top 3 = PRIME BUY, Next 5 = STABLE, Bottom 5 = AVOID/CRITICAL
 // -----------------------------------------------------------------------------
@@ -266,18 +286,31 @@ function determineEfficiencyStatus(goalDelta: number): EfficiencyStatus {
 function deriveMarketVerdictByRank(
   rank: number,
   sustainabilityScore: number,
-  efficiencyStatus: EfficiencyStatus
+  efficiencyStatus: EfficiencyStatus,
+  defenseZScore: number, // Z-score: negative = below average defense
+  attackZScore: number   // Z-score: positive = above average attack
 ): MarketVerdict {
   const isHot = efficiencyStatus === 'CRITICAL_OVER' || efficiencyStatus === 'RUNNING_HOT';
+  const hasGoodDefense = defenseZScore >= 0; // At or above average
+  const hasHighAttack = attackZScore > 0.5;  // Above average attack
+  
+  // DEFENSE-GATE: High attack + poor defense = ENTERTAINERS (Glass Cannon)
+  // This prevents teams like Spurs from being labeled DOMINANT
+  if (hasHighAttack && !hasGoodDefense) {
+    return 'ENTERTAINERS';
+  }
   
   // Top 3 teams (score > 85 typically)
   if (rank <= 3) {
-    return isHot ? 'DOMINANT' : 'PRIME_BUY';
+    if (isHot && hasGoodDefense) return 'DOMINANT';
+    if (isHot) return 'ENTERTAINERS'; // Hot but leaky defense
+    return 'PRIME_BUY';
   }
   
   // Next 5 teams (ranks 4-8)
   if (rank <= 8) {
-    if (isHot) return 'DOMINANT';
+    if (isHot && hasGoodDefense) return 'DOMINANT';
+    if (isHot) return 'ENTERTAINERS'; // Hot but leaky defense
     if (sustainabilityScore >= 60) return 'STABLE';
     return 'STABLE';
   }
@@ -488,20 +521,46 @@ export function transformTeams(
     rankMap.set(t.team.id, index + 1);
   });
   
-  // STEP 3: Apply league position boost for top 4 teams
+  // STEP 3: Calculate Z-scores for Attack and Defense (for Defense-Gate logic)
+  const attackValues = rawTeamData.map(t => t.avgXGPer90);
+  const defenseValues = rawTeamData.map(t => t.avgXGCPer90);
+  
+  const attackMean = attackValues.reduce((a, b) => a + b, 0) / attackValues.length;
+  const defenseMean = defenseValues.reduce((a, b) => a + b, 0) / defenseValues.length;
+  
+  const attackStdDev = Math.sqrt(attackValues.reduce((sum, v) => sum + Math.pow(v - attackMean, 2), 0) / attackValues.length) || 1;
+  const defenseStdDev = Math.sqrt(defenseValues.reduce((sum, v) => sum + Math.pow(v - defenseMean, 2), 0) / defenseValues.length) || 1;
+  
+  // Z-score maps: Attack (higher is better), Defense (lower xGC is better, so we invert)
+  const zScoreMap = new Map<number, { attackZ: number; defenseZ: number }>();
+  for (const t of rawTeamData) {
+    const attackZ = (t.avgXGPer90 - attackMean) / attackStdDev;
+    // Invert defense Z-score: lower xGC = positive Z (good defense)
+    const defenseZ = (defenseMean - t.avgXGCPer90) / defenseStdDev;
+    zScoreMap.set(t.team.id, { attackZ, defenseZ });
+  }
+  
+  // STEP 4: Apply league position boost for top 4 teams
   const boostedScores = rawTeamData.map(t => ({
     id: t.team.id,
     rawScore: applyLeaguePositionBoost(t.rawScore, rankMap.get(t.team.id) || 20),
   }));
   
-  // STEP 4: Apply Min-Max Normalization (spread 0-99)
+  // STEP 5: Apply Min-Max Normalization (spread 0-99)
   const normalizedScoreMap = normalizeScores(boostedScores);
   
-  // STEP 5: Build final team objects with normalized scores and rank-based verdicts
+  // STEP 6: Build final team objects with normalized scores and rank-based verdicts
   const finalTeams = rawTeamData.map(t => {
     const rank = rankMap.get(t.team.id) || 20;
     const sustainabilityScore = normalizedScoreMap.get(t.team.id) || 50;
-    const marketVerdict = deriveMarketVerdictByRank(rank, sustainabilityScore, t.efficiencyStatus);
+    const zScores = zScoreMap.get(t.team.id) || { attackZ: 0, defenseZ: 0 };
+    const marketVerdict = deriveMarketVerdictByRank(
+      rank, 
+      sustainabilityScore, 
+      t.efficiencyStatus,
+      zScores.defenseZ,
+      zScores.attackZ
+    );
     
     return {
       id: t.team.id,
@@ -576,6 +635,9 @@ function generateInsightNote(team: TeamHealthHeat): string {
   
   if (team.marketVerdict === 'DOMINANT') {
     return `${team.name} are firing on all cylinders. Strong xG structure (${team.avgXGPer90.toFixed(2)} per 90) backs up their ${team.totalGoals} goals. Trust the process.`;
+  }
+  if (team.marketVerdict === 'ENTERTAINERS') {
+    return `${team.name} are Glass Cannons - high attack (${team.avgXGPer90.toFixed(2)} xG/90) but leaky defense (${team.avgXGCPer90.toFixed(2)} xGC/90). High risk, high reward. Goals both ends.`;
   }
   if (team.marketVerdict === 'PRIME_BUY') {
     return `${team.name} are underperforming their underlying numbers. With ${delta.toFixed(1)} goal luck deficit, regression to the mean should bring returns.`;

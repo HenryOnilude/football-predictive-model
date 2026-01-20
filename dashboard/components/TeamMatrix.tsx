@@ -83,7 +83,8 @@ function InsightModal({ team, onClose }: InsightModalProps) {
           {/* Insight Note */}
           <div className={`rounded-xl p-4 ${
             team.marketVerdict === 'PRIME_BUY' ? 'bg-purple-900/30 border border-purple-700' :
-            team.marketVerdict === 'OVERHEATED' ? 'bg-amber-900/30 border border-amber-700' :
+            team.marketVerdict === 'OVERHEATED' ? 'bg-orange-900/30 border border-orange-700' :
+            team.marketVerdict === 'ENTERTAINERS' ? 'bg-amber-900/30 border border-amber-700' :
             team.marketVerdict === 'CRITICAL' ? 'bg-red-900/30 border border-red-700' :
             team.marketVerdict === 'DOMINANT' ? 'bg-emerald-900/30 border border-emerald-700' :
             'bg-slate-800/50'
@@ -121,7 +122,7 @@ export default function TeamMatrix({ teams }: TeamMatrixProps) {
       case 'efficiency':
         return b.efficiencyDelta - a.efficiencyDelta;
       case 'verdict':
-        const verdictOrder = ['DOMINANT', 'PRIME_BUY', 'STABLE', 'FRAGILE', 'OVERHEATED', 'CRITICAL'];
+        const verdictOrder = ['DOMINANT', 'PRIME_BUY', 'ENTERTAINERS', 'STABLE', 'FRAGILE', 'OVERHEATED', 'CRITICAL'];
         return verdictOrder.indexOf(a.marketVerdict) - verdictOrder.indexOf(b.marketVerdict);
       default:
         return 0;

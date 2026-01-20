@@ -28,12 +28,13 @@ export type EfficiencyStatus =
 
 // Market Verdict Archetypes
 export type MarketVerdict = 
-  | 'DOMINANT'    // High Sust + Hot (Trust)
-  | 'OVERHEATED'  // Low Sust + Hot (Warning)
-  | 'PRIME_BUY'   // High Sust + Cold (Opportunity)
-  | 'CRITICAL'    // Low Sust + Cold (Relegation Form)
-  | 'STABLE'      // High Sust + Sustainable
-  | 'FRAGILE';    // Low Sust + Sustainable
+  | 'DOMINANT'      // High Sust + Hot + Good Defense (Trust - THE ELITE)
+  | 'ENTERTAINERS'  // High Attack + Poor Defense (Glass Cannon - Top-Left Quadrant)
+  | 'OVERHEATED'    // Low Sust + Hot (Warning)
+  | 'PRIME_BUY'     // High Sust + Cold (Opportunity)
+  | 'CRITICAL'      // Low Sust + Cold (Relegation Form)
+  | 'STABLE'        // High Sust + Sustainable
+  | 'FRAGILE';      // Low Sust + Sustainable
 
 // Finishing Badge (PSxG-based analysis)
 export type FinishingBadge = 
@@ -330,13 +331,15 @@ export function getVerdictConfig(verdict: MarketVerdict): {
 } {
   switch (verdict) {
     case 'DOMINANT':
-      return { label: 'DOMINANT', icon: '', color: 'text-emerald-400' };
+      return { label: 'DOMINANT', icon: '👑', color: 'text-emerald-400' };
+    case 'ENTERTAINERS':
+      return { label: 'ENTERTAINERS', icon: '🎭', color: 'text-amber-400' };
     case 'OVERHEATED':
-      return { label: 'OVERHEATED', icon: '', color: 'text-amber-400' };
+      return { label: 'OVERHEATED', icon: '🔥', color: 'text-orange-400' };
     case 'PRIME_BUY':
-      return { label: 'PRIME BUY', icon: '', color: 'text-purple-400' };
+      return { label: 'PRIME BUY', icon: '💎', color: 'text-purple-400' };
     case 'CRITICAL':
-      return { label: 'CRITICAL', icon: '', color: 'text-red-400' };
+      return { label: 'CRITICAL', icon: '⚠️', color: 'text-red-400' };
     case 'STABLE':
       return { label: 'STABLE', icon: '', color: 'text-slate-400' };
     case 'FRAGILE':
