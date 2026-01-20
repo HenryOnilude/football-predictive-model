@@ -44,7 +44,7 @@ export default function LuckCard({ player }: LuckCardProps) {
                 <div className="relative">
                   <div className="w-20 h-20 rounded-full bg-gradient-to-br from-slate-700 to-slate-800 overflow-hidden ring-2 ring-slate-700">
                     <PlayerImage
-                      playerId={player.id}
+                      playerId={player.code}
                       playerName={player.name}
                       teamName={player.team}
                       size="lg"

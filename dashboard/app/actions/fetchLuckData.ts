@@ -202,6 +202,7 @@ async function checkCachedData(gameweek: number): Promise<PlayerLuckData[] | nul
     // Transform Supabase records back to PlayerLuckData
     return data.map((record: SupabaseLuckRecord) => ({
       id: record.player_id,
+      code: record.player_id, // Use player_id as code for cached records
       name: record.player_name,
       team: record.team,
       teamShort: record.team_short,
@@ -284,6 +285,7 @@ async function fetchPlayersFromAPI(): Promise<PlayerLuckData[]> {
 
     return {
       id: p.player.id,
+      code: p.player.id, // Use player id as code for API-Football data
       name: playerName,
       team: teamName,
       teamShort: TEAM_SHORT_NAMES[teamName] || teamName.slice(0, 3).toUpperCase(),
@@ -342,6 +344,7 @@ async function fetchPlayersFromFPLAPI(): Promise<PlayerLuckData[]> {
     
     return {
       id: el.id,
+      code: el.code, // Persistent ID for images
       name: el.web_name,
       team: teamName,
       teamShort: team?.short_name || teamName.slice(0, 3).toUpperCase(),
@@ -386,6 +389,7 @@ function generateDemoData(): PlayerLuckData[] {
 
     return {
       id: p.id,
+      code: p.code, // Persistent ID for images
       name: p.name,
       team: p.team,
       teamShort: TEAM_SHORT_NAMES[p.team] || p.team.slice(0, 3).toUpperCase(),

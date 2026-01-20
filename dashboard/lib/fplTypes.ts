@@ -1,5 +1,6 @@
 export interface PlayerLuckData {
   id: number;
+  code: number; // Persistent player ID for images (never changes between seasons)
   name: string;
   team: string;
   teamShort: string;

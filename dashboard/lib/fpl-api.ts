@@ -33,6 +33,7 @@ export interface FPLTeam {
 
 export interface FPLPlayer {
   id: number;
+  code: number; // Persistent player ID (never changes between seasons)
   web_name: string;
   first_name: string;
   second_name: string;
@@ -122,6 +123,7 @@ export interface FPLPlayerSummary {
 // Our mapped types
 export interface MappedPlayer {
   id: number;
+  code: number; // Persistent ID for images (never changes)
   name: string;
   fullName: string;
   team: string;
@@ -303,6 +305,7 @@ export async function getFPLData(): Promise<FPLData> {
 
       return {
         id: player.id,
+        code: player.code, // Persistent player ID for image URLs
         name: player.web_name,
         fullName: `${player.first_name} ${player.second_name}`,
         team: teamNames[player.team] || 'Unknown',
