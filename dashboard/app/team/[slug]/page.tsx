@@ -4,8 +4,39 @@ import RiskBadge from '@/components/RiskBadge';
 import TeamChart from '@/components/TeamChart';
 import LuckWaterfallChart from '@/components/LuckWaterfallChart';
 import { getAllTeams } from '@/lib/fpl-api';
+import { Metadata } from 'next';
 
 export const revalidate = 300; // Revalidate every 5 minutes
+
+export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
+  const { slug } = await params;
+  const data = await getData();
+  const team = findTeamBySlug(data.teams, slug);
+  
+  if (!team) {
+    return {
+      title: 'Team Not Found | FPL Axiom',
+      description: 'The requested team could not be found.',
+    };
+  }
+  
+  const healthRating = team.Risk_Category;
+  
+  return {
+    title: `${team.Team}: ${healthRating} Risk | FPL Axiom`,
+    description: `Detailed analysis of ${team.Team}'s xG structure and FPL buy/sell signals. Risk Score: ${team.Risk_Score}/100.`,
+    openGraph: {
+      title: `${team.Team} Analysis | FPL Axiom`,
+      description: `${team.Team} has a ${healthRating} risk rating with ${team.Variance > 0 ? '+' : ''}${team.Variance} variance. Get detailed xG insights.`,
+      type: 'article',
+    },
+    twitter: {
+      card: 'summary',
+      title: `${team.Team}: ${healthRating} Risk | FPL Axiom`,
+      description: `Detailed xG analysis and FPL signals for ${team.Team}.`,
+    },
+  };
+}
 
 // Team name aliases (FPL API names -> common names people search for)
 const TEAM_ALIASES: Record<string, string[]> = {

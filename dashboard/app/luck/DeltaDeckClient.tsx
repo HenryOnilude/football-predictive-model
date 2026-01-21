@@ -103,11 +103,13 @@ export default function DeltaDeckClient({ players, gameweek, lastUpdated, cached
             </div>
             
             {/* Position Filter */}
-            <div className="flex items-center gap-1 bg-slate-900 rounded-lg p-1 border border-slate-800">
+            <div className="flex items-center gap-1 bg-slate-900 rounded-lg p-1 border border-slate-800" role="group" aria-label="Filter by position">
               {(['ALL', 'GK', 'DEF', 'MID', 'FWD'] as PositionFilter[]).map((pos) => (
                 <button
                   key={pos}
                   onClick={() => setPositionFilter(pos)}
+                  aria-label={`Filter by ${pos === 'ALL' ? 'all positions' : pos === 'GK' ? 'Goalkeepers' : pos === 'DEF' ? 'Defenders' : pos === 'MID' ? 'Midfielders' : 'Forwards'}`}
+                  aria-pressed={positionFilter === pos}
                   className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
                     positionFilter === pos
                       ? 'bg-emerald-500 text-white'

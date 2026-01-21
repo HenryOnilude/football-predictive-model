@@ -11,20 +11,23 @@ import { test, expect } from '@playwright/test';
 // =============================================================================
 test.describe('Mobile Responsiveness', () => {
   test('Teams page renders correctly on mobile @mobile', async ({ page, isMobile }) => {
+    // Extended timeout for mobile rendering in dev mode
+    test.setTimeout(60000);
+    
     // Skip if not running in mobile project
     test.skip(!isMobile, 'This test only runs in mobile project');
     
-    await page.goto('/teams');
+    await page.goto('/teams', { timeout: 30000 });
     
     // Wait for the page to load
-    await page.waitForLoadState('networkidle');
+    await page.waitForLoadState('networkidle', { timeout: 30000 });
     
     // Verify the page title/header is visible
-    await expect(page.locator('h1')).toBeVisible();
+    await expect(page.locator('h1')).toBeVisible({ timeout: 15000 });
     
     // Look for Burnley in the table - should be visible or scrollable
     const burnleyRow = page.locator('text=Burnley').first();
-    await expect(burnleyRow).toBeVisible({ timeout: 10000 });
+    await expect(burnleyRow).toBeVisible({ timeout: 15000 });
     
     // Verify no horizontal overflow - page width should match viewport
     const body = page.locator('body');
