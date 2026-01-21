@@ -331,15 +331,15 @@ export function getVerdictConfig(verdict: MarketVerdict): {
 } {
   switch (verdict) {
     case 'DOMINANT':
-      return { label: 'DOMINANT', icon: '👑', color: 'text-emerald-400' };
+      return { label: 'DOMINANT', icon: '', color: 'text-emerald-400' };
     case 'ENTERTAINERS':
-      return { label: 'ENTERTAINERS', icon: '🎭', color: 'text-amber-400' };
+      return { label: 'ENTERTAINERS', icon: '', color: 'text-amber-400' };
     case 'OVERHEATED':
-      return { label: 'OVERHEATED', icon: '🔥', color: 'text-orange-400' };
+      return { label: 'OVERHEATED', icon: '', color: 'text-orange-400' };
     case 'PRIME_BUY':
-      return { label: 'PRIME BUY', icon: '💎', color: 'text-purple-400' };
+      return { label: 'PRIME BUY', icon: '', color: 'text-purple-400' };
     case 'CRITICAL':
-      return { label: 'CRITICAL', icon: '⚠️', color: 'text-red-400' };
+      return { label: 'CRITICAL', icon: '', color: 'text-red-400' };
     case 'STABLE':
       return { label: 'STABLE', icon: '', color: 'text-slate-400' };
     case 'FRAGILE':
