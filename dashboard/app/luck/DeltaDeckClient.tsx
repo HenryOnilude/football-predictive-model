@@ -12,15 +12,7 @@ interface DeltaDeckClientProps {
   cached: boolean;
 }
 
-// Market Class helper
-function getMarketClass(price: number): 'Premium' | 'Mid-Range' | 'Budget' {
-  if (price >= 10) return 'Premium';
-  if (price >= 6) return 'Mid-Range';
-  return 'Budget';
-}
-
 type PositionFilter = 'ALL' | 'GK' | 'DEF' | 'MID' | 'FWD';
-type MarketClassFilter = 'ALL' | 'Premium' | 'Mid-Range' | 'Budget';
 
 const POSITION_MAP: Record<string, PositionFilter> = {
   'Goalkeeper': 'GK',
@@ -31,26 +23,17 @@ const POSITION_MAP: Record<string, PositionFilter> = {
 
 export default function DeltaDeckClient({ players, gameweek, lastUpdated, cached }: DeltaDeckClientProps) {
   const [positionFilter, setPositionFilter] = useState<PositionFilter>('ALL');
-  const [marketClassFilter, setMarketClassFilter] = useState<MarketClassFilter>('ALL');
 
-  // Filter players based on selected filters
+  // Filter players based on position
   const filteredPlayers = useMemo(() => {
     return players.filter(player => {
-      // Position filter
       if (positionFilter !== 'ALL') {
         const playerPos = POSITION_MAP[player.position] || 'FWD';
         if (playerPos !== positionFilter) return false;
       }
-      
-      // Market class filter
-      if (marketClassFilter !== 'ALL') {
-        const playerClass = getMarketClass(player.price);
-        if (playerClass !== marketClassFilter) return false;
-      }
-      
       return true;
     });
-  }, [players, positionFilter, marketClassFilter]);
+  }, [players, positionFilter]);
 
   // Group by signal type
   const alphaBuys = filteredPlayers.filter(p => p.luckScore < -3.0);
@@ -87,21 +70,21 @@ export default function DeltaDeckClient({ players, gameweek, lastUpdated, cached
           <div className="grid grid-cols-3 gap-4 max-w-xl mx-auto mt-8">
             <div className="text-center p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30">
               <div className="flex items-center justify-center gap-1.5 mb-1">
-                <span className="text-lg">📈</span>
+                <TrendingUp className="w-5 h-5 text-emerald-400" />
                 <span className="text-2xl font-bold text-emerald-400">{totalAlpha}</span>
               </div>
               <p className="text-xs text-slate-500 uppercase tracking-wider">Alpha Buys</p>
             </div>
             <div className="text-center p-4 rounded-xl bg-rose-500/10 border border-rose-500/30">
               <div className="flex items-center justify-center gap-1.5 mb-1">
-                <span className="text-lg">📉</span>
+                <TrendingDown className="w-5 h-5 text-rose-400" />
                 <span className="text-2xl font-bold text-rose-400">{totalRisk}</span>
               </div>
               <p className="text-xs text-slate-500 uppercase tracking-wider">Regression Risk</p>
             </div>
             <div className="text-center p-4 rounded-xl bg-slate-500/10 border border-slate-500/30">
               <div className="flex items-center justify-center gap-1.5 mb-1">
-                <span className="text-lg">⚖️</span>
+                <Scale className="w-5 h-5 text-slate-400" />
                 <span className="text-2xl font-bold text-slate-400">{totalFair}</span>
               </div>
               <p className="text-xs text-slate-500 uppercase tracking-wider">Fair Value</p>
@@ -136,23 +119,6 @@ export default function DeltaDeckClient({ players, gameweek, lastUpdated, cached
               ))}
             </div>
 
-            {/* Market Class Filter */}
-            <div className="flex items-center gap-1 bg-slate-900 rounded-lg p-1 border border-slate-800">
-              {(['ALL', 'Premium', 'Mid-Range', 'Budget'] as MarketClassFilter[]).map((cls) => (
-                <button
-                  key={cls}
-                  onClick={() => setMarketClassFilter(cls)}
-                  className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
-                    marketClassFilter === cls
-                      ? 'bg-emerald-500 text-white'
-                      : 'text-slate-400 hover:text-white hover:bg-slate-800'
-                  }`}
-                >
-                  {cls === 'Premium' ? '>£10m' : cls === 'Budget' ? '<£6m' : cls === 'Mid-Range' ? '£6-10m' : cls}
-                </button>
-              ))}
-            </div>
-
             {/* Results count */}
             <div className="ml-auto text-xs text-slate-500">
               Showing {filteredPlayers.length} of {players.length} assets
@@ -171,8 +137,8 @@ export default function DeltaDeckClient({ players, gameweek, lastUpdated, cached
                 <TrendingUp className="w-5 h-5 text-emerald-400" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
-                  <span>📈</span> Alpha Buys
+                <h2 className="text-2xl font-bold text-white tracking-tight">
+                  Alpha Buys
                 </h2>
                 <p className="text-sm text-slate-500">
                   Delta &lt; -3.0 — Buy low before regression upward
@@ -196,8 +162,8 @@ export default function DeltaDeckClient({ players, gameweek, lastUpdated, cached
                 <TrendingDown className="w-5 h-5 text-rose-400" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
-                  <span>📉</span> Regression Risk
+                <h2 className="text-2xl font-bold text-white tracking-tight">
+                  Regression Risk
                 </h2>
                 <p className="text-sm text-slate-500">
                   Delta &gt; +3.0 — Sell high before correction
@@ -221,8 +187,8 @@ export default function DeltaDeckClient({ players, gameweek, lastUpdated, cached
                 <Scale className="w-5 h-5 text-slate-400" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-white tracking-tight flex items-center gap-2">
-                  <span>⚖️</span> Fair Value
+                <h2 className="text-2xl font-bold text-white tracking-tight">
+                  Fair Value
                 </h2>
                 <p className="text-sm text-slate-500">
                   -3.0 ≤ Delta ≤ +3.0 — Performing as expected
@@ -243,10 +209,7 @@ export default function DeltaDeckClient({ players, gameweek, lastUpdated, cached
           <div className="text-center py-16">
             <p className="text-slate-400">No players match your current filters.</p>
             <button
-              onClick={() => {
-                setPositionFilter('ALL');
-                setMarketClassFilter('ALL');
-              }}
+              onClick={() => setPositionFilter('ALL')}
               className="mt-4 px-4 py-2 bg-emerald-500 text-white rounded-lg text-sm font-semibold hover:bg-emerald-600 transition-colors"
             >
               Reset Filters
@@ -260,7 +223,7 @@ export default function DeltaDeckClient({ players, gameweek, lastUpdated, cached
           <div className="grid md:grid-cols-3 gap-6 text-sm">
             <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30">
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-xl">📈</span>
+                <TrendingUp className="w-5 h-5 text-emerald-400" />
                 <h4 className="font-semibold text-emerald-400">Alpha Buy</h4>
               </div>
               <p className="text-slate-400">
@@ -270,7 +233,7 @@ export default function DeltaDeckClient({ players, gameweek, lastUpdated, cached
             </div>
             <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30">
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-xl">📉</span>
+                <TrendingDown className="w-5 h-5 text-rose-400" />
                 <h4 className="font-semibold text-rose-400">Regression Risk</h4>
               </div>
               <p className="text-slate-400">
@@ -280,7 +243,7 @@ export default function DeltaDeckClient({ players, gameweek, lastUpdated, cached
             </div>
             <div className="p-4 rounded-xl bg-slate-500/10 border border-slate-500/30">
               <div className="flex items-center gap-2 mb-2">
-                <span className="text-xl">⚖️</span>
+                <Scale className="w-5 h-5 text-slate-400" />
                 <h4 className="font-semibold text-slate-400">Fair Value</h4>
               </div>
               <p className="text-slate-400">
