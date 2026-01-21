@@ -103,7 +103,19 @@ async function debugTeamScores() {
   const targetTeams = ['Liverpool', 'Burnley', 'Arsenal', 'Man City', 'Chelsea', 'Newcastle'];
   
   // Build player data by team
-  const teamPlayers = new Map<number, any[]>();
+  interface PlayerData {
+    name: string;
+    teamId: number;
+    position: string;
+    goals: number;
+    xG: number;
+    xGC: number;
+    xGPer90: number;
+    xGCPer90: number;
+    minutes: number;
+    cleanSheets: number;
+  }
+  const teamPlayers = new Map<number, PlayerData[]>();
   
   for (const player of data.elements) {
     const position = POSITION_MAP[player.element_type] || 'UNK';
@@ -227,7 +239,9 @@ async function debugTeamScores() {
       ? defenders.reduce((sum, p) => sum + p.xGCPer90, 0) / defenders.length
       : 0;
     
-    const netXGPer90 = avgXGPer90 - avgXGCPer90;
+    // netXGPer90 kept for reference but not used in new calculation
+    const _netXGPer90 = avgXGPer90 - avgXGCPer90;
+    void _netXGPer90; // Suppress unused warning
     const baseScore = calculateRawSustainabilityScore(totalXG, totalXGC);
     const penaltyXGA = totalXGC; // FIXED: Use normalized value directly
     const { adjustedScore } = applyAbsoluteVolumePenalty(baseScore, totalXG, penaltyXGA);
