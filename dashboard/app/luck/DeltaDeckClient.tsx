@@ -295,12 +295,7 @@ export default function DeltaDeckClient({ players, gameweek, lastUpdated, cached
         <div className="mt-8 text-center">
           <p className="text-xs text-slate-600">
             {cached ? 'Cached data' : 'Fresh data'} • 
-            Last updated: {new Date(lastUpdated).toLocaleString('en-GB', {
-              day: 'numeric',
-              month: 'short',
-              hour: '2-digit',
-              minute: '2-digit',
-            })}
+            Last updated: {lastUpdated}
           </p>
         </div>
       </div>
