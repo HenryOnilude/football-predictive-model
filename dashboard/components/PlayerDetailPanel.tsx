@@ -7,20 +7,20 @@ import PlayerImage from './PlayerImage';
 interface PlayerDetailPanelProps {
   player: MappedPlayer | null;
   isOpen: boolean;
-  onClose: () => void;
+  onCloseAction: () => void;
 }
 
 function getSignalBadge(delta: number): { label: string; color: string; bgColor: string; icon: string } {
   if (delta < -2) {
-    return { label: 'Positive Alpha', color: 'text-emerald-400', bgColor: 'bg-emerald-500/20', icon: '+' };
+    return { label: 'Positive Alpha', color: 'text-emerald-400', bgColor: 'bg-emerald-500/20', icon: '📈' };
   }
   if (delta > 2) {
-    return { label: 'Regression Risk', color: 'text-rose-400', bgColor: 'bg-rose-500/20', icon: '-' };
+    return { label: 'Regression Risk', color: 'text-rose-400', bgColor: 'bg-rose-500/20', icon: '📉' };
   }
-  return { label: 'Fair Value', color: 'text-slate-400', bgColor: 'bg-slate-500/20', icon: '=' };
+  return { label: 'Fair Value', color: 'text-slate-400', bgColor: 'bg-slate-500/20', icon: '⚖️' };
 }
 
-export default function PlayerDetailPanel({ player, isOpen, onClose }: PlayerDetailPanelProps) {
+export default function PlayerDetailPanel({ player, isOpen, onCloseAction }: PlayerDetailPanelProps) {
   if (!player) return null;
 
   const signal = getSignalBadge(player.goalDelta);
@@ -33,7 +33,7 @@ export default function PlayerDetailPanel({ player, isOpen, onClose }: PlayerDet
         className={`fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity duration-300 ${
           isOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
         }`}
-        onClick={onClose}
+        onClick={onCloseAction}
       />
 
       {/* Panel */}
@@ -47,7 +47,7 @@ export default function PlayerDetailPanel({ player, isOpen, onClose }: PlayerDet
           <div className="flex items-center justify-between">
             <h2 className="text-lg font-bold text-white">Player Analysis</h2>
             <button 
-              onClick={onClose}
+              onClick={onCloseAction}
               className="p-2 rounded-lg hover:bg-slate-800 transition-colors"
             >
               <X className="w-5 h-5 text-slate-400" />

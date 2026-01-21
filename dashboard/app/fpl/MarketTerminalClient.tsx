@@ -377,7 +377,7 @@ export default function MarketTerminalClient({
       <PlayerDetailPanel
         player={selectedPlayer}
         isOpen={isPanelOpen}
-        onClose={handleClosePanel}
+        onCloseAction={handleClosePanel}
       />
     </div>
   );
