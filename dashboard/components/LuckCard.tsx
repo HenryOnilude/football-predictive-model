@@ -65,23 +65,17 @@ export default function LuckCard({ player }: LuckCardProps) {
                   <p className="text-sm text-slate-400 font-medium">
                     {player.teamShort}
                   </p>
-                  {/* Price & Fixtures Pills */}
-                  <div className="flex items-center gap-2 mt-2 flex-wrap">
-                    <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-400 text-xs font-bold rounded-full">
-                      £{player.price.toFixed(1)}m
-                    </span>
-                    {/* Next 3 Fixtures - FDR colored */}
-                    <div className="flex gap-1">
-                      {player.fixtures.slice(0, 3).map((fixture, idx) => (
-                        <span
-                          key={idx}
-                          className={`px-1.5 py-0.5 text-[10px] font-bold rounded ${FDR_COLORS[fixture.fdr].bg} ${FDR_COLORS[fixture.fdr].text}`}
-                          title={`${fixture.isHome ? 'H' : 'A'}: ${fixture.opponent}`}
-                        >
-                          {fixture.opponentShort}
-                        </span>
-                      ))}
-                    </div>
+                  {/* Next 3 Fixtures - FDR colored */}
+                  <div className="flex items-center gap-1 mt-2 flex-wrap">
+                    {player.fixtures.slice(0, 3).map((fixture, idx) => (
+                      <span
+                        key={idx}
+                        className={`px-1.5 py-0.5 text-[10px] font-bold rounded ${FDR_COLORS[fixture.fdr].bg} ${FDR_COLORS[fixture.fdr].text}`}
+                        title={`${fixture.isHome ? 'H' : 'A'}: ${fixture.opponent}`}
+                      >
+                        {fixture.opponentShort}
+                      </span>
+                    ))}
                   </div>
                 </div>
               </div>
