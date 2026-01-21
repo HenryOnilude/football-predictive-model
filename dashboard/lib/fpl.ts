@@ -216,6 +216,7 @@ function parseFloatSafe(value: string | number): number {
 
 // FORENSIC FIX: Apply penalties based on absolute xG/xGA totals
 // This prevents teams like Burnley (low volume) from gaming the per-90 ratio
+// Thresholds based on forensic audit data (league averages ~30 xG, ~27 xGA)
 function applyAbsoluteVolumePenalty(
   baseScore: number,
   totalXG: number,
@@ -224,32 +225,35 @@ function applyAbsoluteVolumePenalty(
   let penalty = 0;
   
   // FIX 1: Minimum xG threshold - teams creating few chances can't be "Elite"
-  // Burnley has 18.7 xG (lowest) - should be heavily penalized
+  // League average xG is ~30, Burnley has 18.7 (lowest)
   if (totalXG < 20) {
-    penalty += 40; // Severe penalty for bottom-tier attack
-  } else if (totalXG < 25) {
-    penalty += 25; // Significant penalty for weak attack
-  } else if (totalXG < 30) {
-    penalty += 10; // Moderate penalty for below-average attack
+    penalty += 30; // Severe penalty for bottom-tier attack (Burnley, Wolves)
+  } else if (totalXG < 22) {
+    penalty += 15; // Moderate penalty for very weak attack (Spurs 21.4)
   }
+  // Removed < 25 and < 30 thresholds - too aggressive for mid-table teams
   
   // FIX 2: Maximum xGA threshold - teams conceding lots can't be "Elite"
-  // Burnley has 45.4 xGA (worst) - should be heavily penalized
-  if (totalXGA > 40) {
-    penalty += 40; // Severe penalty for terrible defense
-  } else if (totalXGA > 35) {
-    penalty += 25; // Significant penalty for poor defense
-  } else if (totalXGA > 30) {
-    penalty += 15; // Moderate penalty for leaky defense
+  // League average xGA is ~27, Burnley has 45.4 (worst)
+  if (totalXGA > 42) {
+    penalty += 30; // Severe penalty for terrible defense (Burnley only)
+  } else if (totalXGA > 38) {
+    penalty += 15; // Moderate penalty for very poor defense
   }
+  // Removed > 30 and > 35 thresholds - too aggressive, was penalizing Man City (30.8)
   
   return Math.max(0, baseScore - penalty);
 }
 
-function calculateRawSustainabilityScore(netXGPer90: number): number {
-  // Scale: -1.5 (terrible) to +1.5 (elite) -> 0-100
+// FIXED: Use absolute xG difference instead of flawed per-90 averages
+// Per-90 metrics from FPL API are player-level, not team-level
+function calculateRawSustainabilityScore(totalXG: number, totalXGA: number): number {
+  // Net xG Difference: Man City +28, Arsenal +25, Burnley -27
+  const netXGDiff = totalXG - totalXGA;
+  
+  // Scale: -30 (terrible like Burnley) to +30 (elite like Man City) -> 0-100
   // Midpoint (0) = 50
-  const normalized = (netXGPer90 + 1.5) / 3.0; // Maps -1.5..+1.5 to 0..1
+  const normalized = (netXGDiff + 30) / 60; // Maps -30..+30 to 0..1
   const score = Math.round(normalized * 100);
   return Math.max(0, Math.min(100, score));
 }
@@ -454,7 +458,9 @@ export function transformPlayers(
         ? -xGCPer90 // Lower xGC is better for defenders
         : xGPer90 - xAPer90 * 0.5; // Weighted for attacking contribution
       
-      const sustainabilityScore = calculateRawSustainabilityScore(netXGPer90);
+      // Player-level sustainability: use per-90 metrics (different from team-level)
+      const playerNormalized = (netXGPer90 + 0.5) / 1.0; // Scale -0.5..+0.5 to 0..1
+      const sustainabilityScore = Math.max(0, Math.min(100, Math.round(playerNormalized * 100)));
       const efficiencyStatus = determineEfficiencyStatus(goalDelta);
       // Simple verdict for players (not rank-based)
       const marketVerdict = derivePlayerVerdict(sustainabilityScore, efficiencyStatus);
@@ -541,14 +547,13 @@ export function transformTeams(
       : 0;
     
     const goalDelta = totalGoals - totalXG;
-    const netXGPer90 = avgXGPer90 - avgXGCPer90;
     
-    // Calculate base score from per-90 metrics
-    const baseScore = calculateRawSustainabilityScore(netXGPer90);
+    // FIXED: Calculate base score using absolute xG totals (not flawed per-90 averages)
+    // totalXGC is already normalized (/11), so it represents team-level xGA
+    const baseScore = calculateRawSustainabilityScore(totalXG, totalXGC);
     
-    // FORENSIC FIX: Apply absolute volume penalties
-    // This prevents low-volume teams (Burnley) from gaming per-90 ratios
-    const rawScore = applyAbsoluteVolumePenalty(baseScore, totalXG, totalXGC * 11);
+    // FORENSIC FIX: Apply absolute volume penalties for extreme cases
+    const rawScore = applyAbsoluteVolumePenalty(baseScore, totalXG, totalXGC);
     
     const efficiencyStatus = determineEfficiencyStatus(goalDelta);
     
@@ -556,6 +561,9 @@ export function transformTeams(
     const gk = teamPlayersList.find(p => p.position === 'GK' && p.minutes > 450);
     const matches = gk ? Math.floor(gk.minutes / 90) : 10;
     const cleanSheetLuck = calculateCleanSheetLuck(cleanSheets, totalXGC * matches, matches);
+    
+    // Calculate netXGPer90 for backward compatibility (used in return object)
+    const netXGPer90 = avgXGPer90 - avgXGCPer90;
     
     return {
       team,
