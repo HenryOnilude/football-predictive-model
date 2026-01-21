@@ -44,7 +44,7 @@ export default function RootLayout({
                   href="/" 
                   className="text-sm font-medium text-slate-400 hover:text-white transition-colors"
                 >
-                  Home
+                  Dashboard
                 </Link>
                 <Link 
                   href="/fpl" 
@@ -56,7 +56,7 @@ export default function RootLayout({
                   href="/luck" 
                   className="text-sm font-medium text-slate-400 hover:text-amber-400 transition-colors"
                 >
-                  Delta Deck
+                  Alpha
                 </Link>
                 <Link 
                   href="/teams" 
