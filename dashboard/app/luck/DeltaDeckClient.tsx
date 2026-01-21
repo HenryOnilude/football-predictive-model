@@ -12,32 +12,6 @@ interface DeltaDeckClientProps {
   cached: boolean;
 }
 
-// Smart Signal Algorithm
-function getSignal(delta: number): { label: string; color: string; icon: string; bgColor: string } {
-  if (delta > 3.0) {
-    return { 
-      label: 'Regression Risk', 
-      color: 'text-rose-400', 
-      icon: 'DOWN',
-      bgColor: 'bg-rose-500/10 border-rose-500/30'
-    };
-  }
-  if (delta < -3.0) {
-    return { 
-      label: 'Alpha Buy', 
-      color: 'text-emerald-400', 
-      icon: 'UP',
-      bgColor: 'bg-emerald-500/10 border-emerald-500/30'
-    };
-  }
-  return { 
-    label: 'Fair Value', 
-    color: 'text-slate-400', 
-    icon: 'FAIR',
-    bgColor: 'bg-slate-500/10 border-slate-500/30'
-  };
-}
-
 // Market Class helper
 function getMarketClass(price: number): 'Premium' | 'Mid-Range' | 'Budget' {
   if (price >= 10) return 'Premium';

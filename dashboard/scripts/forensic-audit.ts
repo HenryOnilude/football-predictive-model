@@ -62,9 +62,7 @@ async function fetchRawData() {
     const goalkeepers = teamPlayers.filter(p => p.element_type === 1);
     const rawGoalsAgainst = Math.max(...goalkeepers.map(p => p.goals_conceded), 0);
     
-    // xGA: Sum from GKs (they have xGC data)  
-    const rawXGA = goalkeepers.reduce((sum, p) => sum + parseFloat(p.expected_goals_conceded || '0'), 0);
-    // Take max GK's xGC as team xGA (main keeper)
+    // xGA: Take max GK's xGC as team xGA (main keeper)
     const maxXGA = Math.max(...goalkeepers.map(p => parseFloat(p.expected_goals_conceded || '0')), 0);
     
     // Total FPL points (proxy for team quality)
