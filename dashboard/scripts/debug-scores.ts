@@ -1,3 +1,5 @@
+export {};
+
 /**
  * Debug Script: Trace System Health calculation for Liverpool and Burnley
  * Run with: npx tsx scripts/debug-scores.ts

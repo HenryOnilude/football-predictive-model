@@ -1,3 +1,5 @@
+export {};
+
 /**
  * FORENSIC DATA AUDIT SCRIPT
  * Fetches raw, unprocessed API data to verify data integrity
