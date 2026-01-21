@@ -20,11 +20,11 @@ export interface TeamStats {
 
 // 5-Tier Efficiency Status
 export type EfficiencyStatus = 
-  | 'CRITICAL_OVER'   // Diff > +6.0 (🔴 Red)
-  | 'RUNNING_HOT'     // Diff +2.0 to +6.0 (🟠 Orange)
-  | 'SUSTAINABLE'     // Diff -2.0 to +2.0 (⚪ Gray)
-  | 'COLD'            // Diff -6.0 to -2.0 (🔵 Blue)
-  | 'CRITICAL_VALUE'; // Diff < -6.0 (🟣 Purple)
+  | 'CRITICAL_OVER'   // Diff > +6.0 (Red)
+  | 'RUNNING_HOT'     // Diff +2.0 to +6.0 (Orange)
+  | 'SUSTAINABLE'     // Diff -2.0 to +2.0 (Gray)
+  | 'COLD'            // Diff -6.0 to -2.0 (Blue)
+  | 'CRITICAL_VALUE'; // Diff < -6.0 (Purple)
 
 // Market Verdict Archetypes
 export type MarketVerdict = 

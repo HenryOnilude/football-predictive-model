@@ -25,7 +25,7 @@ interface FPLTeam {
 }
 
 async function fetchRawData() {
-  console.log('\n🔍 FORENSIC DATA AUDIT - Premier League Dataset\n');
+  console.log('\nFORENSIC DATA AUDIT - Premier League Dataset\n');
   console.log('='.repeat(80));
   
   // Fetch FPL API data (xG metrics)
@@ -87,7 +87,7 @@ async function fetchRawData() {
   const sortedByGoals = [...teamStats].sort((a, b) => b.rawGoals - a.rawGoals);
   
   // Build the truth table
-  console.log('\n## 📊 THE TRUTH TABLE (Raw FPL API Data - Sorted by Goals Scored)\n');
+  console.log('\n## THE TRUTH TABLE (Raw FPL API Data - Sorted by Goals Scored)\n');
   console.log('| # | Team         | GF  | xG    | GF-xG  | GA  | xGA   | GA-xGA | FPL Pts |');
   console.log('|---|--------------|-----|-------|--------|-----|-------|--------|---------|');
   
@@ -100,7 +100,7 @@ async function fetchRawData() {
   });
   
   // Evidence Analysis
-  console.log('\n\n## 🔬 EVIDENCE ANALYSIS\n');
+  console.log('\n\n## EVIDENCE ANALYSIS\n');
   
   // Find specific teams
   const burnley = teamStats.find(t => t.name.toLowerCase().includes('burnley'));
@@ -120,9 +120,9 @@ async function fetchRawData() {
     console.log(`- Raw xGA: ${burnley.rawXGA}`);
     
     if (burnley.rawXG > 35) {
-      console.log('\n❌ VERDICT: DATA BUG - API is sending unrealistic xG data for Burnley');
+      console.log('\n[X] VERDICT: DATA BUG - API is sending unrealistic xG data for Burnley');
     } else if (burnley.rawXG < 25) {
-      console.log('\n✅ VERDICT: LOGIC BUG CONFIRMED');
+      console.log('\n[OK] VERDICT: LOGIC BUG CONFIRMED');
       console.log('   → Burnley has LOW xG (expected for relegation team)');
       console.log('   → But our System Health algorithm is giving them high scores');
       console.log('   → ROOT CAUSE: Net xG calculation not weighted by actual output');
@@ -142,12 +142,12 @@ async function fetchRawData() {
     console.log(`- GA - xGA: ${(spurs.rawGoalsAgainst - spurs.rawXGA).toFixed(1)}`);
     
     if (spurs.rawXGA > 28 || spurs.rawGoalsAgainst > 30) {
-      console.log('\n❌ VERDICT: LOGIC BUG CONFIRMED');
+      console.log('\n[X] VERDICT: LOGIC BUG CONFIRMED');
       console.log('   → Spurs defense is statistically POOR (high xGA/GA)');
       console.log('   → But labeled "DOMINANT" because high attack masks bad defense');
       console.log('   → ROOT CAUSE: Missing "Defense Gate" in verdict logic');
     } else {
-      console.log('\n⚠️ VERDICT: Possible DATA BUG');
+      console.log('\n[!] VERDICT: Possible DATA BUG');
       console.log('   → API says defense is elite, which may contradict match results');
     }
   } else {
@@ -167,19 +167,19 @@ async function fetchRawData() {
     // Compare to top teams
     const avgTopXG = manCity && liverpool ? (manCity.rawXG + liverpool.rawXG) / 2 : 50;
     if (arsenal.rawXG < avgTopXG * 0.8) {
-      console.log('\n⚠️ VERDICT: POSSIBLE LOGIC ISSUE');
+      console.log('\n[!] VERDICT: POSSIBLE LOGIC ISSUE');
       console.log('   → Arsenal is a "Control" team (efficiency > volume)');
       console.log('   → Lower xG than expected for top team');
       console.log('   → Algorithm may be under-rating them vs volume teams');
     } else {
-      console.log('\n✅ Arsenal data appears consistent with top-team metrics');
+      console.log('\n[OK] Arsenal data appears consistent with top-team metrics');
     }
   } else {
     console.log('Arsenal not found in dataset');
   }
   
   // Summary comparison
-  console.log('\n\n### 📈 TOP 5 vs BOTTOM 5 COMPARISON\n');
+  console.log('\n\n### TOP 5 vs BOTTOM 5 COMPARISON\n');
   const top5 = sortedByGoals.slice(0, 5);
   const bottom5 = sortedByGoals.slice(-5);
   
@@ -197,18 +197,18 @@ async function fetchRawData() {
   const sortedByXG = [...teamStats].sort((a, b) => b.rawXG - a.rawXG);
   const burnleyXGRank = sortedByXG.findIndex(t => t.name.includes('Burnley')) + 1;
   
-  console.log('\n\n### 🎯 FINAL DIAGNOSIS\n');
+  console.log('\n\n### FINAL DIAGNOSIS\n');
   console.log(`Burnley xG Rank: ${burnleyXGRank}/20`);
   
   if (burnleyXGRank <= 10) {
-    console.log('\n🔴 DATA ANOMALY DETECTED:');
+    console.log('\n[ALERT] DATA ANOMALY DETECTED:');
     console.log('   Burnley has top-half xG despite being a relegation team.');
     console.log('   This could indicate:');
     console.log('   1. FPL API aggregates xG differently than expected');
     console.log('   2. Burnley genuinely creates chances but fails to convert');
     console.log('   3. Our algorithm correctly reflects xG but xG != quality');
   } else {
-    console.log('\n🟢 DATA APPEARS VALID:');
+    console.log('\n[OK] DATA APPEARS VALID:');
     console.log('   Burnley has low xG as expected for a relegation team.');
     console.log('   The bug is in our ALGORITHM, not the data.');
   }

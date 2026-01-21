@@ -12,12 +12,12 @@ interface PlayerDetailPanelProps {
 
 function getSignalBadge(delta: number): { label: string; color: string; bgColor: string; icon: string } {
   if (delta < -2) {
-    return { label: 'Positive Alpha', color: 'text-emerald-400', bgColor: 'bg-emerald-500/20', icon: '📈' };
+    return { label: 'Positive Alpha', color: 'text-emerald-400', bgColor: 'bg-emerald-500/20', icon: '+' };
   }
   if (delta > 2) {
-    return { label: 'Regression Risk', color: 'text-rose-400', bgColor: 'bg-rose-500/20', icon: '📉' };
+    return { label: 'Regression Risk', color: 'text-rose-400', bgColor: 'bg-rose-500/20', icon: '-' };
   }
-  return { label: 'Fair Value', color: 'text-slate-400', bgColor: 'bg-slate-500/20', icon: '⚖️' };
+  return { label: 'Fair Value', color: 'text-slate-400', bgColor: 'bg-slate-500/20', icon: '=' };
 }
 
 export default function PlayerDetailPanel({ player, isOpen, onClose }: PlayerDetailPanelProps) {

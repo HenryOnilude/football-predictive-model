@@ -18,7 +18,7 @@ function getSignal(delta: number): { label: string; color: string; icon: string;
     return { 
       label: 'Regression Risk', 
       color: 'text-rose-400', 
-      icon: '📉',
+      icon: 'DOWN',
       bgColor: 'bg-rose-500/10 border-rose-500/30'
     };
   }
@@ -26,14 +26,14 @@ function getSignal(delta: number): { label: string; color: string; icon: string;
     return { 
       label: 'Alpha Buy', 
       color: 'text-emerald-400', 
-      icon: '📈',
+      icon: 'UP',
       bgColor: 'bg-emerald-500/10 border-emerald-500/30'
     };
   }
   return { 
     label: 'Fair Value', 
     color: 'text-slate-400', 
-    icon: '⚖️',
+    icon: 'FAIR',
     bgColor: 'bg-slate-500/10 border-slate-500/30'
   };
 }

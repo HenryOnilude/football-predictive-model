@@ -94,7 +94,7 @@ function calculateRawSustainabilityScore(totalXG: number, totalXGA: number): num
 }
 
 async function debugTeamScores() {
-  console.log('🔍 DEBUG: Tracing System Health Calculation\n');
+  console.log('DEBUG: Tracing System Health Calculation\n');
   console.log('='.repeat(60));
   
   const data = await fetchFPLData();
@@ -141,12 +141,12 @@ async function debugTeamScores() {
   for (const teamName of targetTeams) {
     const team = data.teams.find(t => t.name === teamName);
     if (!team) {
-      console.log(`\n❌ Team not found: ${teamName}`);
+      console.log(`\n[ERROR] Team not found: ${teamName}`);
       continue;
     }
     
     console.log(`\n${'='.repeat(60)}`);
-    console.log(`📊 ${team.name.toUpperCase()}`);
+    console.log(`[TEAM] ${team.name.toUpperCase()}`);
     console.log('='.repeat(60));
     
     const players = teamPlayers.get(team.id) || [];
@@ -157,7 +157,7 @@ async function debugTeamScores() {
     const totalXGC = players.reduce((sum, p) => sum + p.xGC, 0) / 11; // Normalized
     const totalXGCRaw = players.reduce((sum, p) => sum + p.xGC, 0); // Raw for penalty calc
     
-    console.log('\n📈 STEP 1: Raw Aggregated Stats');
+    console.log('\nSTEP 1: Raw Aggregated Stats');
     console.log(`   Total Goals: ${totalGoals}`);
     console.log(`   Total xG: ${totalXG.toFixed(2)}`);
     console.log(`   Total xGC (raw): ${totalXGCRaw.toFixed(2)}`);
@@ -173,7 +173,7 @@ async function debugTeamScores() {
       ? defenders.reduce((sum, p) => sum + p.xGCPer90, 0) / defenders.length
       : 0;
     
-    console.log('\n📈 STEP 2: Per-90 Metrics');
+    console.log('\nSTEP 2: Per-90 Metrics');
     console.log(`   Starters (>450 min): ${starters.length}`);
     console.log(`   Defenders/GKs: ${defenders.length}`);
     console.log(`   Avg xG/90: ${avgXGPer90.toFixed(4)}`);
@@ -182,13 +182,13 @@ async function debugTeamScores() {
     // Step 3: Calculate net xG per 90
     const netXGPer90 = avgXGPer90 - avgXGCPer90;
     
-    console.log('\n📈 STEP 3: Net xG Per 90');
+    console.log('\nSTEP 3: Net xG Per 90');
     console.log(`   Net xG/90 = ${avgXGPer90.toFixed(4)} - ${avgXGCPer90.toFixed(4)} = ${netXGPer90.toFixed(4)}`);
     
     // Step 4: Calculate base sustainability score (using absolute totals)
     const baseScore = calculateRawSustainabilityScore(totalXG, totalXGC);
     
-    console.log('\n📈 STEP 4: Base Sustainability Score');
+    console.log('\nSTEP 4: Base Sustainability Score');
     console.log(`   Formula: (netXGPer90 + 1.5) / 3.0 * 100`);
     console.log(`   = (${netXGPer90.toFixed(4)} + 1.5) / 3.0 * 100`);
     console.log(`   = ${((netXGPer90 + 1.5) / 3.0 * 100).toFixed(2)}`);
@@ -198,7 +198,7 @@ async function debugTeamScores() {
     const penaltyXGA = totalXGC; // FIXED: Use normalized value directly
     const { adjustedScore, penalties } = applyAbsoluteVolumePenalty(baseScore, totalXG, penaltyXGA);
     
-    console.log('\n📈 STEP 5: Apply Absolute Volume Penalty');
+    console.log('\nSTEP 5: Apply Absolute Volume Penalty');
     console.log(`   Input to penalty function:`);
     console.log(`     - baseScore: ${baseScore}`);
     console.log(`     - totalXG: ${totalXG.toFixed(2)}`);
@@ -210,7 +210,7 @@ async function debugTeamScores() {
     console.log(`   Final Score: ${adjustedScore}`);
     
     // Step 6: Check for NaN/Infinity
-    console.log('\n🔍 STEP 6: NaN/Infinity Check');
+    console.log('\nSTEP 6: NaN/Infinity Check');
     console.log(`   avgXGPer90 isNaN: ${isNaN(avgXGPer90)}`);
     console.log(`   avgXGCPer90 isNaN: ${isNaN(avgXGCPer90)}`);
     console.log(`   netXGPer90 isNaN: ${isNaN(netXGPer90)}`);
@@ -220,7 +220,7 @@ async function debugTeamScores() {
   
   // Show ALL teams sorted by raw score
   console.log('\n\n' + '='.repeat(60));
-  console.log('📊 ALL TEAMS SUMMARY (Sorted by Final Score)');
+  console.log('ALL TEAMS SUMMARY (Sorted by Final Score)');
   console.log('='.repeat(60));
   
   const allTeamScores: { name: string; baseScore: number; finalScore: number; totalXG: number; totalXGA: number }[] = [];
