@@ -24,12 +24,20 @@ interface FPLTeam {
   strength: number;
 }
 
+const FPL_HEADERS = {
+  'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36',
+  'Accept': 'application/json',
+  'Referer': 'https://fantasy.premierleague.com/',
+};
+
 async function fetchRawData() {
   console.log('\nFORENSIC DATA AUDIT - Premier League Dataset\n');
   console.log('='.repeat(80));
   
   // Fetch FPL API data (xG metrics)
-  const fplRes = await fetch('https://fantasy.premierleague.com/api/bootstrap-static/');
+  const fplRes = await fetch('https://fantasy.premierleague.com/api/bootstrap-static/', {
+    headers: FPL_HEADERS,
+  });
   const fplData = await fplRes.json();
   
   const teams: FPLTeam[] = fplData.teams;

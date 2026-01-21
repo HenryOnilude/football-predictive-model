@@ -4,6 +4,7 @@
 // ============================================================================
 
 import type { TeamAnalysis } from './TeamAnalysis';
+import { fetchBootstrapStatic } from './fpl-fetch';
 
 // -----------------------------------------------------------------------------
 // Raw FPL API Types
@@ -167,21 +168,7 @@ export async function fetchFPLData(): Promise<FPLBootstrapResponse> {
 
 // Server-side direct fetch (bypasses proxy for server components)
 export async function fetchFPLDataServer(): Promise<FPLBootstrapResponse> {
-  const response = await fetch(
-    'https://fantasy.premierleague.com/api/bootstrap-static/',
-    {
-      next: { revalidate: 300 },
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (compatible; FPL-Dashboard/1.0)',
-      },
-    }
-  );
-  
-  if (!response.ok) {
-    throw new Error(`FPL API error: ${response.status}`);
-  }
-  
-  return response.json();
+  return fetchBootstrapStatic<FPLBootstrapResponse>(300);
 }
 
 // -----------------------------------------------------------------------------

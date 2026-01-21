@@ -1,5 +1,7 @@
 'use server';
 
+import { fetchBootstrapStatic, fetchElementSummary } from './fpl-fetch';
+
 // FPL API Types
 export interface FPLBootstrapResponse {
   events: FPLEvent[];
@@ -178,30 +180,14 @@ const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
  * Fetch bootstrap data from FPL API
  */
 async function fetchBootstrap(): Promise<FPLBootstrapResponse> {
-  const response = await fetch('https://fantasy.premierleague.com/api/bootstrap-static/', {
-    next: { revalidate: 300 }, // Revalidate every 5 minutes
-  });
-
-  if (!response.ok) {
-    throw new Error(`FPL API error: ${response.status}`);
-  }
-
-  return response.json();
+  return fetchBootstrapStatic<FPLBootstrapResponse>(300);
 }
 
 /**
  * Fetch detailed player history
  */
 export async function fetchPlayerSummary(playerId: number): Promise<FPLPlayerSummary> {
-  const response = await fetch(`https://fantasy.premierleague.com/api/element-summary/${playerId}/`, {
-    next: { revalidate: 300 },
-  });
-
-  if (!response.ok) {
-    throw new Error(`FPL API error: ${response.status}`);
-  }
-
-  return response.json();
+  return fetchElementSummary<FPLPlayerSummary>(playerId, 300);
 }
 
 /**
