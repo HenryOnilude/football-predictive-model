@@ -7,7 +7,7 @@
 const FPL_BASE_URL = 'https://fantasy.premierleague.com/api';
 
 // 2025-26 Season identifier for cache validation
-const CURRENT_SEASON = '2025-26';
+export const CURRENT_SEASON = '2025-26';
 
 // Browser-like headers to prevent 403 blocks
 const FPL_HEADERS = {

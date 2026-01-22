@@ -138,7 +138,7 @@ export function NumericValue({
   return <span className={className}>{value}</span>;
 }
 
-export default {
+const SkeletonComponents = {
   Skeleton,
   CardSkeleton,
   TableRowSkeleton,
@@ -147,3 +147,5 @@ export default {
   EmptyState,
   NumericValue,
 };
+
+export default SkeletonComponents;
