@@ -4,6 +4,9 @@ import { useEffect, useState } from 'react';
 import TeamMatrix from '@/components/TeamMatrix';
 import MagicQuadrant from '@/components/MagicQuadrant';
 import { TeamAnalysis } from '@/lib/TeamAnalysis';
+import { InfoTooltip, AXIOM_TOOLTIPS } from '@/components/InfoTooltip';
+import { ArchetypeLegend } from '@/components/ArchetypeLegend';
+import { LoadingState } from '@/components/SkeletonLoader';
 import { 
   fetchFPLData, 
   transformTeams, 
@@ -50,10 +53,7 @@ export default function MatrixPage() {
     return (
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
         <div className="flex items-center justify-center min-h-[400px]">
-          <div className="text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-emerald-500 mx-auto mb-4" />
-            <p className="text-slate-400">Loading FPL data...</p>
-          </div>
+          <LoadingState message="Scanning Premier League Alpha Signals..." />
         </div>
       </div>
     );
@@ -95,7 +95,10 @@ export default function MatrixPage() {
       {/* Legend Cards */}
       <div className="grid md:grid-cols-2 gap-4 mb-8">
         <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4">
-          <h3 className="text-sm font-semibold text-white mb-2">Structure (Health)</h3>
+          <div className="flex items-center gap-1 mb-2">
+            <h3 className="text-sm font-semibold text-white">Structure (Health)</h3>
+            <InfoTooltip {...AXIOM_TOOLTIPS.systemHealth} />
+          </div>
           <p className="text-xs text-slate-400 mb-3">
             <strong className="text-slate-300">What it measures:</strong> How good is this team at creating chances AND preventing them? 
             We calculate xG created minus xG conceded per game. Higher score = better overall quality.
@@ -120,7 +123,10 @@ export default function MatrixPage() {
         </div>
 
         <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4">
-          <h3 className="text-sm font-semibold text-white mb-2">Form (Heat)</h3>
+          <div className="flex items-center gap-1 mb-2">
+            <h3 className="text-sm font-semibold text-white">Form (Heat)</h3>
+            <InfoTooltip {...AXIOM_TOOLTIPS.finishingHeat} />
+          </div>
           <p className="text-xs text-slate-400 mb-3">
             <strong className="text-slate-300">What it measures:</strong> Are they scoring more or less than expected? 
             We subtract xG from actual goals. Positive = overperforming, Negative = underperforming.
@@ -155,7 +161,13 @@ export default function MatrixPage() {
 
       {/* Verdict Summary */}
       <div className="bg-slate-900/50 border border-slate-800 rounded-xl p-4 mb-8">
-        <h3 className="text-sm font-semibold text-white mb-4">Market Archetypes</h3>
+        <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center gap-1">
+            <h3 className="text-sm font-semibold text-white">Market Archetypes</h3>
+            <InfoTooltip {...AXIOM_TOOLTIPS.archetypes} />
+          </div>
+          <ArchetypeLegend />
+        </div>
         <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
           <div className="text-center p-3 rounded-lg bg-emerald-900/20 border border-emerald-800">
             <div className="text-xl font-bold text-emerald-400">{verdictCounts.DOMINANT}</div>

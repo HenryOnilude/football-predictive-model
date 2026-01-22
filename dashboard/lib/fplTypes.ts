@@ -80,7 +80,8 @@ export interface SupabaseLuckRecord {
   created_at?: string;
 }
 
-// FPL Team mappings for short names
+// FPL Team mappings for short names (2025-26 Season)
+// Includes promoted teams: Leeds, Burnley, Sunderland
 export const TEAM_SHORT_NAMES: Record<string, string> = {
   'Arsenal': 'ARS',
   'Aston Villa': 'AVL',
@@ -88,14 +89,13 @@ export const TEAM_SHORT_NAMES: Record<string, string> = {
   'Brentford': 'BRE',
   'Brighton': 'BHA',
   'Brighton & Hove Albion': 'BHA',
+  'Burnley': 'BUR',
   'Chelsea': 'CHE',
   'Crystal Palace': 'CRY',
   'Everton': 'EVE',
   'Fulham': 'FUL',
-  'Ipswich': 'IPS',
-  'Ipswich Town': 'IPS',
-  'Leicester': 'LEI',
-  'Leicester City': 'LEI',
+  'Leeds': 'LEE',
+  'Leeds United': 'LEE',
   'Liverpool': 'LIV',
   'Manchester City': 'MCI',
   'Manchester United': 'MUN',
@@ -103,7 +103,8 @@ export const TEAM_SHORT_NAMES: Record<string, string> = {
   'Newcastle United': 'NEW',
   'Nottingham Forest': 'NFO',
   "Nott'ham Forest": 'NFO',
-  'Southampton': 'SOU',
+  'Sunderland': 'SUN',
+  'Sunderland AFC': 'SUN',
   'Tottenham': 'TOT',
   'Tottenham Hotspur': 'TOT',
   'West Ham': 'WHU',
@@ -166,7 +167,9 @@ export interface TeamLuckResponse {
   cached: boolean;
 }
 
-// Premier League Team IDs (API-Football)
+// Premier League Team IDs (API-Football) - 2025-26 Season
+// Updated with promoted teams: Leeds (63), Burnley (44), Sunderland (71)
+// Removed relegated: Leicester, Ipswich, Southampton
 export const PL_TEAM_IDS: Record<number, string> = {
   33: 'Manchester United',
   34: 'Newcastle United',
@@ -175,8 +178,8 @@ export const PL_TEAM_IDS: Record<number, string> = {
   39: 'Wolverhampton Wanderers',
   40: 'Liverpool',
   42: 'Arsenal',
+  44: 'Burnley',
   45: 'Everton',
-  46: 'Leicester City',
   47: 'Tottenham Hotspur',
   48: 'West Ham United',
   49: 'Chelsea',
@@ -184,8 +187,8 @@ export const PL_TEAM_IDS: Record<number, string> = {
   51: 'Brighton & Hove Albion',
   52: 'Crystal Palace',
   55: 'Brentford',
-  57: 'Ipswich Town',
   62: 'Aston Villa',
-  63: 'Southampton',
+  63: 'Leeds United',
   65: 'Nottingham Forest',
+  71: 'Sunderland',
 };
