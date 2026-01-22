@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import MobileNav from "@/components/MobileNav";
 import "./globals.css";
 
 const inter = Inter({ 
@@ -39,7 +40,13 @@ export default function RootLayout({
                   </p>
                 </div>
               </Link>
-              <div className="flex items-center gap-4">
+              {/* Year Badge - Always visible */}
+              <div className="px-3 py-1.5 rounded-full bg-slate-800/80 border border-slate-700">
+                <span className="text-xs font-semibold text-emerald-400">2025-26</span>
+              </div>
+              
+              {/* Desktop Navigation - Hidden on mobile */}
+              <div className="hidden md:flex items-center gap-4">
                 <Link 
                   href="/" 
                   className="text-sm font-medium text-slate-400 hover:text-white transition-colors"
@@ -70,15 +77,13 @@ export default function RootLayout({
                 >
                   Matrix
                 </Link>
-                <div className="px-3 py-1.5 rounded-full bg-slate-800/80 border border-slate-700">
-                  <span className="text-xs font-semibold text-emerald-400">2025-26</span>
-                </div>
               </div>
             </div>
           </div>
         </nav>
-        <main className="min-h-screen bg-slate-950">{children}</main>
-        <footer className="bg-slate-950 border-t border-slate-800/60 mt-16">
+        <main className="min-h-screen bg-slate-950 pb-20 md:pb-0">{children}</main>
+        <MobileNav />
+        <footer className="bg-slate-950 border-t border-slate-800/60 mt-16 mb-16 md:mb-0">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
             <div className="text-center space-y-3">
               <div className="flex items-center justify-center gap-2 text-sm text-slate-500">

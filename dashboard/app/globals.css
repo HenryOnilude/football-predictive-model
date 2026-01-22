@@ -197,3 +197,80 @@ h3 {
   user-select: none;
   -webkit-user-select: none;
 }
+
+/* ===== MOBILE UX FIXES ===== */
+
+/* Prevent horizontal page shaking - critical fix */
+html, body {
+  overflow-x: hidden;
+  max-width: 100vw;
+}
+
+/* iOS safe area support for bottom nav */
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+/* Minimum touch target size (44x44px) for accessibility */
+.touch-target {
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* Tabular numbers for financial data alignment */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Sticky column shadow for horizontal scroll indication */
+.sticky-shadow {
+  box-shadow: 2px 0 8px rgba(0, 0, 0, 0.3);
+}
+
+/* Custom scrollbar for horizontal scroll containers */
+.scrollbar-thin {
+  scrollbar-width: thin;
+  scrollbar-color: #475569 transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  height: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background-color: #475569;
+  border-radius: 3px;
+}
+
+/* Prevent text wrapping in table cells */
+.whitespace-nowrap {
+  white-space: nowrap;
+}
+
+/* Mobile-first responsive text */
+@media (max-width: 768px) {
+  h1 {
+    font-size: 1.5rem;
+  }
+  
+  h2 {
+    font-size: 1.25rem;
+  }
+  
+  h3 {
+    font-size: 1rem;
+  }
+}
+
+/* Smooth scroll for better UX */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}

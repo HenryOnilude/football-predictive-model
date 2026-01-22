@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { X } from 'lucide-react';
+import { X, ChevronDown } from 'lucide-react';
 import {
   TeamAnalysis,
   getEfficiencyBadgeConfig,
@@ -113,6 +113,7 @@ function InsightModal({ team, onClose }: InsightModalProps) {
 
 export default function TeamMatrix({ teams }: TeamMatrixProps) {
   const [selectedTeam, setSelectedTeam] = useState<TeamAnalysis | null>(null);
+  const [expandedTeam, setExpandedTeam] = useState<number | null>(null);
   const [sortBy, setSortBy] = useState<'sustainability' | 'efficiency' | 'verdict'>('sustainability');
 
   const sortedTeams = [...teams].sort((a, b) => {
@@ -129,16 +130,25 @@ export default function TeamMatrix({ teams }: TeamMatrixProps) {
     }
   });
 
+  const handleRowClick = (team: TeamAnalysis) => {
+    // On mobile, toggle expanded row; on desktop, open modal
+    if (window.innerWidth < 768) {
+      setExpandedTeam(expandedTeam === team.teamId ? null : team.teamId);
+    } else {
+      setSelectedTeam(team);
+    }
+  };
+
   return (
     <>
       {/* Sort Controls */}
-      <div className="flex gap-2 mb-4">
-        <span className="text-slate-500 text-sm py-2">Sort by:</span>
+      <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
+        <span className="text-slate-500 text-sm py-2 shrink-0">Sort:</span>
         {(['sustainability', 'efficiency', 'verdict'] as const).map((option) => (
           <button
             key={option}
             onClick={() => setSortBy(option)}
-            className={`px-3 py-1.5 rounded-lg text-sm font-medium transition-colors ${
+            className={`px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium transition-colors shrink-0 min-h-[44px] min-w-[44px] ${
               sortBy === option
                 ? 'bg-emerald-600 text-white'
                 : 'bg-slate-800 text-slate-400 hover:bg-slate-700'
@@ -149,83 +159,146 @@ export default function TeamMatrix({ teams }: TeamMatrixProps) {
         ))}
       </div>
 
-      {/* Matrix Table */}
-      <div className="bg-slate-900/50 rounded-xl border border-slate-800 overflow-hidden">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-slate-800">
-              <th className="text-left py-4 px-4 text-slate-400 font-medium text-sm">Team</th>
-              <th className="text-left py-4 px-4 text-slate-400 font-medium text-sm">Structure</th>
-              <th className="text-left py-4 px-4 text-slate-400 font-medium text-sm">Form</th>
-              <th className="text-left py-4 px-4 text-slate-400 font-medium text-sm">Verdict</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedTeams.map((team) => {
-              const efficiencyConfig = getEfficiencyBadgeConfig(team.efficiencyStatus);
-              const verdictConfig = getVerdictConfig(team.marketVerdict);
-              const sustainabilityColor = getSustainabilityColor(team.sustainabilityScore);
+      {/* Matrix Table - BBC Sport Style Sticky */}
+      <div className="relative bg-slate-900/50 rounded-xl border border-slate-800">
+        {/* Scroll shadow indicator */}
+        <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-slate-900 to-transparent pointer-events-none z-10 md:hidden rounded-r-xl" />
+        
+        <div className="overflow-x-auto">
+          <table className="w-max min-w-full border-collapse">
+            <thead>
+              <tr className="border-b border-slate-800">
+                {/* Sticky Team Header */}
+                <th className="sticky left-0 z-20 bg-slate-900 text-left py-3 px-3 md:px-4 text-slate-400 font-medium text-xs md:text-sm min-w-[140px] after:absolute after:right-0 after:top-0 after:bottom-0 after:w-px after:bg-slate-700/50">
+                  Team
+                </th>
+                <th className="text-right py-3 px-3 md:px-4 text-slate-400 font-medium text-xs md:text-sm whitespace-nowrap">Score</th>
+                <th className="text-left py-3 px-3 md:px-4 text-slate-400 font-medium text-xs md:text-sm hidden md:table-cell">Structure</th>
+                <th className="text-left py-3 px-3 md:px-4 text-slate-400 font-medium text-xs md:text-sm">Form</th>
+                <th className="text-left py-3 px-3 md:px-4 text-slate-400 font-medium text-xs md:text-sm hidden sm:table-cell">Verdict</th>
+                {/* Mobile expand indicator */}
+                <th className="md:hidden w-8"></th>
+              </tr>
+            </thead>
+            <tbody>
+              {sortedTeams.map((team) => {
+                const efficiencyConfig = getEfficiencyBadgeConfig(team.efficiencyStatus);
+                const verdictConfig = getVerdictConfig(team.marketVerdict);
+                const sustainabilityColor = getSustainabilityColor(team.sustainabilityScore);
+                const isExpanded = expandedTeam === team.teamId;
 
-              return (
-                <tr
-                  key={team.teamId}
-                  onClick={() => setSelectedTeam(team)}
-                  className="border-b border-slate-800/50 hover:bg-slate-800/30 cursor-pointer transition-colors"
-                >
-                  {/* Col 1: Team */}
-                  <td className="py-4 px-4">
-                    <div className="flex items-center gap-3">
-                      {team.teamLogo && (
-                        <Image
-                          src={team.teamLogo}
-                          alt={team.teamName}
-                          width={32}
-                          height={32}
-                          className="object-contain"
-                          unoptimized
-                        />
-                      )}
-                      <span className="text-white font-medium">{team.teamName}</span>
-                    </div>
-                  </td>
+                return (
+                  <>
+                    <tr
+                      key={team.teamId}
+                      onClick={() => handleRowClick(team)}
+                      className="border-b border-slate-800/50 hover:bg-slate-800/30 cursor-pointer transition-colors"
+                    >
+                      {/* Sticky Team Column */}
+                      <td className="sticky left-0 z-20 bg-slate-900 py-3 px-3 md:px-4 after:absolute after:right-0 after:top-0 after:bottom-0 after:w-px after:bg-slate-700/50">
+                        <div className="flex items-center gap-2 md:gap-3">
+                          {team.teamLogo && (
+                            <Image
+                              src={team.teamLogo}
+                              alt={team.teamName}
+                              width={24}
+                              height={24}
+                              className="object-contain md:w-8 md:h-8"
+                              unoptimized
+                            />
+                          )}
+                          <span className="text-white font-medium text-xs md:text-sm truncate max-w-[80px] md:max-w-none">
+                            {team.teamName}
+                          </span>
+                        </div>
+                      </td>
 
-                  {/* Col 2: Structure (Progress Bar) */}
-                  <td className="py-4 px-4">
-                    <div className="flex items-center gap-3">
-                      <div className="w-24 h-2 bg-slate-800 rounded-full overflow-hidden">
-                        <div
-                          className={`h-full ${sustainabilityColor} transition-all duration-300`}
-                          style={{ width: `${team.sustainabilityScore}%` }}
-                        />
-                      </div>
-                      <span className="text-slate-400 text-sm font-mono w-8">
-                        {team.sustainabilityScore}
-                      </span>
-                    </div>
-                  </td>
+                      {/* Score - Right aligned for financial style */}
+                      <td className="py-3 px-3 md:px-4 text-right tabular-nums">
+                        <span className="text-white font-mono text-xs md:text-sm font-bold">
+                          {team.sustainabilityScore}
+                        </span>
+                      </td>
 
-                  {/* Col 3: Form (Efficiency Badge) */}
-                  <td className="py-4 px-4">
-                    <span className={`px-2.5 py-1 rounded font-mono text-xs font-bold ${efficiencyConfig.bgColor} ${efficiencyConfig.textColor}`}>
-                      {efficiencyConfig.label}
-                    </span>
-                  </td>
+                      {/* Structure Bar - Hidden on mobile */}
+                      <td className="py-3 px-3 md:px-4 hidden md:table-cell">
+                        <div className="flex items-center gap-3">
+                          <div className="w-20 h-2 bg-slate-800 rounded-full overflow-hidden">
+                            <div
+                              className={`h-full ${sustainabilityColor} transition-all duration-300`}
+                              style={{ width: `${team.sustainabilityScore}%` }}
+                            />
+                          </div>
+                        </div>
+                      </td>
 
-                  {/* Col 4: Verdict */}
-                  <td className="py-4 px-4">
-                    <span className={`font-bold ${verdictConfig.color}`}>
-                      {verdictConfig.icon && <span className="mr-1">{verdictConfig.icon}</span>}
-                      {verdictConfig.label}
-                    </span>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                      {/* Form Badge */}
+                      <td className="py-3 px-3 md:px-4">
+                        <span className={`px-1.5 md:px-2.5 py-0.5 md:py-1 rounded font-mono text-[10px] md:text-xs font-bold ${efficiencyConfig.bgColor} ${efficiencyConfig.textColor}`}>
+                          {efficiencyConfig.label}
+                        </span>
+                      </td>
+
+                      {/* Verdict - Hidden on small mobile */}
+                      <td className="py-3 px-3 md:px-4 hidden sm:table-cell">
+                        <span className={`font-bold text-xs md:text-sm ${verdictConfig.color}`}>
+                          {verdictConfig.icon && <span className="mr-1">{verdictConfig.icon}</span>}
+                          <span className="hidden lg:inline">{verdictConfig.label}</span>
+                        </span>
+                      </td>
+
+                      {/* Mobile expand indicator */}
+                      <td className="md:hidden px-2 py-3 text-slate-500">
+                        <ChevronDown className={`w-4 h-4 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                      </td>
+                    </tr>
+
+                    {/* Expanded Row - Mobile Only */}
+                    {isExpanded && (
+                      <tr key={`${team.teamId}-expanded`} className="md:hidden bg-slate-800/40 border-b border-slate-700/50">
+                        <td colSpan={6} className="px-4 py-4">
+                          <div className="space-y-3">
+                            {/* Verdict on mobile */}
+                            <div className="flex items-center justify-between">
+                              <span className="text-slate-400 text-xs">Verdict</span>
+                              <span className={`font-bold text-sm ${verdictConfig.color}`}>
+                                {verdictConfig.icon} {verdictConfig.label}
+                              </span>
+                            </div>
+                            {/* Structure bar on mobile */}
+                            <div>
+                              <span className="text-slate-400 text-xs block mb-1">Health Structure</span>
+                              <div className="w-full h-2 bg-slate-800 rounded-full overflow-hidden">
+                                <div
+                                  className={`h-full ${sustainabilityColor} transition-all duration-300`}
+                                  style={{ width: `${team.sustainabilityScore}%` }}
+                                />
+                              </div>
+                            </div>
+                            {/* Efficiency Delta */}
+                            <div className="flex items-center justify-between">
+                              <span className="text-slate-400 text-xs">Goal Delta</span>
+                              <span className={`font-mono font-bold text-sm ${team.efficiencyDelta > 0 ? 'text-rose-400' : team.efficiencyDelta < 0 ? 'text-emerald-400' : 'text-slate-400'}`}>
+                                {team.efficiencyDelta > 0 ? '+' : ''}{team.efficiencyDelta}
+                              </span>
+                            </div>
+                            {/* Insight */}
+                            <p className="text-slate-300 text-xs leading-relaxed">
+                              {team.insightNote}
+                            </p>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      {/* Insight Modal */}
+      {/* Insight Modal - Desktop Only */}
       {selectedTeam && (
         <InsightModal team={selectedTeam} onClose={() => setSelectedTeam(null)} />
       )}

@@ -110,87 +110,96 @@ export default function PremierLeagueTable() {
         </div>
       </div>
 
-      {/* Table */}
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-slate-800 text-xs text-slate-500 uppercase tracking-wider">
-              <th className="px-4 py-3 text-left font-medium">#</th>
-              <th className="px-4 py-3 text-left font-medium">Team</th>
-              <th className="px-4 py-3 text-center font-medium">P</th>
-              <th className="px-4 py-3 text-center font-medium hidden sm:table-cell">W</th>
-              <th className="px-4 py-3 text-center font-medium hidden sm:table-cell">D</th>
-              <th className="px-4 py-3 text-center font-medium hidden sm:table-cell">L</th>
-              <th className="px-4 py-3 text-center font-medium hidden md:table-cell">GF</th>
-              <th className="px-4 py-3 text-center font-medium hidden md:table-cell">GA</th>
-              <th className="px-4 py-3 text-center font-medium">GD</th>
-              <th className="px-4 py-3 text-center font-medium">Pts</th>
-              <th className="px-4 py-3 text-center font-medium hidden lg:table-cell">Form</th>
-            </tr>
-          </thead>
-          <tbody>
-            {standings.map((team) => {
-              // Position styling
-              let positionClass = 'text-slate-400';
-              let rowClass = '';
-              
-              if (team.position <= 4) {
-                positionClass = 'text-blue-400';
-                rowClass = 'border-l-2 border-l-blue-500';
-              } else if (team.position === 5) {
-                positionClass = 'text-orange-400';
-                rowClass = 'border-l-2 border-l-orange-500';
-              } else if (team.position >= 18) {
-                positionClass = 'text-rose-400';
-                rowClass = 'border-l-2 border-l-rose-500';
-              }
+      {/* Table - BBC Sport Style Sticky */}
+      <div className="relative">
+        {/* Scroll shadow indicator */}
+        <div className="absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-slate-900 to-transparent pointer-events-none z-10 md:hidden" />
+        
+        <div className="overflow-x-auto">
+          <table className="w-max min-w-full border-collapse">
+            <thead>
+              <tr className="border-b border-slate-800 text-xs text-slate-500 uppercase tracking-wider">
+                {/* Sticky Position + Team columns */}
+                <th className="sticky left-0 z-20 bg-slate-900 px-2 md:px-4 py-3 text-left font-medium w-8">#</th>
+                <th className="sticky left-8 z-20 bg-slate-900 px-2 md:px-4 py-3 text-left font-medium min-w-[100px] after:absolute after:right-0 after:top-0 after:bottom-0 after:w-px after:bg-slate-700/50">Team</th>
+                <th className="px-2 md:px-4 py-3 text-right font-medium">P</th>
+                <th className="px-2 md:px-4 py-3 text-right font-medium hidden sm:table-cell">W</th>
+                <th className="px-2 md:px-4 py-3 text-right font-medium hidden sm:table-cell">D</th>
+                <th className="px-2 md:px-4 py-3 text-right font-medium hidden sm:table-cell">L</th>
+                <th className="px-2 md:px-4 py-3 text-right font-medium hidden md:table-cell">GF</th>
+                <th className="px-2 md:px-4 py-3 text-right font-medium hidden md:table-cell">GA</th>
+                <th className="px-2 md:px-4 py-3 text-right font-medium">GD</th>
+                <th className="px-2 md:px-4 py-3 text-right font-medium">Pts</th>
+                <th className="px-2 md:px-4 py-3 text-center font-medium hidden lg:table-cell">Form</th>
+              </tr>
+            </thead>
+            <tbody>
+              {standings.map((team) => {
+                // Position styling
+                let positionClass = 'text-slate-400';
+                let rowClass = '';
+                
+                if (team.position <= 4) {
+                  positionClass = 'text-blue-400';
+                  rowClass = 'border-l-2 border-l-blue-500';
+                } else if (team.position === 5) {
+                  positionClass = 'text-orange-400';
+                  rowClass = 'border-l-2 border-l-orange-500';
+                } else if (team.position >= 18) {
+                  positionClass = 'text-rose-400';
+                  rowClass = 'border-l-2 border-l-rose-500';
+                }
 
-              return (
-                <tr 
-                  key={team.team.id}
-                  className={`border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors ${rowClass}`}
-                >
-                  <td className={`px-4 py-3 font-bold ${positionClass}`}>
-                    {team.position}
-                  </td>
-                  <td className="px-4 py-3">
-                    <div className="flex items-center gap-3">
-                      <Image
-                        src={team.team.crest}
-                        alt={team.team.name}
-                        width={24}
-                        height={24}
-                        className="object-contain"
-                        unoptimized
-                      />
-                      <span className="font-medium text-white text-sm">
-                        <span className="hidden sm:inline">{team.team.name}</span>
-                        <span className="sm:hidden">{team.team.tla}</span>
-                      </span>
-                    </div>
-                  </td>
-                  <td className="px-4 py-3 text-center text-slate-400 text-sm">{team.playedGames}</td>
-                  <td className="px-4 py-3 text-center text-slate-400 text-sm hidden sm:table-cell">{team.won}</td>
-                  <td className="px-4 py-3 text-center text-slate-400 text-sm hidden sm:table-cell">{team.draw}</td>
-                  <td className="px-4 py-3 text-center text-slate-400 text-sm hidden sm:table-cell">{team.lost}</td>
-                  <td className="px-4 py-3 text-center text-slate-400 text-sm hidden md:table-cell">{team.goalsFor}</td>
-                  <td className="px-4 py-3 text-center text-slate-400 text-sm hidden md:table-cell">{team.goalsAgainst}</td>
-                  <td className={`px-4 py-3 text-center font-medium text-sm ${team.goalDifference > 0 ? 'text-emerald-400' : team.goalDifference < 0 ? 'text-rose-400' : 'text-slate-400'}`}>
-                    {team.goalDifference > 0 ? '+' : ''}{team.goalDifference}
-                  </td>
-                  <td className="px-4 py-3 text-center font-bold text-white">{team.points}</td>
-                  <td className="px-4 py-3 hidden lg:table-cell">
-                    <div className="flex items-center justify-center gap-1">
-                      {team.form?.split(',').slice(0, 5).map((result: string, i: number) => (
-                        <FormBadge key={i} result={result} />
-                      ))}
-                    </div>
-                  </td>
-                </tr>
-              );
-            })}
-          </tbody>
-        </table>
+                return (
+                  <tr 
+                    key={team.team.id}
+                    className={`border-b border-slate-800/50 hover:bg-slate-800/30 transition-colors ${rowClass}`}
+                  >
+                    {/* Sticky Position */}
+                    <td className={`sticky left-0 z-20 bg-slate-900 px-2 md:px-4 py-3 font-bold text-xs md:text-sm ${positionClass}`}>
+                      {team.position}
+                    </td>
+                    {/* Sticky Team */}
+                    <td className="sticky left-8 z-20 bg-slate-900 px-2 md:px-4 py-3 after:absolute after:right-0 after:top-0 after:bottom-0 after:w-px after:bg-slate-700/50">
+                      <div className="flex items-center gap-2 md:gap-3">
+                        <Image
+                          src={team.team.crest}
+                          alt={team.team.name}
+                          width={20}
+                          height={20}
+                          className="object-contain md:w-6 md:h-6"
+                          unoptimized
+                        />
+                        <span className="font-medium text-white text-xs md:text-sm truncate max-w-[60px] md:max-w-none">
+                          <span className="hidden md:inline">{team.team.name}</span>
+                          <span className="md:hidden">{team.team.tla}</span>
+                        </span>
+                      </div>
+                    </td>
+                    {/* Right-aligned numeric columns for financial typography */}
+                    <td className="px-2 md:px-4 py-3 text-right text-slate-400 text-xs md:text-sm tabular-nums">{team.playedGames}</td>
+                    <td className="px-2 md:px-4 py-3 text-right text-slate-400 text-xs md:text-sm tabular-nums hidden sm:table-cell">{team.won}</td>
+                    <td className="px-2 md:px-4 py-3 text-right text-slate-400 text-xs md:text-sm tabular-nums hidden sm:table-cell">{team.draw}</td>
+                    <td className="px-2 md:px-4 py-3 text-right text-slate-400 text-xs md:text-sm tabular-nums hidden sm:table-cell">{team.lost}</td>
+                    <td className="px-2 md:px-4 py-3 text-right text-slate-400 text-xs md:text-sm tabular-nums hidden md:table-cell">{team.goalsFor}</td>
+                    <td className="px-2 md:px-4 py-3 text-right text-slate-400 text-xs md:text-sm tabular-nums hidden md:table-cell">{team.goalsAgainst}</td>
+                    <td className={`px-2 md:px-4 py-3 text-right font-medium text-xs md:text-sm tabular-nums ${team.goalDifference > 0 ? 'text-emerald-400' : team.goalDifference < 0 ? 'text-rose-400' : 'text-slate-400'}`}>
+                      {team.goalDifference > 0 ? '+' : ''}{team.goalDifference}
+                    </td>
+                    <td className="px-2 md:px-4 py-3 text-right font-bold text-white text-xs md:text-sm tabular-nums">{team.points}</td>
+                    <td className="px-2 md:px-4 py-3 hidden lg:table-cell">
+                      <div className="flex items-center justify-center gap-1">
+                        {team.form?.split(',').slice(0, 5).map((result: string, i: number) => (
+                          <FormBadge key={i} result={result} />
+                        ))}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {/* Legend */}
