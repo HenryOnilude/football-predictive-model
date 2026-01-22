@@ -1,9 +1,23 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import CompactPlayerCard from '@/components/CompactPlayerCard';
+import dynamic from 'next/dynamic';
 import { TrendingUp, TrendingDown, Scale, Filter } from 'lucide-react';
 import { PlayerLuckData } from '@/lib/fplTypes';
+import AlphaMobileGrid from '@/components/alpha/AlphaMobileGrid';
+
+// Lazy load desktop table - only loads on lg+ screens
+const AlphaDesktopTable = dynamic(
+  () => import('@/components/alpha/AlphaDesktopTable'),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="py-6 text-center text-slate-500">
+        Loading terminal view...
+      </div>
+    )
+  }
+);
 
 interface DeltaDeckClientProps {
   players: PlayerLuckData[];
@@ -129,98 +143,27 @@ export default function DeltaDeckClient({ players, gameweek, lastUpdated, cached
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8">
-        {/* Alpha Buys Section */}
-        {alphaBuys.length > 0 && (
-          <section className="mb-8 md:mb-12">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center">
-                <TrendingUp className="w-4 h-4 text-emerald-400" />
-              </div>
-              <div>
-                <h2 className="text-lg md:text-xl font-bold text-white tracking-tight">
-                  Alpha Buys
-                </h2>
-                <p className="text-xs text-slate-500 hidden md:block">
-                  Delta &lt; -3.0 — Buy low before regression upward
-                </p>
-              </div>
-              <span className="ml-auto text-xs text-slate-600 font-mono">{alphaBuys.length}</span>
-            </div>
-            
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-              {alphaBuys.map((player) => (
-                <CompactPlayerCard key={player.id} player={player} />
-              ))}
-            </div>
-          </section>
-        )}
+      {/* Main Content - Responsive View Splitting */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        {/* Mobile View: High-density Futbin-style cards (< 1024px) */}
+        <div className="block lg:hidden">
+          <AlphaMobileGrid
+            alphaBuys={alphaBuys}
+            regressionRisks={regressionRisks}
+            fairValues={fairValues}
+            filteredCount={filteredPlayers.length}
+            onResetFilters={() => setPositionFilter('ALL')}
+          />
+        </div>
 
-        {/* Regression Risk Section */}
-        {regressionRisks.length > 0 && (
-          <section className="mb-8 md:mb-12">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-rose-500/20 flex items-center justify-center">
-                <TrendingDown className="w-4 h-4 text-rose-400" />
-              </div>
-              <div>
-                <h2 className="text-lg md:text-xl font-bold text-white tracking-tight">
-                  Regression Risk
-                </h2>
-                <p className="text-xs text-slate-500 hidden md:block">
-                  Delta &gt; +3.0 — Sell high before correction
-                </p>
-              </div>
-              <span className="ml-auto text-xs text-slate-600 font-mono">{regressionRisks.length}</span>
-            </div>
-            
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-              {regressionRisks.map((player) => (
-                <CompactPlayerCard key={player.id} player={player} />
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* Fair Value Section */}
-        {fairValues.length > 0 && (
-          <section className="mb-8 md:mb-12">
-            <div className="flex items-center gap-2 mb-4">
-              <div className="w-8 h-8 rounded-lg bg-slate-500/20 flex items-center justify-center">
-                <Scale className="w-4 h-4 text-slate-400" />
-              </div>
-              <div>
-                <h2 className="text-lg md:text-xl font-bold text-white tracking-tight">
-                  Fair Value
-                </h2>
-                <p className="text-xs text-slate-500 hidden md:block">
-                  -3.0 ≤ Delta ≤ +3.0 — Performing as expected
-                </p>
-              </div>
-              <span className="ml-auto text-xs text-slate-600 font-mono">{fairValues.length}</span>
-            </div>
-            
-            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
-              {fairValues.map((player) => (
-                <CompactPlayerCard key={player.id} player={player} />
-              ))}
-            </div>
-          </section>
-        )}
-
-        {/* No Results */}
-        {filteredPlayers.length === 0 && (
-          <div className="text-center py-16">
-            <p className="text-slate-400">No players match your current filters.</p>
-            <button
-              onClick={() => setPositionFilter('ALL')}
-              className="mt-4 px-4 py-2 bg-emerald-500 text-white rounded-lg text-sm font-semibold hover:bg-emerald-600 transition-colors"
-            >
-              Reset Filters
-            </button>
-          </div>
-        )}
+        {/* Desktop View: Professional terminal table (>= 1024px) */}
+        <div className="hidden lg:block">
+          <AlphaDesktopTable
+            players={filteredPlayers}
+            filteredCount={filteredPlayers.length}
+            onResetFilters={() => setPositionFilter('ALL')}
+          />
+        </div>
 
         {/* Signal Legend - Collapsible on mobile */}
         <details className="mt-8 md:mt-12 rounded-xl bg-slate-900/50 border border-slate-800 overflow-hidden">
