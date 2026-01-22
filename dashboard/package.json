@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "test:ui": "playwright test",
-    "test:ui:headed": "playwright test --headed"
+    "test:ui:headed": "playwright test --headed",
+    "verify-api": "npx tsx scripts/verify-api.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.90.1",
