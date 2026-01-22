@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import LuckCard from '@/components/LuckCard';
+import CompactPlayerCard from '@/components/CompactPlayerCard';
 import { TrendingUp, TrendingDown, Scale, Filter } from 'lucide-react';
 import { PlayerLuckData } from '@/lib/fplTypes';
 
@@ -47,47 +47,47 @@ export default function DeltaDeckClient({ players, gameweek, lastUpdated, cached
 
   return (
     <div className="min-h-screen bg-slate-950">
-      {/* Hero Section */}
+      {/* Compact Hero Section */}
       <div className="bg-gradient-to-b from-slate-900 to-slate-950 border-b border-slate-800/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 md:py-16">
-          <div className="text-center">
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-6">
-              <span className="text-xl">Δ</span>
-              <span className="text-sm font-semibold text-emerald-400">
-                GW {gameweek}
-              </span>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10">
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            {/* Title */}
+            <div className="text-center md:text-left">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-2">
+                <span className="text-base">Δ</span>
+                <span className="text-xs font-semibold text-emerald-400">GW {gameweek}</span>
+              </div>
+              <h1 className="text-2xl md:text-3xl font-bold text-white tracking-tight">
+                Alpha Signals
+              </h1>
+              <p className="text-sm text-slate-400 hidden md:block">
+                Market Inefficiencies & Performance Variance
+              </p>
             </div>
-            
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white tracking-tight mb-4">
-              The Delta Deck
-            </h1>
-            <p className="text-lg text-slate-400 max-w-2xl mx-auto">
-              Market Inefficiencies & Performance Variance
-            </p>
-          </div>
 
-          {/* Quick Stats */}
-          <div className="grid grid-cols-3 gap-4 max-w-xl mx-auto mt-8">
-            <div className="text-center p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30">
-              <div className="flex items-center justify-center gap-1.5 mb-1">
-                <TrendingUp className="w-5 h-5 text-emerald-400" />
-                <span className="text-2xl font-bold text-emerald-400">{totalAlpha}</span>
+            {/* Quick Stats - Inline on mobile */}
+            <div className="grid grid-cols-3 gap-2 md:gap-4">
+              <div className="text-center p-2 md:p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30">
+                <div className="flex items-center justify-center gap-1">
+                  <TrendingUp className="w-4 h-4 text-emerald-400" />
+                  <span className="text-xl font-bold font-mono tabular-nums text-emerald-400">{totalAlpha}</span>
+                </div>
+                <p className="text-[10px] text-slate-500 uppercase tracking-wider">Buy</p>
               </div>
-              <p className="text-xs text-slate-500 uppercase tracking-wider">Alpha Buys</p>
-            </div>
-            <div className="text-center p-4 rounded-xl bg-rose-500/10 border border-rose-500/30">
-              <div className="flex items-center justify-center gap-1.5 mb-1">
-                <TrendingDown className="w-5 h-5 text-rose-400" />
-                <span className="text-2xl font-bold text-rose-400">{totalRisk}</span>
+              <div className="text-center p-2 md:p-3 rounded-lg bg-rose-500/10 border border-rose-500/30">
+                <div className="flex items-center justify-center gap-1">
+                  <TrendingDown className="w-4 h-4 text-rose-400" />
+                  <span className="text-xl font-bold font-mono tabular-nums text-rose-400">{totalRisk}</span>
+                </div>
+                <p className="text-[10px] text-slate-500 uppercase tracking-wider">Sell</p>
               </div>
-              <p className="text-xs text-slate-500 uppercase tracking-wider">Regression Risk</p>
-            </div>
-            <div className="text-center p-4 rounded-xl bg-slate-500/10 border border-slate-500/30">
-              <div className="flex items-center justify-center gap-1.5 mb-1">
-                <Scale className="w-5 h-5 text-slate-400" />
-                <span className="text-2xl font-bold text-slate-400">{totalFair}</span>
+              <div className="text-center p-2 md:p-3 rounded-lg bg-slate-500/10 border border-slate-500/30">
+                <div className="flex items-center justify-center gap-1">
+                  <Scale className="w-4 h-4 text-slate-400" />
+                  <span className="text-xl font-bold font-mono tabular-nums text-slate-400">{totalFair}</span>
+                </div>
+                <p className="text-[10px] text-slate-500 uppercase tracking-wider">Hold</p>
               </div>
-              <p className="text-xs text-slate-500 uppercase tracking-wider">Fair Value</p>
             </div>
           </div>
         </div>
@@ -130,27 +130,28 @@ export default function DeltaDeckClient({ players, gameweek, lastUpdated, cached
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-8">
         {/* Alpha Buys Section */}
         {alphaBuys.length > 0 && (
-          <section className="mb-16">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center">
-                <TrendingUp className="w-5 h-5 text-emerald-400" />
+          <section className="mb-8 md:mb-12">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-8 h-8 rounded-lg bg-emerald-500/20 flex items-center justify-center">
+                <TrendingUp className="w-4 h-4 text-emerald-400" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-white tracking-tight">
+                <h2 className="text-lg md:text-xl font-bold text-white tracking-tight">
                   Alpha Buys
                 </h2>
-                <p className="text-sm text-slate-500">
+                <p className="text-xs text-slate-500 hidden md:block">
                   Delta &lt; -3.0 — Buy low before regression upward
                 </p>
               </div>
+              <span className="ml-auto text-xs text-slate-600 font-mono">{alphaBuys.length}</span>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
               {alphaBuys.map((player) => (
-                <LuckCard key={player.id} player={player} />
+                <CompactPlayerCard key={player.id} player={player} />
               ))}
             </div>
           </section>
@@ -158,24 +159,25 @@ export default function DeltaDeckClient({ players, gameweek, lastUpdated, cached
 
         {/* Regression Risk Section */}
         {regressionRisks.length > 0 && (
-          <section className="mb-16">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-10 h-10 rounded-xl bg-rose-500/20 flex items-center justify-center">
-                <TrendingDown className="w-5 h-5 text-rose-400" />
+          <section className="mb-8 md:mb-12">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-8 h-8 rounded-lg bg-rose-500/20 flex items-center justify-center">
+                <TrendingDown className="w-4 h-4 text-rose-400" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-white tracking-tight">
+                <h2 className="text-lg md:text-xl font-bold text-white tracking-tight">
                   Regression Risk
                 </h2>
-                <p className="text-sm text-slate-500">
+                <p className="text-xs text-slate-500 hidden md:block">
                   Delta &gt; +3.0 — Sell high before correction
                 </p>
               </div>
+              <span className="ml-auto text-xs text-slate-600 font-mono">{regressionRisks.length}</span>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
               {regressionRisks.map((player) => (
-                <LuckCard key={player.id} player={player} />
+                <CompactPlayerCard key={player.id} player={player} />
               ))}
             </div>
           </section>
@@ -183,24 +185,25 @@ export default function DeltaDeckClient({ players, gameweek, lastUpdated, cached
 
         {/* Fair Value Section */}
         {fairValues.length > 0 && (
-          <section className="mb-16">
-            <div className="flex items-center gap-3 mb-8">
-              <div className="w-10 h-10 rounded-xl bg-slate-500/20 flex items-center justify-center">
-                <Scale className="w-5 h-5 text-slate-400" />
+          <section className="mb-8 md:mb-12">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-8 h-8 rounded-lg bg-slate-500/20 flex items-center justify-center">
+                <Scale className="w-4 h-4 text-slate-400" />
               </div>
               <div>
-                <h2 className="text-2xl font-bold text-white tracking-tight">
+                <h2 className="text-lg md:text-xl font-bold text-white tracking-tight">
                   Fair Value
                 </h2>
-                <p className="text-sm text-slate-500">
+                <p className="text-xs text-slate-500 hidden md:block">
                   -3.0 ≤ Delta ≤ +3.0 — Performing as expected
                 </p>
               </div>
+              <span className="ml-auto text-xs text-slate-600 font-mono">{fairValues.length}</span>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 justify-items-center">
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-4">
               {fairValues.map((player) => (
-                <LuckCard key={player.id} player={player} />
+                <CompactPlayerCard key={player.id} player={player} />
               ))}
             </div>
           </section>
@@ -219,42 +222,41 @@ export default function DeltaDeckClient({ players, gameweek, lastUpdated, cached
           </div>
         )}
 
-        {/* Signal Legend */}
-        <section className="mt-16 p-6 rounded-2xl bg-slate-900/50 border border-slate-800">
-          <h3 className="text-lg font-bold text-white mb-4">Signal Definitions</h3>
-          <div className="grid md:grid-cols-3 gap-6 text-sm">
-            <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/30">
-              <div className="flex items-center gap-2 mb-2">
-                <TrendingUp className="w-5 h-5 text-emerald-400" />
+        {/* Signal Legend - Collapsible on mobile */}
+        <details className="mt-8 md:mt-12 rounded-xl bg-slate-900/50 border border-slate-800 overflow-hidden">
+          <summary className="p-4 cursor-pointer text-sm font-semibold text-white hover:bg-slate-800/50 transition-colors">
+            Signal Definitions
+          </summary>
+          <div className="p-4 pt-0 grid md:grid-cols-3 gap-3 text-xs">
+            <div className="p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/30">
+              <div className="flex items-center gap-2 mb-1">
+                <TrendingUp className="w-4 h-4 text-emerald-400" />
                 <h4 className="font-semibold text-emerald-400">Alpha Buy</h4>
               </div>
-              <p className="text-slate-400">
-                Delta &lt; -3.0 — Player is significantly underperforming xG. 
-                Statistical regression predicts returns will increase. Buy before the market corrects.
+              <p className="text-slate-400 leading-relaxed">
+                Delta &lt; -3.0 — Underperforming xG. Buy before regression.
               </p>
             </div>
-            <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/30">
-              <div className="flex items-center gap-2 mb-2">
-                <TrendingDown className="w-5 h-5 text-rose-400" />
+            <div className="p-3 rounded-lg bg-rose-500/10 border border-rose-500/30">
+              <div className="flex items-center gap-2 mb-1">
+                <TrendingDown className="w-4 h-4 text-rose-400" />
                 <h4 className="font-semibold text-rose-400">Regression Risk</h4>
               </div>
-              <p className="text-slate-400">
-                Delta &gt; +3.0 — Player is significantly overperforming xG.
-                Unsustainable output. Sell high before the inevitable correction.
+              <p className="text-slate-400 leading-relaxed">
+                Delta &gt; +3.0 — Overperforming xG. Sell before correction.
               </p>
             </div>
-            <div className="p-4 rounded-xl bg-slate-500/10 border border-slate-500/30">
-              <div className="flex items-center gap-2 mb-2">
-                <Scale className="w-5 h-5 text-slate-400" />
+            <div className="p-3 rounded-lg bg-slate-500/10 border border-slate-500/30">
+              <div className="flex items-center gap-2 mb-1">
+                <Scale className="w-4 h-4 text-slate-400" />
                 <h4 className="font-semibold text-slate-400">Fair Value</h4>
               </div>
-              <p className="text-slate-400">
-                -3.0 ≤ Delta ≤ +3.0 — Player is performing in line with expected metrics.
-                No statistical edge. Hold or evaluate based on fixtures.
+              <p className="text-slate-400 leading-relaxed">
+                -3.0 ≤ Delta ≤ +3.0 — Performing as expected. Hold.
               </p>
             </div>
           </div>
-        </section>
+        </details>
 
         {/* Cache Status */}
         <div className="mt-8 text-center">
