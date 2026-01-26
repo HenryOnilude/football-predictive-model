@@ -146,10 +146,39 @@ export interface TeamHealthHeat {
 }
 
 // -----------------------------------------------------------------------------
-// Data Fetcher
+// Data Fetcher with Status Tracking
 // -----------------------------------------------------------------------------
 
+// Global status tracking for observability
+export type FPLAlphaStatus = {
+  mode: 'SERVER' | 'CLIENT_FALLBACK' | 'DISCONNECTED';
+  lastFetch: number;
+  latency: number;
+  error?: string;
+};
+
+// Extend Window interface for TypeScript
+declare global {
+  interface Window {
+    FPL_ALPHA_STATUS: FPLAlphaStatus;
+  }
+}
+
+function updateStatus(status: Partial<FPLAlphaStatus>) {
+  if (typeof window !== 'undefined') {
+    window.FPL_ALPHA_STATUS = {
+      ...(window.FPL_ALPHA_STATUS || { mode: 'DISCONNECTED', lastFetch: 0, latency: 0 }),
+      ...status,
+      lastFetch: Date.now(),
+    };
+    // Dispatch custom event for UI updates
+    window.dispatchEvent(new CustomEvent('fpl-status-change', { detail: window.FPL_ALPHA_STATUS }));
+  }
+}
+
 export async function fetchFPLData(): Promise<FPLBootstrapResponse> {
+  const startTime = Date.now();
+  
   // Use our proxy API route to avoid CORS
   const baseUrl = typeof window !== 'undefined' 
     ? window.location.origin 
@@ -168,23 +197,50 @@ export async function fetchFPLData(): Promise<FPLBootstrapResponse> {
     if (data.error) {
       throw new Error(data.error);
     }
+    
+    // Server fetch succeeded
+    updateStatus({ mode: 'SERVER', latency: Date.now() - startTime, error: undefined });
     return data;
   } catch (proxyError) {
     // Fallback: Direct client-side fetch (browsers aren't blocked by FPL API)
     if (typeof window !== 'undefined') {
-      console.warn('Proxy failed, trying direct fetch:', proxyError);
-      const directResponse = await fetch('https://fantasy.premierleague.com/api/bootstrap-static/', {
-        headers: {
-          'Accept': 'application/json',
-        },
-      });
+      console.warn('[FPL Alpha] Proxy failed, activating client fallback:', proxyError);
       
-      if (!directResponse.ok) {
-        throw new Error(`FPL API error: ${directResponse.status} ${directResponse.statusText} for https://fantasy.premierleague.com/api/bootstrap-static/`);
+      try {
+        const fallbackStart = Date.now();
+        const directResponse = await fetch('https://fantasy.premierleague.com/api/bootstrap-static/', {
+          headers: {
+            'Accept': 'application/json',
+            'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
+          },
+        });
+        
+        if (!directResponse.ok) {
+          updateStatus({ 
+            mode: 'DISCONNECTED', 
+            latency: Date.now() - startTime,
+            error: `FPL API: ${directResponse.status}` 
+          });
+          throw new Error(`FPL API error: ${directResponse.status} ${directResponse.statusText}`);
+        }
+        
+        // Client fallback succeeded
+        updateStatus({ 
+          mode: 'CLIENT_FALLBACK', 
+          latency: Date.now() - fallbackStart, 
+          error: undefined 
+        });
+        return directResponse.json();
+      } catch (fallbackError) {
+        updateStatus({ 
+          mode: 'DISCONNECTED', 
+          latency: Date.now() - startTime,
+          error: fallbackError instanceof Error ? fallbackError.message : 'Unknown error'
+        });
+        throw fallbackError;
       }
-      
-      return directResponse.json();
     }
+    
     throw proxyError;
   }
 }

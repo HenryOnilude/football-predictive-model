@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import MobileNav from "@/components/MobileNav";
+import AlphaPulse from "@/components/AlphaPulse";
 import "./globals.css";
 
 const inter = Inter({ 
@@ -40,9 +41,12 @@ export default function RootLayout({
                   </p>
                 </div>
               </Link>
-              {/* Year Badge - Always visible */}
-              <div className="px-3 py-1.5 rounded-full bg-slate-800/80 border border-slate-700">
-                <span className="text-xs font-semibold text-emerald-400">2025-26</span>
+              {/* Year Badge + Health Indicator */}
+              <div className="flex items-center gap-2">
+                <div className="px-3 py-1.5 rounded-full bg-slate-800/80 border border-slate-700">
+                  <span className="text-xs font-semibold text-emerald-400">2025-26</span>
+                </div>
+                <AlphaPulse />
               </div>
               
               {/* Desktop Navigation - Hidden on mobile */}
