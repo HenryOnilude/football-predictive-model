@@ -139,7 +139,7 @@ export default function DeltaDeckClient({ players, gameweek, lastUpdated, cached
             regressionRisks={regressionRisks}
             fairValues={fairValues}
             filteredCount={filteredPlayers.length}
-            onResetFilters={() => setPositionFilter('ALL')}
+            onResetFiltersAction={() => setPositionFilter('ALL')}
           />
         </div>
 

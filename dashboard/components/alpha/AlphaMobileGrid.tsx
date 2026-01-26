@@ -9,7 +9,7 @@ interface AlphaMobileGridProps {
   regressionRisks: PlayerLuckData[];
   fairValues: PlayerLuckData[];
   filteredCount: number;
-  onResetFilters: () => void;
+  onResetFiltersAction: () => void;
 }
 
 /**
@@ -21,7 +21,7 @@ export default function AlphaMobileGrid({
   regressionRisks,
   fairValues,
   filteredCount,
-  onResetFilters,
+  onResetFiltersAction,
 }: AlphaMobileGridProps) {
   return (
     <div className="py-4">
@@ -108,7 +108,7 @@ export default function AlphaMobileGrid({
         <div className="text-center py-16">
           <p className="text-slate-400">No players match your current filters.</p>
           <button
-            onClick={onResetFilters}
+            onClick={onResetFiltersAction}
             className="mt-4 px-4 py-2 bg-emerald-500 text-white rounded-lg text-sm font-semibold hover:bg-emerald-600 transition-colors"
           >
             Reset Filters

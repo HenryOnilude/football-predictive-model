@@ -8,7 +8,7 @@ import { PlayerLuckData, FDR_COLORS } from '@/lib/fplTypes';
 interface AlphaDesktopTableProps {
   players: PlayerLuckData[];
   filteredCount: number;
-  onResetFilters: () => void;
+  onResetFiltersAction: () => void;
 }
 
 type SortKey = 'luckScore' | 'xG' | 'actualGoals' | 'price' | 'name';
@@ -46,7 +46,7 @@ function getSignalBadge(score: number) {
 export default function AlphaDesktopTable({
   players,
   filteredCount,
-  onResetFilters,
+  onResetFiltersAction,
 }: AlphaDesktopTableProps) {
   const [sortKey, setSortKey] = useState<SortKey>('luckScore');
   const [sortDir, setSortDir] = useState<SortDir>('asc');
@@ -97,7 +97,7 @@ export default function AlphaDesktopTable({
       <div className="text-center py-16">
         <p className="text-slate-400">No players match your current filters.</p>
         <button
-          onClick={onResetFilters}
+          onClick={onResetFiltersAction}
           className="mt-4 px-4 py-2 bg-emerald-500 text-white rounded-lg text-sm font-semibold hover:bg-emerald-600 transition-colors"
         >
           Reset Filters
