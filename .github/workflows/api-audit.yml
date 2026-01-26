@@ -38,6 +38,11 @@ jobs:
         env:
           CI: true
 
+      - name: FPL Fallback Test (403 Prevention)
+        run: npm run test:fpl
+        env:
+          CI: true
+
       - name: Build verification
         run: npm run build
         env:

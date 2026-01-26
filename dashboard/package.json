@@ -9,7 +9,8 @@
     "lint": "eslint",
     "test:ui": "playwright test",
     "test:ui:headed": "playwright test --headed",
-    "verify-api": "npx tsx scripts/verify-api.ts"
+    "verify-api": "npx tsx scripts/verify-api.ts",
+    "test:fpl": "npx tsx scripts/test-fpl-fallback.ts"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.90.1",
