@@ -1,17 +1,5 @@
-import { fetchLuckData } from '@/app/actions/fetchLuckData';
-import DeltaDeckClient from './DeltaDeckClient';
+import AlphaClientWrapper from './AlphaClientWrapper';
 
-export const dynamic = 'force-dynamic';
-
-export default async function DeltaDeckPage() {
-  const data = await fetchLuckData();
-
-  return (
-    <DeltaDeckClient 
-      players={data.players}
-      gameweek={data.gameweek}
-      lastUpdated={data.lastUpdated}
-      cached={data.cached}
-    />
-  );
+export default function DeltaDeckPage() {
+  return <AlphaClientWrapper />;
 }
