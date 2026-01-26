@@ -155,15 +155,38 @@ export async function fetchFPLData(): Promise<FPLBootstrapResponse> {
     ? window.location.origin 
     : process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
   
-  const response = await fetch(`${baseUrl}/api/fpl`, {
-    next: { revalidate: 300 }, // Cache for 5 minutes
-  });
-  
-  if (!response.ok) {
-    throw new Error(`Failed to fetch FPL data: ${response.status}`);
+  try {
+    const response = await fetch(`${baseUrl}/api/fpl`, {
+      next: { revalidate: 300 }, // Cache for 5 minutes
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Proxy failed: ${response.status}`);
+    }
+    
+    const data = await response.json();
+    if (data.error) {
+      throw new Error(data.error);
+    }
+    return data;
+  } catch (proxyError) {
+    // Fallback: Direct client-side fetch (browsers aren't blocked by FPL API)
+    if (typeof window !== 'undefined') {
+      console.warn('Proxy failed, trying direct fetch:', proxyError);
+      const directResponse = await fetch('https://fantasy.premierleague.com/api/bootstrap-static/', {
+        headers: {
+          'Accept': 'application/json',
+        },
+      });
+      
+      if (!directResponse.ok) {
+        throw new Error(`FPL API error: ${directResponse.status} ${directResponse.statusText} for https://fantasy.premierleague.com/api/bootstrap-static/`);
+      }
+      
+      return directResponse.json();
+    }
+    throw proxyError;
   }
-  
-  return response.json();
 }
 
 // Server-side direct fetch (bypasses proxy for server components)
