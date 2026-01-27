@@ -23,6 +23,7 @@ interface DiscordEmbed {
 interface DiscordWebhookPayload {
   username?: string;
   avatar_url?: string;
+  content?: string;
   embeds: DiscordEmbed[];
 }
 
@@ -39,6 +40,9 @@ const EMOJI = {
   warning: '🟡',
   critical: '🔴',
 } as const;
+
+// Discord role ID for critical alert mentions (triggers mobile push)
+const ALPHA_ROLE_ID = '1465768895183978789';
 
 // Rate limiting: Track last notification to prevent spam
 let lastNotificationTime = 0;
@@ -107,6 +111,7 @@ export async function sendDiscordNotification(
   const payload: DiscordWebhookPayload = {
     username: 'Axiom Monitor',
     avatar_url: 'https://fplaxiom.com/favicon.ico',
+    content: level === 'critical' ? `🔴 **CRITICAL SYSTEM ALERT** <@&${ALPHA_ROLE_ID}>` : undefined,
     embeds: [embed],
   };
 
