@@ -42,7 +42,20 @@ const EMOJI = {
 } as const;
 
 // Discord role ID for critical alert mentions (triggers mobile push)
-const ALPHA_ROLE_ID = '1465768895183978789';
+// Replace with your actual Discord role ID
+const ALPHA_ROLE_ID = 'PASTE_YOUR_REAL_ID_HERE';
+
+// Content strings for each severity level
+function getAlertContent(level: NotificationLevel): string | undefined {
+  switch (level) {
+    case 'critical':
+      return `🔴 **CRITICAL SYSTEM ALERT** <@&${ALPHA_ROLE_ID}>`;
+    case 'warning':
+      return `⚠️ **SYSTEM WARNING**`;
+    default:
+      return undefined;
+  }
+}
 
 // Rate limiting: Track last notification to prevent spam
 let lastNotificationTime = 0;
@@ -111,7 +124,7 @@ export async function sendDiscordNotification(
   const payload: DiscordWebhookPayload = {
     username: 'Axiom Monitor',
     avatar_url: 'https://fplaxiom.com/favicon.ico',
-    content: level === 'critical' ? `🔴 **CRITICAL SYSTEM ALERT** <@&${ALPHA_ROLE_ID}>` : undefined,
+    content: getAlertContent(level),
     embeds: [embed],
   };
 
