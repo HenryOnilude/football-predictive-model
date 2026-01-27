@@ -42,8 +42,7 @@ const EMOJI = {
 } as const;
 
 // Discord role ID for critical alert mentions (triggers mobile push)
-// Replace with your actual Discord role ID
-const ALPHA_ROLE_ID = 'PASTE_YOUR_REAL_ID_HERE';
+const ALPHA_ROLE_ID = '1465768895183978789';
 
 // Content strings for each severity level
 function getAlertContent(level: NotificationLevel): string | undefined {
