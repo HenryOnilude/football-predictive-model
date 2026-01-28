@@ -1,5 +1,11 @@
 import { NextResponse } from 'next/server';
 import { sendDiscordNotification } from '@/lib/notifications';
+import { fetchBootstrapStatic } from '@/lib/fpl-fetch';
+import type { FPLBootstrapResponse } from '@/lib/fpl';
+
+// Extend Vercel function timeout for proxy
+export const maxDuration = 60;
+export const dynamic = 'force-dynamic';
 
 // Track previous status to only notify on changes
 let previousStatus: 'ok' | 'degraded' | 'down' | null = null;
@@ -19,40 +25,31 @@ export async function GET() {
   let playerCount = 0;
   let serverBlocked = false;
 
-  // Step 1: Test server-side proxy (simulates Vercel environment)
+  // Step 1: Test via residential proxy (same path as production)
   try {
-    const proxyResponse = await fetch('https://fantasy.premierleague.com/api/bootstrap-static/', {
-      headers: {
-        'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
-        'Accept': 'application/json',
-      },
-      signal: AbortSignal.timeout(10000),
-    });
-
+    const data = await fetchBootstrapStatic<FPLBootstrapResponse>();
     fplLatency = Date.now() - startTime;
-
-    if (proxyResponse.status === 403) {
-      serverBlocked = true;
-      fplError = 'Server blocked (403 Forbidden)';
-    } else if (proxyResponse.ok) {
-      const data = await proxyResponse.json();
-      teamCount = data.teams?.length || 0;
-      playerCount = data.elements?.length || 0;
-      
-      if (teamCount === 20 && playerCount > 500) {
-        fplStatus = 'ok';
-      } else {
-        fplStatus = 'degraded';
-        fplError = `Data incomplete: ${teamCount} teams, ${playerCount} players`;
-      }
+    
+    teamCount = data.teams?.length || 0;
+    playerCount = data.elements?.length || 0;
+    
+    if (teamCount === 20 && playerCount > 500) {
+      fplStatus = 'ok';
     } else {
-      fplStatus = 'down';
-      fplError = `HTTP ${proxyResponse.status}`;
+      fplStatus = 'degraded';
+      fplError = `Data incomplete: ${teamCount} teams, ${playerCount} players`;
     }
   } catch (error) {
     fplLatency = Date.now() - startTime;
     serverBlocked = true;
     fplError = error instanceof Error ? error.message : 'Unknown error';
+    
+    // Check if it's a 403 specifically
+    if (fplError.includes('403')) {
+      fplStatus = 'degraded';
+    } else {
+      fplStatus = 'down';
+    }
   }
 
   // Step 2: If server blocked, mark as degraded (client fallback will work)
