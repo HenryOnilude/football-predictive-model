@@ -1,6 +1,9 @@
 import { NextResponse } from 'next/server';
 import { fetchBootstrapStatic } from '@/lib/fpl-fetch';
 
+// Extend Vercel function timeout for slow proxy connections
+export const maxDuration = 60;
+
 // Proxy endpoint for FPL API to avoid CORS issues
 export async function GET() {
   try {

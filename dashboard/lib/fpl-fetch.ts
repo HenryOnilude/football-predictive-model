@@ -19,11 +19,15 @@ const FPL_HEADERS = {
   'Referer': 'https://fantasy.premierleague.com/',
 } as const;
 
-// Create proxy agent if URL is configured
+// Create proxy agent if URL is configured with extended timeouts
 function getProxyAgent(): ProxyAgent | undefined {
   const proxyUrl = process.env.RESIDENTIAL_PROXY_URL;
   if (proxyUrl) {
-    return new ProxyAgent(proxyUrl);
+    return new ProxyAgent({
+      uri: proxyUrl,
+      bodyTimeout: 30000,    // 30 seconds for slow residential connections
+      headersTimeout: 30000, // 30 seconds for proxy handshake
+    });
   }
   return undefined;
 }
