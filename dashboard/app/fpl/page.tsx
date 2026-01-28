@@ -1,7 +1,7 @@
 import { getTopPerformers } from '@/lib/fpl-api';
 import MarketTerminalClient from './MarketTerminalClient';
 
-export const revalidate = 300; // Revalidate every 5 minutes
+export const dynamic = 'force-dynamic'; // Force server-side rendering to use proxy
 
 export default async function MarketTerminalPage() {
   let data;

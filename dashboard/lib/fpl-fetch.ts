@@ -53,7 +53,7 @@ export async function fplFetch<T>(
   endpoint: string,
   options: FPLFetchOptions = {}
 ): Promise<T> {
-  const { revalidate = 14400, headers = {}, bustCache = false } = options;
+  const { headers = {}, bustCache = false } = options;
   
   // Ensure endpoint doesn't have leading slash
   const cleanEndpoint = endpoint.startsWith('/') ? endpoint.slice(1) : endpoint;
@@ -65,7 +65,7 @@ export async function fplFetch<T>(
   const proxyAgent = getProxyAgent();
   
   const fetchOptions: RequestInit & { dispatcher?: ProxyAgent } = {
-    next: { revalidate },
+    cache: 'no-store', // Prevent static caching, ensure proxy is used
     headers: {
       ...FPL_HEADERS,
       ...headers,

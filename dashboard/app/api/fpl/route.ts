@@ -3,6 +3,7 @@ import { fetchBootstrapStatic } from '@/lib/fpl-fetch';
 
 // Extend Vercel function timeout for slow proxy connections
 export const maxDuration = 60;
+export const dynamic = 'force-dynamic'; // Ensure proxy is used on every request
 
 // Proxy endpoint for FPL API to avoid CORS issues
 export async function GET() {
