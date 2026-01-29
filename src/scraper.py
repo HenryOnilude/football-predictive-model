@@ -3,6 +3,7 @@ Data Scraper Module
 Scrapes Expected Goals (xG) data from FBRef.com for Premier League teams
 """
 
+import os
 import requests
 from bs4 import BeautifulSoup
 import pandas as pd
@@ -32,8 +33,22 @@ class PremierLeagueScraper:
         self.output_dir = Path(output_dir)
         self.output_dir.mkdir(parents=True, exist_ok=True)
         self.headers = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/121.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8',
+            'Accept-Language': 'en-GB,en;q=0.9',
         }
+
+        # Configure proxy if available (for GitHub Actions)
+        self.proxies = None
+        proxy_url = os.getenv('RESIDENTIAL_PROXY_URL')
+        if proxy_url:
+            self.proxies = {
+                'http': proxy_url,
+                'https': proxy_url,
+            }
+            logger.info("Using residential proxy for requests")
+        else:
+            logger.info("No proxy configured, using direct connection")
 
     def scrape_league_table(self) -> pd.DataFrame:
         """
@@ -48,7 +63,12 @@ class PremierLeagueScraper:
             # Add delay to respect rate limiting
             time.sleep(3)
 
-            response = requests.get(self.base_url, headers=self.headers, timeout=10)
+            response = requests.get(
+                self.base_url,
+                headers=self.headers,
+                proxies=self.proxies,
+                timeout=30  # Increased for residential proxy latency
+            )
             response.raise_for_status()
 
             logger.info(f"Successfully fetched data (Status: {response.status_code})")
