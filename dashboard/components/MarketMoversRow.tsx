@@ -2,22 +2,32 @@
 
 import Link from 'next/link';
 import Image from 'next/image';
-import { demoTeams } from '@/lib/demoData';
-import { analyzeTeamPerformance, getFinishingBadgeConfig } from '@/lib/TeamAnalysis';
+import { TeamHealthHeat } from '@/lib/fpl';
+import { getEfficiencyBadgeConfig } from '@/lib/TeamAnalysis';
 
-export default function MarketMoversRow() {
-  // Analyze demo teams and pick top 3 most interesting
-  const analyzedTeams = demoTeams.map(team => ({
-    team,
-    analysis: analyzeTeamPerformance(team),
-  }));
+interface MarketMoversRowProps {
+  teams: TeamHealthHeat[];
+}
 
-  // Get diverse selection: SIEGE (unlucky), SNIPER (elite), MIRAGE (illusion)
-  const siege = analyzedTeams.find(t => t.analysis.finishingBadge === 'SIEGE');
-  const sniper = analyzedTeams.find(t => t.analysis.finishingBadge === 'SNIPER');
-  const mirage = analyzedTeams.find(t => t.analysis.finishingBadge === 'MIRAGE');
+export default function MarketMoversRow({ teams }: MarketMoversRowProps) {
+  // Get diverse selection based on efficiency status
+  // Prioritize interesting patterns: CRITICAL_OVER (hot), COLD (value), CRITICAL_VALUE (extreme value)
+  const hot = teams.find(t => t.efficiencyStatus === 'CRITICAL_OVER');
+  const cold = teams.find(t => t.efficiencyStatus === 'COLD');
+  const extremeValue = teams.find(t => t.efficiencyStatus === 'CRITICAL_VALUE');
 
-  const topMovers = [siege, sniper, mirage].filter((t): t is { team: typeof demoTeams[0]; analysis: ReturnType<typeof analyzeTeamPerformance> } => t !== undefined).slice(0, 3);
+  // Fallback to any interesting teams if specific statuses not found
+  const topMovers = [hot, cold, extremeValue]
+    .filter((t): t is TeamHealthHeat => t !== undefined)
+    .slice(0, 3);
+
+  // If we don't have 3 teams, fill with other interesting teams (not SUSTAINABLE)
+  if (topMovers.length < 3) {
+    const remaining = teams
+      .filter(t => !topMovers.includes(t) && t.efficiencyStatus !== 'SUSTAINABLE')
+      .slice(0, 3 - topMovers.length);
+    topMovers.push(...remaining);
+  }
 
   return (
     <div className="mb-8">
@@ -42,24 +52,24 @@ export default function MarketMoversRow() {
 
       {/* Horizontal Cards Row */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        {topMovers.map(({ team, analysis }) => {
-          const badgeConfig = getFinishingBadgeConfig(analysis.finishingBadge || 'FAIR');
-          
+        {topMovers.map((team) => {
+          const badgeConfig = getEfficiencyBadgeConfig(team.efficiencyStatus);
+
           return (
-            <Link 
-              key={team.teamId}
-              href={`/team/${team.teamName.toLowerCase().replace(/\s+/g, '-')}`}
+            <Link
+              key={team.id}
+              href={`/team/${team.name.toLowerCase().replace(/\s+/g, '-')}`}
               className="group"
             >
               <div className="bg-[var(--bg-card)] rounded-xl border border-[var(--border-subtle-color)] p-4 hover:border-[var(--border-card-color)] hover:bg-[var(--bg-surface)] transition-all">
                 {/* Header */}
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-3">
-                    {team.teamLogo && (
+                    {team.logo && (
                       <div className="w-8 h-8 rounded-lg bg-[var(--bg-surface)] flex items-center justify-center overflow-hidden">
                         <Image
-                          src={team.teamLogo}
-                          alt={team.teamName}
+                          src={team.logo}
+                          alt={team.name}
                           width={24}
                           height={24}
                           className="object-contain"
@@ -69,10 +79,10 @@ export default function MarketMoversRow() {
                     )}
                     <div>
                       <h4 className="text-sm font-semibold text-[var(--text-primary-color)] group-hover:text-emerald-400 transition-colors">
-                        {team.teamName}
+                        {team.name}
                       </h4>
                       <p className="text-[10px] text-[var(--text-muted-color)]">
-                        {team.matchesPlayed} matches
+                        20 matches
                       </p>
                     </div>
                   </div>
@@ -85,17 +95,15 @@ export default function MarketMoversRow() {
                 <div className="flex items-center gap-3 text-xs">
                   <div className="flex items-center gap-1">
                     <span className="text-[var(--text-muted-color)]">xG</span>
-                    <span className="font-mono font-semibold text-[var(--text-primary-color)]">{team.xGFor.toFixed(1)}</span>
+                    <span className="font-mono font-semibold text-[var(--text-primary-color)]">{team.totalXG.toFixed(1)}</span>
                   </div>
-                  {team.PSxG && (
-                    <div className="flex items-center gap-1">
-                      <span className="text-purple-400">PSxG</span>
-                      <span className="font-mono font-semibold text-purple-400">{team.PSxG.toFixed(1)}</span>
-                    </div>
-                  )}
+                  <div className="flex items-center gap-1">
+                    <span className="text-purple-400">PSxG</span>
+                    <span className="font-mono font-semibold text-purple-400">{team.avgXGPer90.toFixed(1)}</span>
+                  </div>
                   <div className="flex items-center gap-1">
                     <span className="text-emerald-400">Goals</span>
-                    <span className="font-mono font-semibold text-emerald-400">{team.goalsFor}</span>
+                    <span className="font-mono font-semibold text-emerald-400">{team.totalGoals}</span>
                   </div>
                 </div>
 

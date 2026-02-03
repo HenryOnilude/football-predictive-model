@@ -4,7 +4,12 @@
  * Includes 4-hour caching to save proxy bandwidth
  */
 
-import { ProxyAgent } from 'undici';
+// Conditional import: only load ProxyAgent on server-side to prevent bundling node:net for client
+let ProxyAgent: typeof import('undici').ProxyAgent | undefined;
+if (typeof window === 'undefined') {
+  // Server-side only
+  ProxyAgent = require('undici').ProxyAgent;
+}
 
 const FPL_BASE_URL = 'https://fantasy.premierleague.com/api';
 
@@ -20,7 +25,12 @@ const FPL_HEADERS = {
 } as const;
 
 // Create proxy agent if URL is configured with extended timeouts
-function getProxyAgent(): ProxyAgent | undefined {
+function getProxyAgent(): InstanceType<typeof import('undici').ProxyAgent> | undefined {
+  // Only create proxy agent on server-side
+  if (typeof window !== 'undefined' || !ProxyAgent) {
+    return undefined;
+  }
+
   const proxyUrl = process.env.RESIDENTIAL_PROXY_URL;
   if (proxyUrl) {
     return new ProxyAgent({
@@ -64,7 +74,7 @@ export async function fplFetch<T>(
   
   const proxyAgent = getProxyAgent();
 
-  const fetchOptions: RequestInit & { dispatcher?: ProxyAgent } = {
+  const fetchOptions: RequestInit & { dispatcher?: any } = {
     cache: 'no-store', // Prevent static caching, ensure proxy is used
     signal: AbortSignal.timeout(15000), // 15 second timeout for slow residential proxy
     headers: {

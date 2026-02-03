@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import { X, ChevronDown } from 'lucide-react';
 import {
@@ -188,9 +188,8 @@ export default function TeamMatrix({ teams }: TeamMatrixProps) {
                 const isExpanded = expandedTeam === team.teamId;
 
                 return (
-                  <>
+                  <React.Fragment key={team.teamId}>
                     <tr
-                      key={team.teamId}
                       onClick={() => handleRowClick(team)}
                       className="border-b border-slate-800/50 hover:bg-slate-800/30 cursor-pointer transition-colors"
                     >
@@ -290,7 +289,7 @@ export default function TeamMatrix({ teams }: TeamMatrixProps) {
                         </td>
                       </tr>
                     )}
-                  </>
+                  </React.Fragment>
                 );
               })}
             </tbody>

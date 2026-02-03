@@ -5,7 +5,7 @@ import LeagueTable from '@/components/LeagueTable';
 import MarketMoversRow from '@/components/MarketMoversRow';
 import DeepDiveLinks from '@/components/DeepDiveLinks';
 import { DashboardData, TeamData } from '@/lib/types';
-import { fetchFPLData, transformTeams, getCurrentGameweek } from '@/lib/fpl';
+import { fetchFPLData, transformTeams, getCurrentGameweek, TeamHealthHeat } from '@/lib/fpl';
 
 interface StandingsTeam {
   position: number;
@@ -64,6 +64,7 @@ function normalizeTeamName(name: string): string {
 
 export default function DashboardClient() {
   const [data, setData] = useState<DashboardData | null>(null);
+  const [rawTeams, setRawTeams] = useState<TeamHealthHeat[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [currentGameweek, setCurrentGameweek] = useState(0);
@@ -83,6 +84,7 @@ export default function DashboardClient() {
         const teams = transformTeams(fplData);
         const gameweek = getCurrentGameweek(fplData);
         setCurrentGameweek(gameweek);
+        setRawTeams(teams);
 
         const standingsTable: StandingsTeam[] = (standingsRes as StandingsResponse)?.standings?.[0]?.table || [];
         
@@ -241,7 +243,7 @@ export default function DashboardClient() {
       </div>
 
       {/* Market Movers */}
-      <MarketMoversRow />
+      <MarketMoversRow teams={rawTeams} />
 
       {/* Main Table */}
       <LeagueTable teams={data.teams} />
