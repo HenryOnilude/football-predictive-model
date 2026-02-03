@@ -63,15 +63,16 @@ export async function fplFetch<T>(
   const url = `${FPL_BASE_URL}/${cleanEndpoint}${cacheBuster}`;
   
   const proxyAgent = getProxyAgent();
-  
+
   const fetchOptions: RequestInit & { dispatcher?: ProxyAgent } = {
     cache: 'no-store', // Prevent static caching, ensure proxy is used
+    signal: AbortSignal.timeout(15000), // 15 second timeout for slow residential proxy
     headers: {
       ...FPL_HEADERS,
       ...headers,
     },
   };
-  
+
   // Add proxy dispatcher if available
   if (proxyAgent) {
     fetchOptions.dispatcher = proxyAgent;
@@ -79,7 +80,7 @@ export async function fplFetch<T>(
   } else {
     console.warn('[FPL Fetch] No RESIDENTIAL_PROXY_URL configured, using direct fetch');
   }
-  
+
   const response = await fetch(url, fetchOptions);
 
   if (!response.ok) {
