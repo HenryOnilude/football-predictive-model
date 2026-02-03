@@ -187,8 +187,9 @@ export async function fetchFPLData(): Promise<FPLBootstrapResponse> {
   try {
     const response = await fetch(`${baseUrl}/api/fpl`, {
       next: { revalidate: 300 }, // Cache for 5 minutes
+      signal: AbortSignal.timeout(20000), // 20 second timeout for slow proxy
     });
-    
+
     if (!response.ok) {
       throw new Error(`Proxy failed: ${response.status}`);
     }
@@ -209,6 +210,7 @@ export async function fetchFPLData(): Promise<FPLBootstrapResponse> {
       try {
         const fallbackStart = Date.now();
         const directResponse = await fetch('https://fantasy.premierleague.com/api/bootstrap-static/', {
+          signal: AbortSignal.timeout(10000), // 10 second timeout for direct fetch
           headers: {
             'Accept': 'application/json',
             'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36',
