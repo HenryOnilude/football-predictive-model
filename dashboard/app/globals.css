@@ -95,10 +95,18 @@ body {
   font-family: 'Inter', system-ui, sans-serif;
 }
 
-/* Monospace numbers for data display */
+/* Monospace numbers for data display - Bloomberg Terminal aesthetic */
 .font-mono {
-  font-family: ui-monospace, 'SF Mono', 'Roboto Mono', monospace;
+  font-family: var(--font-mono), ui-monospace, 'JetBrains Mono', 'SF Mono', 'Roboto Mono', monospace;
   font-variant-numeric: tabular-nums;
+  letter-spacing: -0.02em;
+}
+
+/* Data-specific monospace utility */
+.font-data {
+  font-family: var(--font-mono), ui-monospace, 'JetBrains Mono', monospace;
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum', 'zero';
 }
 
 /* 3D Transform utilities for flip card */

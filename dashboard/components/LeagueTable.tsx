@@ -132,25 +132,25 @@ export default function LeagueTable({ teams }: LeagueTableProps) {
           <table className="min-w-full">
             <thead>
               <tr className="border-b border-slate-700 bg-slate-800/50">
-                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider font-mono">
                   <SortButton field="Position_Actual" currentSortField={sortField} sortDirection={sortDirection} onSort={handleSort}>Pos</SortButton>
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">
                   <SortButton field="Team" currentSortField={sortField} sortDirection={sortDirection} onSort={handleSort}>Team</SortButton>
                 </th>
-                <th className="px-6 py-4 text-center text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                <th className="px-6 py-4 text-center text-xs font-semibold text-slate-400 uppercase tracking-wider font-mono">
                   <SortButton field="Matches" currentSortField={sortField} sortDirection={sortDirection} onSort={handleSort}>MP</SortButton>
                 </th>
-                <th className="px-6 py-4 text-center text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                <th className="px-6 py-4 text-center text-xs font-semibold text-slate-400 uppercase tracking-wider font-mono">
                   <SortButton field="Actual_Points" currentSortField={sortField} sortDirection={sortDirection} onSort={handleSort}>Pts</SortButton>
                 </th>
-                <th className="px-6 py-4 text-center text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                <th className="px-6 py-4 text-center text-xs font-semibold text-slate-400 uppercase tracking-wider font-mono">
                   <SortButton field="xPTS" currentSortField={sortField} sortDirection={sortDirection} onSort={handleSort}>xPTS</SortButton>
                 </th>
-                <th className="px-6 py-4 text-center text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                <th className="px-6 py-4 text-center text-xs font-semibold text-slate-400 uppercase tracking-wider font-mono">
                   <SortButton field="Variance" currentSortField={sortField} sortDirection={sortDirection} onSort={handleSort}>Var</SortButton>
                 </th>
-                <th className="px-6 py-4 text-center text-xs font-semibold text-slate-400 uppercase tracking-wider">
+                <th className="px-6 py-4 text-center text-xs font-semibold text-slate-400 uppercase tracking-wider font-mono">
                   <SortButton field="Risk_Score" currentSortField={sortField} sortDirection={sortDirection} onSort={handleSort}>Risk</SortButton>
                 </th>
                 <th className="px-6 py-4 text-left text-xs font-semibold text-slate-400 uppercase tracking-wider">
@@ -166,7 +166,7 @@ export default function LeagueTable({ teams }: LeagueTableProps) {
                 >
                   <td className="px-6 py-5 whitespace-nowrap">
                     <div className="w-8 h-8 rounded-lg bg-slate-800 flex items-center justify-center group-hover:bg-slate-700 transition-colors">
-                      <span className="text-sm font-semibold text-slate-200">{team.Position_Actual}</span>
+                      <span className="text-sm font-mono font-semibold text-slate-200">{team.Position_Actual}</span>
                     </div>
                   </td>
                   <td className="px-6 py-5 whitespace-nowrap">
@@ -177,19 +177,19 @@ export default function LeagueTable({ teams }: LeagueTableProps) {
                       {team.Team}
                     </Link>
                   </td>
-                  <td className="px-6 py-5 whitespace-nowrap text-sm text-slate-300 text-center font-medium">
+                  <td className="px-6 py-5 whitespace-nowrap text-sm text-slate-200 text-center font-mono font-medium">
                     {team.Matches}
                   </td>
                   <td className="px-6 py-5 whitespace-nowrap text-center">
-                    <span className="text-sm font-semibold text-white">
+                    <span className="text-sm font-mono font-semibold text-white">
                       {team.Actual_Points}
                     </span>
                   </td>
-                  <td className="px-6 py-5 whitespace-nowrap text-sm text-slate-300 text-center font-medium">
+                  <td className="px-6 py-5 whitespace-nowrap text-sm text-slate-200 text-center font-mono font-medium">
                     {team.xPTS.toFixed(1)}
                   </td>
                   <td className="px-6 py-5 whitespace-nowrap text-center">
-                    <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-semibold ${
+                    <span className={`inline-flex items-center px-2.5 py-1 rounded-md text-xs font-mono font-semibold ${
                       team.Variance > 3 ? 'bg-rose-500/20 text-rose-400' :
                       team.Variance < -3 ? 'bg-emerald-500/20 text-emerald-400' :
                       'bg-slate-700 text-slate-300'
@@ -198,7 +198,7 @@ export default function LeagueTable({ teams }: LeagueTableProps) {
                     </span>
                   </td>
                   <td className="px-6 py-5 whitespace-nowrap text-center">
-                    <span className="text-sm font-bold text-white">
+                    <span className="text-sm font-mono font-bold text-white">
                       {Math.round(team.Risk_Score)}
                     </span>
                   </td>
@@ -217,22 +217,22 @@ export default function LeagueTable({ teams }: LeagueTableProps) {
         <h4 className="text-sm font-semibold text-white mb-4 tracking-tight">Legend</h4>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
           <div>
-            <span className="text-slate-500">MP</span>
-            <p className="text-slate-300 font-medium">Matches Played</p>
+            <span className="text-slate-400 font-mono font-semibold">MP</span>
+            <p className="text-slate-200 font-medium">Matches Played</p>
           </div>
           <div>
-            <span className="text-slate-500">Pts</span>
-            <p className="text-slate-300 font-medium">Actual Points</p>
+            <span className="text-slate-400 font-mono font-semibold">Pts</span>
+            <p className="text-slate-200 font-medium">Actual Points</p>
           </div>
           <div>
-            <span className="text-slate-500">xPTS</span>
-            <p className="text-slate-300 font-medium">Expected Points</p>
-            <p className="text-xs text-slate-500 mt-1">Based on chance quality</p>
+            <span className="text-slate-400 font-mono font-semibold">xPTS</span>
+            <p className="text-slate-200 font-medium">Expected Points</p>
+            <p className="text-xs text-slate-400 mt-1">Based on chance quality</p>
           </div>
           <div>
-            <span className="text-slate-500">Var</span>
-            <p className="text-slate-300 font-medium">Variance</p>
-            <p className="text-xs text-slate-500 mt-1">Pts - xPTS difference</p>
+            <span className="text-slate-400 font-mono font-semibold">Var</span>
+            <p className="text-slate-200 font-medium">Variance</p>
+            <p className="text-xs text-slate-400 mt-1">Pts - xPTS difference</p>
           </div>
         </div>
         <div className="mt-4 pt-4 border-t border-slate-700 space-y-3">

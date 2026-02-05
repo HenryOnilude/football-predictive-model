@@ -1,15 +1,20 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import Image from "next/image";
-import { Inter } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import MobileNav from "@/components/MobileNav";
 import AlphaPulse from "@/components/AlphaPulse";
 import "./globals.css";
 
-const inter = Inter({ 
+const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+});
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-mono",
 });
 
 export const metadata: Metadata = {
@@ -27,7 +32,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} dark`} suppressHydrationWarning>
+    <html lang="en" className={`${inter.variable} ${jetbrainsMono.variable} dark`} suppressHydrationWarning>
       <body className="bg-[rgb(var(--background))] text-[rgb(var(--text-primary))] font-sans">
         <ThemeProvider>
         <nav className="bg-[rgb(var(--background))]/90 backdrop-blur-md border-b border-[rgb(var(--surface-highlight))]/60 sticky top-0 z-50">
