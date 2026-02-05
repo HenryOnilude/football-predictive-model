@@ -7,7 +7,7 @@ const navItems = [
   { href: '/', label: 'Dashboard', icon: '📊' },
   { href: '/fpl', label: 'Terminal', icon: '💹' },
   { href: '/luck', label: 'Alpha', icon: 'Δ' },
-  { href: '/teams', label: 'Teams', icon: '⚽' },
+  { href: '/teams', label: 'Assets', icon: '💼' },
   { href: '/matrix', label: 'Matrix', icon: '📈' },
 ];
 

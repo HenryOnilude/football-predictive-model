@@ -35,17 +35,17 @@ export default function MarketMoversRow({ teams }: MarketMoversRowProps) {
       <div className="flex items-center justify-between mb-4">
         <div>
           <h3 className="text-lg font-semibold text-[var(--text-primary-color)]">
-            Market Movers
+            High-Volatility Assets
           </h3>
           <p className="text-sm text-[var(--text-secondary-color)]">
-            Teams with notable finishing patterns
+            Assets with significant pricing inefficiencies and mean-reversion potential
           </p>
         </div>
-        <Link 
-          href="/teams" 
+        <Link
+          href="/teams"
           className="text-sm font-medium text-emerald-400 hover:text-emerald-300 transition-colors flex items-center gap-1"
         >
-          See All Cards
+          View All Portfolios
           <span>→</span>
         </Link>
       </div>

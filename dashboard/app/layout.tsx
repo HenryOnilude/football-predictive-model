@@ -12,8 +12,8 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "FPL Axiom | Professional Grade Analytics",
-  description: "Separate the signal from the noise. Advanced regression analysis and xG intelligence for Fantasy Premier League.",
+  title: "FPL Axiom | Capture the Alpha",
+  description: "The institutional-grade analytics terminal for serious FPL managers. Separate signal from noise with predictive volatility models and real-time market pricing.",
 };
 
 export default function RootLayout({
@@ -37,7 +37,7 @@ export default function RootLayout({
                     FPL Axiom
                   </h1>
                   <p className="text-[10px] text-slate-500 uppercase tracking-wider">
-                    Establish the Truth
+                    Capture the Alpha
                   </p>
                 </div>
               </Link>
@@ -51,32 +51,32 @@ export default function RootLayout({
               
               {/* Desktop Navigation - Hidden on mobile */}
               <div className="hidden md:flex items-center gap-4">
-                <Link 
-                  href="/" 
+                <Link
+                  href="/"
                   className="text-sm font-medium text-slate-400 hover:text-white transition-colors"
                 >
                   Dashboard
                 </Link>
-                <Link 
-                  href="/fpl" 
+                <Link
+                  href="/fpl"
                   className="text-sm font-medium text-slate-400 hover:text-emerald-400 transition-colors"
                 >
                   Terminal
                 </Link>
-                <Link 
-                  href="/luck" 
+                <Link
+                  href="/luck"
                   className="text-sm font-medium text-slate-400 hover:text-amber-400 transition-colors"
                 >
                   Alpha
                 </Link>
-                <Link 
-                  href="/teams" 
+                <Link
+                  href="/teams"
                   className="text-sm font-medium text-slate-400 hover:text-white transition-colors"
                 >
-                  Teams
+                  Assets
                 </Link>
-                <Link 
-                  href="/matrix" 
+                <Link
+                  href="/matrix"
                   className="text-sm font-medium text-slate-400 hover:text-purple-400 transition-colors"
                 >
                   Matrix
@@ -98,10 +98,10 @@ export default function RootLayout({
                 <span>Powered by API-Football</span>
               </div>
               <p className="text-xs text-slate-600">
-                FPL Axiom • Advanced xG Analytics • Not affiliated with FPL
+                FPL Axiom • Institutional-Grade Analytics Terminal • Not affiliated with FPL
               </p>
               <p className="text-xs text-slate-700">
-                Establish the Truth
+                Capture the Alpha
               </p>
             </div>
           </div>

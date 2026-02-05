@@ -199,15 +199,15 @@ export default function DashboardClient() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="text-4xl font-semibold text-white mb-3 tracking-tight">
-              Performance Analysis
+              Asset Performance Terminal
             </h2>
             <p className="text-slate-400 text-lg">
-              Identifying regression risk using Expected Goals (xG) data
+              Quantifying volatility risk with predictive xG models and market inefficiency detection
             </p>
           </div>
           <div className="hidden md:block">
             <div className="text-right">
-              <p className="text-xs text-slate-400 uppercase tracking-wide mb-1">Gameweek {currentGameweek}</p>
+              <p className="text-xs text-slate-400 uppercase tracking-wide mb-1">Trading Period {currentGameweek}</p>
               <p className="text-sm font-medium text-emerald-400">
                 Live Data · {new Date(data.lastUpdated).toLocaleTimeString('en-GB', {
                   hour: '2-digit',
@@ -222,21 +222,21 @@ export default function DashboardClient() {
       {/* Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-10">
         <div className="card p-6 hover:border-slate-600 transition-colors">
-          <div className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">Total Teams</div>
+          <div className="text-xs font-medium text-slate-500 uppercase tracking-wide mb-2">Total Assets</div>
           <div className="text-4xl font-semibold text-white">{data.teams.length}</div>
         </div>
         <div className="card p-6 bg-rose-500/10 border-rose-500/30 hover:border-rose-500/50 transition-colors">
-          <div className="text-xs font-semibold text-rose-400 uppercase tracking-wide mb-2">High Risk</div>
+          <div className="text-xs font-semibold text-rose-400 uppercase tracking-wide mb-2">High Volatility</div>
           <div className="text-4xl font-semibold text-rose-400">{highRiskCount}</div>
           <div className="text-xs text-rose-400/70 mt-2">Risk Score ≥ 70</div>
         </div>
         <div className="card p-6 bg-orange-500/10 border-orange-500/30 hover:border-orange-500/50 transition-colors">
-          <div className="text-xs font-semibold text-orange-400 uppercase tracking-wide mb-2">Overperforming</div>
+          <div className="text-xs font-semibold text-orange-400 uppercase tracking-wide mb-2">Sell Signal</div>
           <div className="text-4xl font-semibold text-orange-400">{overperformingCount}</div>
           <div className="text-xs text-orange-400/70 mt-2">Variance &gt; +3</div>
         </div>
         <div className="card p-6 bg-emerald-500/10 border-emerald-500/30 hover:border-emerald-500/50 transition-colors">
-          <div className="text-xs font-semibold text-emerald-400 uppercase tracking-wide mb-2">Underperforming</div>
+          <div className="text-xs font-semibold text-emerald-400 uppercase tracking-wide mb-2">Buy Signal</div>
           <div className="text-4xl font-semibold text-emerald-400">{underperformingCount}</div>
           <div className="text-xs text-emerald-400/70 mt-2">Variance &lt; -3</div>
         </div>
