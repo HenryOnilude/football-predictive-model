@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import Image from "next/image";
 import { Inter } from "next/font/google";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import MobileNav from "@/components/MobileNav";
@@ -33,8 +34,14 @@ export default function RootLayout({
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex justify-between items-center h-16">
               <Link href="/luck" className="flex items-center gap-3 hover:opacity-80 transition-opacity">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
-                  <span className="text-xl font-bold text-white">Δ</span>
+                <div className="w-9 h-9 rounded-xl bg-slate-800/50 flex items-center justify-center shadow-lg">
+                  <Image
+                    src="/logo.png"
+                    alt="FPL Axiom Logo"
+                    width={32}
+                    height={32}
+                    className="object-contain"
+                  />
                 </div>
                 <div>
                   <h1 className="text-lg font-bold text-white tracking-tight">
