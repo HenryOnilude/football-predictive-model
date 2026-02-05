@@ -16,7 +16,7 @@ export const metadata: Metadata = {
   title: "FPL Axiom | Capture the Alpha",
   description: "The institutional-grade analytics terminal for serious FPL managers. Separate signal from noise with predictive volatility models and real-time market pricing.",
   icons: {
-    icon: "/favicon.ico",
+    icon: "/favicon-32x32.png",
     apple: "/logo.png",
   },
 };
