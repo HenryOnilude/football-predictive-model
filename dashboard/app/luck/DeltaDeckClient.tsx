@@ -163,7 +163,7 @@ export default function DeltaDeckClient({ players, gameweek, lastUpdated, cached
                 <span className="ml-auto text-xs text-slate-600 font-mono">{alphaBuys.length}</span>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {alphaBuys.map((player) => (
                   <CompactPlayerCard key={player.id} player={player} />
                 ))}
@@ -189,7 +189,7 @@ export default function DeltaDeckClient({ players, gameweek, lastUpdated, cached
                 <span className="ml-auto text-xs text-slate-600 font-mono">{regressionRisks.length}</span>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {regressionRisks.map((player) => (
                   <CompactPlayerCard key={player.id} player={player} />
                 ))}
@@ -215,7 +215,7 @@ export default function DeltaDeckClient({ players, gameweek, lastUpdated, cached
                 <span className="ml-auto text-xs text-slate-600 font-mono">{fairValues.length}</span>
               </div>
               
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {fairValues.map((player) => (
                   <CompactPlayerCard key={player.id} player={player} />
                 ))}

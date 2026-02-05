@@ -74,10 +74,10 @@ export default function CompactPlayerCard({ player }: CompactPlayerCardProps) {
 
           {/* Name & Team */}
           <div className="flex-1 min-w-0">
-            <h3 className="text-sm md:text-lg font-bold text-white truncate leading-tight">
+            <h3 className="text-sm md:text-base font-bold text-white leading-tight line-clamp-2">
               {player.name}
             </h3>
-            <p className="text-[10px] md:text-sm text-slate-500 truncate">
+            <p className="text-[10px] md:text-xs text-slate-400 font-medium">
               {player.teamShort}
             </p>
           </div>
