@@ -275,6 +275,7 @@ export function getEfficiencyBadgeConfig(status: EfficiencyStatus): {
   label: string;
   textColor: string;
   bgColor: string;
+  description: string;
 } {
   switch (status) {
     case 'CRITICAL_OVER':
@@ -282,24 +283,28 @@ export function getEfficiencyBadgeConfig(status: EfficiencyStatus): {
         label: 'CRIT OVER',
         textColor: 'text-white',
         bgColor: 'bg-red-600',
+        description: 'Critically overperforming xG - high regression risk',
       };
     case 'RUNNING_HOT':
       return {
         label: 'HEATING UP',
         textColor: 'text-white',
         bgColor: 'bg-orange-500',
+        description: 'Outperforming xG - potential mean reversion ahead',
       };
     case 'COLD':
       return {
         label: 'COLD',
         textColor: 'text-blue-900',
         bgColor: 'bg-blue-300',
+        description: 'Underperforming xG - value opportunity emerging',
       };
     case 'CRITICAL_VALUE':
       return {
         label: 'EXTREME VAL',
         textColor: 'text-white',
         bgColor: 'bg-purple-600',
+        description: 'Severely underperforming - strong bounce-back candidate',
       };
     case 'SUSTAINABLE':
     default:
@@ -307,6 +312,7 @@ export function getEfficiencyBadgeConfig(status: EfficiencyStatus): {
         label: 'FAIR VALUE',
         textColor: 'text-slate-400',
         bgColor: 'bg-slate-700',
+        description: 'Performance aligned with underlying metrics',
       };
   }
 }
